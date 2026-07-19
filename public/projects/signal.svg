@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1200" y2="750" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#7C3AED" stop-opacity="0.35"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" stroke="rgba(229,231,235,0.08)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="750" fill="#121A2B"/>
+  <rect width="1200" height="750" fill="url(#g)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+  <circle cx="980" cy="140" r="120" fill="#F59E0B" fill-opacity="0.18"/>
+  <circle cx="180" cy="620" r="160" fill="#7C3AED" fill-opacity="0.14"/>
+  <rect x="80" y="90" width="420" height="28" rx="8" fill="rgba(229,231,235,0.12)"/>
+  <rect x="80" y="140" width="280" height="18" rx="6" fill="rgba(148,163,184,0.2)"/>
+  <rect x="80" y="220" width="1040" height="420" rx="18" fill="rgba(11,16,32,0.45)" stroke="rgba(148,163,184,0.18)"/>
+  <text x="100" y="280" fill="#E5E7EB" font-family="ui-sans-serif,system-ui" font-size="42" font-weight="600">Signal</text>
+  <text x="100" y="330" fill="#94A3B8" font-family="ui-sans-serif,system-ui" font-size="22">Project preview placeholder</text>
+</svg>

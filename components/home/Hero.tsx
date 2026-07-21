@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { SignatureName } from "@/components/home/SignatureName";
 import { SITE, TECH_BADGES } from "@/lib/constants";
-import { staggerContainer, staggerItem } from "@/lib/animation";
 
 const floatingPositions = [
   { top: "6%", left: "4%", rotate: -8 },
@@ -27,6 +27,14 @@ const floatingPositions = [
   { top: "70%", right: "42%", rotate: 3 },
 ];
 
+const heroEntrance = {
+  type: "spring" as const,
+  stiffness: 140,
+  damping: 22,
+  mass: 0.85,
+  delay: 0.3,
+};
+
 export function Hero() {
   const reducedMotion = useReducedMotion();
 
@@ -34,46 +42,31 @@ export function Hero() {
     <section className="relative flex min-h-[100svh] items-center pb-16 pt-[calc(var(--nav-height)+1rem)]">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8">
         <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
           className="relative z-10"
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reducedMotion ? { duration: 0 } : heroEntrance}
         >
-          <motion.p
-            variants={staggerItem}
-            className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-secondary"
-          >
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-muted">
             Portfolio
-          </motion.p>
-          <motion.h1
-            variants={staggerItem}
-            className="font-display text-5xl font-semibold tracking-tight text-text sm:text-6xl lg:text-7xl"
-          >
-            {SITE.name}
-          </motion.h1>
-          <motion.p
-            variants={staggerItem}
-            className="mt-4 text-lg font-medium text-primary sm:text-xl"
-          >
+          </p>
+          <h1 className="font-display text-5xl font-semibold tracking-[0.06em] text-text sm:text-6xl lg:text-7xl">
+            <SignatureName name={SITE.name} />
+          </h1>
+          <p className="mt-4 text-lg font-medium text-secondary sm:text-xl">
             {SITE.title}
-          </motion.p>
-          <motion.p
-            variants={staggerItem}
-            className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg"
-          >
+          </p>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
             {SITE.tagline}
-          </motion.p>
-          <motion.div
-            variants={staggerItem}
-            className="mt-8 flex flex-wrap gap-3"
-          >
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
             <Button href="/projects" size="lg">
               View Projects
             </Button>
             <Button href="/contact" variant="outline" size="lg">
               Contact Me
             </Button>
-          </motion.div>
+          </div>
         </motion.div>
 
         <div className="relative mx-auto h-[420px] w-full max-w-lg sm:h-[480px] lg:h-[520px]">
@@ -97,7 +90,7 @@ export function Hero() {
                     }}
                   >
                     <Badge
-                      tone={i % 3 === 0 ? "primary" : i % 3 === 1 ? "secondary" : "default"}
+                      tone={i % 2 === 0 ? "secondary" : "default"}
                       className="glass shadow-lg"
                     >
                       {tech}
@@ -108,7 +101,7 @@ export function Hero() {
             : null}
 
           <motion.div
-            className="glass absolute left-2 top-8 z-10 w-[78%] -rotate-3 overflow-hidden rounded-2xl p-4 shadow-2xl sm:left-4"
+            className="code-panel glass absolute left-2 top-8 z-10 w-[78%] -rotate-3 overflow-hidden rounded-2xl p-4 shadow-2xl sm:left-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
@@ -117,34 +110,58 @@ export function Hero() {
               <Terminal className="size-4 text-secondary" />
               <span className="font-mono text-xs text-muted">zsh — ~/build</span>
             </div>
-            <pre className="font-mono text-[11px] leading-relaxed text-text/90 sm:text-xs">
-{`$ npm run build
-✓ Compiled successfully
-✓ Optimized images
-→ Ready on :3000`}
+            <pre className="font-mono text-[11px] leading-relaxed sm:text-xs">
+              <span className="tok tok-prompt">$</span>{" "}
+              <span className="tok tok-cmd">npm</span>{" "}
+              <span className="tok tok-cmd">run</span>{" "}
+              <span className="tok tok-fn">build</span>
+              {"\n"}
+              <span className="tok tok-success">✓</span>{" "}
+              <span className="tok tok-plain">Compiled successfully</span>
+              {"\n"}
+              <span className="tok tok-success">✓</span>{" "}
+              <span className="tok tok-plain">Optimized images</span>
+              {"\n"}
+              <span className="tok tok-op">→</span>{" "}
+              <span className="tok tok-plain">Ready on</span>{" "}
+              <span className="tok tok-num">:3000</span>
             </pre>
           </motion.div>
 
           <motion.div
-            className="glass absolute right-0 top-28 z-[11] w-[72%] rotate-2 overflow-hidden rounded-2xl border border-primary/20 p-4 shadow-2xl"
+            className="code-panel glass absolute right-0 top-28 z-[11] w-[72%] rotate-2 overflow-hidden rounded-2xl border border-white/10 p-4 shadow-2xl"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.28 }}
           >
             <div className="mb-3 flex items-center justify-between">
               <span className="font-mono text-xs text-muted">editor.tsx</span>
-              <span className="size-2 rounded-full bg-highlight" />
+              <span className="size-2 rounded-full bg-secondary/80" />
             </div>
             <pre className="font-mono text-[11px] leading-relaxed sm:text-xs">
-              <span className="text-primary">const</span>{" "}
-              <span className="text-secondary">portfolio</span> = {"{"}
+              <span className="tok tok-kw">const</span>{" "}
+              <span className="tok tok-var">portfolio</span>{" "}
+              <span className="tok tok-op">=</span>{" "}
+              <span className="tok tok-punct">{"{"}</span>
               {"\n"}
-              {"  "}craft: <span className="text-highlight">&quot;intentional&quot;</span>,
+              {"  "}
+              <span className="tok tok-prop">craft</span>
+              <span className="tok tok-punct">:</span>{" "}
+              <span className="tok tok-str">&quot;intentional&quot;</span>
+              <span className="tok tok-punct">,</span>
               {"\n"}
-              {"  "}stack: [<span className="text-secondary">&quot;Next&quot;</span>,{" "}
-              <span className="text-secondary">&quot;TS&quot;</span>],
+              {"  "}
+              <span className="tok tok-prop">stack</span>
+              <span className="tok tok-punct">:</span>{" "}
+              <span className="tok tok-punct">[</span>
+              <span className="tok tok-str-alt">&quot;Next&quot;</span>
+              <span className="tok tok-punct">,</span>{" "}
+              <span className="tok tok-str-alt">&quot;TS&quot;</span>
+              <span className="tok tok-punct">]</span>
+              <span className="tok tok-punct">,</span>
               {"\n"}
-              {"}"};
+              <span className="tok tok-punct">{"}"}</span>
+              <span className="tok tok-punct">;</span>
             </pre>
           </motion.div>
 
@@ -155,7 +172,7 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <div className="mb-3 flex items-center gap-2">
-              <Activity className="size-4 text-highlight" />
+              <Activity className="size-4 text-secondary" />
               <span className="text-xs font-medium text-text">Diagnostics</span>
             </div>
             <ul className="space-y-2 text-xs text-muted">
@@ -168,7 +185,7 @@ export function Hero() {
                 Network latency 12ms
               </li>
               <li className="flex items-center gap-2">
-                <Cpu className="size-3.5 text-highlight" />
+                <Cpu className="size-3.5 text-muted" />
                 Thermals nominal
               </li>
             </ul>
@@ -177,15 +194,12 @@ export function Hero() {
           <motion.div
             className="glass absolute bottom-2 right-4 z-[13] flex items-center gap-3 rounded-xl px-3 py-2 -rotate-1"
             animate={
-              reducedMotion
-                ? undefined
-                : { y: [0, -6, 0] }
+              reducedMotion ? undefined : { y: [0, -6, 0] }
             }
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           >
             <span className="relative flex size-2.5">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-secondary opacity-40" />
-              <span className="relative inline-flex size-2.5 rounded-full bg-secondary" />
+              <span className="relative inline-flex size-2.5 rounded-full bg-secondary/70" />
             </span>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted">

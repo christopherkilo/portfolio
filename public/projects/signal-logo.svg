@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#1A1208"/>
+  <rect x="48" y="48" width="1104" height="654" rx="32" fill="none" stroke="#F59E0B" stroke-opacity="0.18" stroke-width="2"/>
+  
+      <rect x="480" y="340" width="48" height="90" rx="10" fill="#F59E0B" opacity="0.45"/>
+      <rect x="552" y="280" width="48" height="150" rx="10" fill="#F59E0B" opacity="0.7"/>
+      <rect x="624" y="210" width="48" height="220" rx="10" fill="#F59E0B"/>
+      <circle cx="720" cy="200" r="22" fill="#A78BFA"/>
+  <text x="600" y="620" text-anchor="middle" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="52" font-weight="700">Signal Board</text>
+</svg>

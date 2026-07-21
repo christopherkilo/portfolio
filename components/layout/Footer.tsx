@@ -3,12 +3,13 @@ import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-border bg-surface/40">
+    <footer className="mt-auto border-t border-white/[0.06] bg-black/40 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between gap-8 md:flex-row md:items-start">
           <div className="max-w-sm">
             <p className="font-display text-lg font-semibold text-text">
               {SITE.name}
+              <span className="text-muted">.</span>
             </p>
             <p className="mt-2 text-sm leading-relaxed text-muted">
               {SITE.title}

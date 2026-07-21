@@ -20,7 +20,7 @@ export function Spotlight({
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const background = useMotionTemplate`radial-gradient(${size}px circle at ${mouseX}px ${mouseY}px, var(--glow-primary), transparent 65%)`;
+  const background = useMotionTemplate`radial-gradient(${size}px circle at ${mouseX}px ${mouseY}px, rgba(248,231,28,0.07), transparent 65%)`;
 
   function handleMove(e: React.MouseEvent<HTMLDivElement>) {
     const bounds = ref.current?.getBoundingClientRect();

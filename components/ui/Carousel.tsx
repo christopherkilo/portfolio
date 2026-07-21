@@ -23,6 +23,8 @@ type CarouselProps = {
   autoPlayMs?: number;
 };
 
+const DRAG_THRESHOLD = 10;
+
 export function Carousel({
   children,
   className,
@@ -41,6 +43,8 @@ export function Carousel({
   const velocity = useRef(0);
   const lastX = useRef(0);
   const lastTime = useRef(0);
+  const didDrag = useRef(false);
+  const activePointer = useRef<number | null>(null);
 
   const count = children.length;
   const gap = 24;
@@ -105,33 +109,62 @@ export function Carousel({
   ]);
 
   function onPointerDown(e: React.PointerEvent) {
+    // Ignore non-primary buttons; let links receive clean clicks
+    if (e.button !== 0) return;
+    activePointer.current = e.pointerId;
+    didDrag.current = false;
     setIsDragging(true);
     dragStartX.current = e.clientX;
     scrollStart.current = x.get();
     lastX.current = e.clientX;
     lastTime.current = performance.now();
     velocity.current = 0;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }
 
   function onPointerMove(e: React.PointerEvent) {
-    if (!isDragging) return;
+    if (!isDragging || activePointer.current !== e.pointerId) return;
+
+    const delta = e.clientX - dragStartX.current;
+    if (!didDrag.current && Math.abs(delta) > DRAG_THRESHOLD) {
+      didDrag.current = true;
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    }
+
+    // Don't move the track until we've crossed the drag threshold —
+    // keeps taps feeling like clicks.
+    if (!didDrag.current) return;
+
     const now = performance.now();
     const dx = e.clientX - lastX.current;
     const dt = Math.max(now - lastTime.current, 1);
     velocity.current = dx / dt;
     lastX.current = e.clientX;
     lastTime.current = now;
-    x.set(scrollStart.current + (e.clientX - dragStartX.current));
+    x.set(scrollStart.current + delta);
   }
 
-  function onPointerUp() {
+  function onPointerUp(e: React.PointerEvent) {
+    if (activePointer.current !== e.pointerId) return;
+    activePointer.current = null;
+
     if (!isDragging) return;
     setIsDragging(false);
-    const current = x.get();
-    const projected = current + velocity.current * 180;
-    const rawIndex = Math.round(-projected / itemWidth);
-    scrollToIndex(rawIndex, true);
+
+    if (didDrag.current) {
+      const current = x.get();
+      const projected = current + velocity.current * 180;
+      const rawIndex = Math.round(-projected / itemWidth);
+      scrollToIndex(rawIndex, true);
+    }
+  }
+
+  function onClickCapture(e: React.MouseEvent) {
+    // After a real drag, suppress the synthetic click so cards don't navigate mid-swipe
+    if (didDrag.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      didDrag.current = false;
+    }
   }
 
   const progress = count > 0 ? ((index + 1) / count) * 100 : 0;
@@ -151,7 +184,7 @@ export function Carousel({
           aria-hidden
         >
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
+            className="h-full rounded-full bg-primary/90"
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           />
@@ -161,7 +194,7 @@ export function Carousel({
             type="button"
             aria-label={`Previous ${label}`}
             onClick={() => scrollToIndex(index - 1)}
-            className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-surface text-text transition hover:border-primary/40 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            className="inline-flex size-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -169,7 +202,7 @@ export function Carousel({
             type="button"
             aria-label={`Next ${label}`}
             onClick={() => scrollToIndex(index + 1)}
-            className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-surface text-text transition hover:border-primary/40 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            className="inline-flex size-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -185,13 +218,14 @@ export function Carousel({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
+          onClickCapture={onClickCapture}
         >
           {children.map((child, i) => (
             <div
               key={i}
               data-carousel-item
               className="shrink-0"
-              aria-hidden={i !== index}
+              aria-hidden={i !== index ? true : undefined}
               role="group"
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${count}`}

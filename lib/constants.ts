@@ -1,13 +1,13 @@
 export const SITE = {
-  name: "Alex Rivera",
+  name: "Christopher Kilo",
   title: "Developer · Designer · IT Professional",
   tagline:
     "I build refined digital products, craft intentional visuals, and keep systems running with quiet precision.",
-  email: "hello@alexrivera.dev",
-  linkedin: "https://linkedin.com/in/alexrivera",
-  github: "https://github.com/alexrivera",
+  email: "hello@christopherkilo.dev",
+  linkedin: "https://linkedin.com/in/christopherkilo",
+  github: "https://github.com/christopherkilo",
   resume: "/resume.pdf",
-  copyright: `© ${new Date().getFullYear()} Alex Rivera. All rights reserved.`,
+  copyright: `© ${new Date().getFullYear()} Christopher Kilo. All rights reserved.`,
 } as const;
 
 export const NAV_LINKS = [

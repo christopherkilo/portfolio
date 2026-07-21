@@ -51,9 +51,9 @@ export default function AboutPage() {
             return (
               <article
                 key={role.id}
-                className="rounded-2xl border border-border bg-surface/70 p-5"
+                className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 backdrop-blur-xl"
               >
-                <div className="mb-3 inline-flex size-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                <div className="mb-3 inline-flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-secondary">
                   <Icon className="size-5" aria-hidden />
                 </div>
                 <h2 className="font-display text-lg font-semibold text-text">

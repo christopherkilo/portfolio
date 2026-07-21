@@ -35,7 +35,7 @@ export function SectionHeader({
       viewport={{ once: true, margin: "-80px" }}
     >
       {eyebrow ? (
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-secondary">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-muted">
           {eyebrow}
         </p>
       ) : null}

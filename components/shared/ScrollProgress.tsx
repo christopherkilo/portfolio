@@ -9,10 +9,16 @@ export function ScrollProgress() {
   if (reducedMotion) return null;
 
   return (
-    <motion.div
-      className="fixed inset-x-0 top-0 z-[70] h-0.5 origin-left bg-gradient-to-r from-primary via-secondary to-highlight"
-      style={{ scaleX: scrollYProgress }}
+    <div
+      className="fixed inset-x-0 top-0 z-[70] h-px overflow-visible bg-white/[0.03]"
       aria-hidden
-    />
+    >
+      <motion.div
+        className="relative h-full origin-left bg-primary"
+        style={{ scaleX: scrollYProgress }}
+      >
+        <span className="scroll-progress-edge absolute right-0 top-1/2 h-[3px] w-8 -translate-y-1/2 rounded-full bg-primary/90" />
+      </motion.div>
+    </div>
   );
 }

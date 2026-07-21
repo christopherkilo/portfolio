@@ -14,17 +14,17 @@ type Particle = {
 
 export function BlueprintBackground() {
   const reducedMotion = useReducedMotion();
-  const [pointer, setPointer] = useState({ x: 50, y: 40 });
+  const [pointer, setPointer] = useState({ x: 50, y: 35 });
 
   const particles = useMemo<Particle[]>(
     () =>
-      Array.from({ length: 18 }, (_, i) => ({
+      Array.from({ length: 16 }, (_, i) => ({
         id: i,
-        x: (i * 37) % 100,
-        y: (i * 53) % 100,
-        size: 1.5 + (i % 3),
-        duration: 14 + (i % 7),
-        delay: i * 0.4,
+        x: (i * 41) % 100,
+        y: (i * 57) % 100,
+        size: 1.2 + (i % 3) * 0.6,
+        duration: 16 + (i % 8),
+        delay: i * 0.45,
       })),
     [],
   );
@@ -46,18 +46,30 @@ export function BlueprintBackground() {
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       aria-hidden
     >
-      <div className="absolute inset-0 bg-bg" />
-      <div className="blueprint-grid absolute inset-0 opacity-60" />
+      <div className="absolute inset-0 bg-[#050505]" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,255,255,0.04), transparent 55%),
+            radial-gradient(ellipse 50% 40% at 100% 50%, rgba(255,255,255,0.025), transparent 50%),
+            radial-gradient(ellipse 45% 35% at 0% 80%, rgba(255,255,255,0.02), transparent 50%),
+            linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #050505 100%)
+          `,
+        }}
+      />
+      <div className="blueprint-grid absolute inset-0 opacity-50" />
+      <div className="noise-overlay absolute inset-0" />
 
       <svg
-        className="absolute inset-0 h-full w-full opacity-40"
+        className="absolute inset-0 h-full w-full opacity-25"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <linearGradient id="trace" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#7C3AED" stopOpacity="0" />
-            <stop offset="50%" stopColor="#06B6D4" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="50%" stopColor="#ffffff" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path
@@ -74,7 +86,7 @@ export function BlueprintBackground() {
         />
         <path
           d="M60 680 H300 L360 620 H700 L760 680 H1100"
-          stroke="rgba(148,163,184,0.25)"
+          stroke="rgba(255,255,255,0.1)"
           strokeWidth="1"
           fill="none"
         />
@@ -90,50 +102,48 @@ export function BlueprintBackground() {
             key={i}
             cx={cx}
             cy={cy}
-            r="2.5"
-            fill="#06B6D4"
-            opacity="0.55"
+            r="2"
+            fill="#ffffff"
+            opacity="0.25"
           />
         ))}
       </svg>
 
       <motion.div
-        className="absolute size-[42rem] rounded-full blur-3xl"
+        className="absolute size-[36rem] rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, var(--glow-primary), transparent 70%)",
+            "radial-gradient(circle, rgba(255,255,255,0.045), transparent 70%)",
           left: `${pointer.x}%`,
           top: `${pointer.y}%`,
           translateX: "-50%",
           translateY: "-50%",
         }}
         animate={
-          reducedMotion
-            ? undefined
-            : { opacity: [0.18, 0.28, 0.18] }
+          reducedMotion ? undefined : { opacity: [0.08, 0.16, 0.08] }
         }
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <motion.div
-        className="absolute -right-24 top-24 size-[28rem] rounded-full blur-3xl"
+        className="absolute -left-32 bottom-0 size-[30rem] rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, var(--glow-secondary), transparent 70%)",
+            "radial-gradient(circle, rgba(255,255,255,0.035), transparent 70%)",
         }}
         animate={
           reducedMotion
-            ? { opacity: 0.15 }
-            : { opacity: [0.12, 0.22, 0.12], y: [0, 18, 0] }
+            ? { opacity: 0.1 }
+            : { opacity: [0.06, 0.12, 0.06], x: [0, 24, 0] }
         }
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {!reducedMotion
         ? particles.map((p) => (
             <motion.span
               key={p.id}
-              className="absolute rounded-full bg-secondary/50"
+              className="absolute rounded-full bg-white/30"
               style={{
                 left: `${p.x}%`,
                 top: `${p.y}%`,
@@ -141,8 +151,8 @@ export function BlueprintBackground() {
                 height: p.size,
               }}
               animate={{
-                y: [0, -24, 0],
-                opacity: [0.15, 0.55, 0.15],
+                y: [0, -18, 0],
+                opacity: [0.08, 0.28, 0.08],
               }}
               transition={{
                 duration: p.duration,

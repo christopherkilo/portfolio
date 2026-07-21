@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#111827"/>
+  <rect x="48" y="48" width="1104" height="654" rx="32" fill="none" stroke="#38BDF8" stroke-opacity="0.18" stroke-width="2"/>
+  
+      <rect x="470" y="190" width="260" height="260" rx="32" fill="#1F2937"/>
+      <path d="M545 410 V230 L675 410 V230" fill="none" stroke="#38BDF8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M510 440 H690" stroke="#94A3B8" stroke-width="10" stroke-linecap="round"/>
+  <text x="600" y="620" text-anchor="middle" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="52" font-weight="700">Northline</text>
+</svg>

@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { GithubIcon } from "@/components/ui/BrandIcons";
 import {
   categoryLabels,
   projects,
@@ -13,7 +11,8 @@ import {
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: "Web, design, and IT projects — rendered dynamically from a shared data source.",
+  description:
+    "Web, design, and IT projects — open any card for a full case study.",
 };
 
 const order: ProjectCategory[] = ["web", "design", "it"];
@@ -24,7 +23,7 @@ export default function ProjectsPage() {
       <SectionHeader
         eyebrow="Projects"
         title="Selected work across disciplines"
-        description="Nine placeholder projects spanning product interfaces, visual systems, and infrastructure. Swap content in lib/projectData.ts."
+        description="Click any project to open its case study—with live demo access, GitHub, and high-resolution result charts."
       />
 
       {order.map((category) => {
@@ -36,10 +35,11 @@ export default function ProjectsPage() {
             </h2>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {items.map((project) => (
-                <article
+                <Link
                   id={project.id}
                   key={project.id}
-                  className="scroll-mt-28 overflow-hidden rounded-2xl border border-border bg-surface/70"
+                  href={`/projects/${project.id}`}
+                  className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-xl transition hover:border-white/16 hover:bg-white/[0.05]"
                 >
                   <div className="relative aspect-[16/10] bg-surface-elevated">
                     <Image
@@ -47,13 +47,14 @@ export default function ProjectsPage() {
                       alt={`${project.title} preview`}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover"
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
                       loading="lazy"
+                      unoptimized
                     />
                   </div>
                   <div className="space-y-4 p-5">
                     <div>
-                      <h3 className="font-display text-lg font-semibold text-text">
+                      <h3 className="font-display text-lg font-semibold text-text transition group-hover:text-white">
                         {project.title}
                       </h3>
                       <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -65,23 +66,11 @@ export default function ProjectsPage() {
                         <Badge key={tech}>{tech}</Badge>
                       ))}
                     </div>
-                    <div className="flex gap-2">
-                      <Button href={project.liveDemo} external size="sm">
-                        <ExternalLink className="size-3.5" aria-hidden />
-                        Live Demo
-                      </Button>
-                      <Button
-                        href={project.github}
-                        external
-                        size="sm"
-                        variant="outline"
-                      >
-                        <GithubIcon className="size-3.5" />
-                        GitHub
-                      </Button>
-                    </div>
+                    <p className="text-xs font-medium text-muted transition group-hover:text-primary">
+                      Open case study →
+                    </p>
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
           </section>

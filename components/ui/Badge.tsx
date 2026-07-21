@@ -7,10 +7,10 @@ type BadgeProps = {
 };
 
 const tones = {
-  default: "border-border bg-surface/80 text-muted",
-  primary: "border-primary/30 bg-primary/15 text-primary",
-  secondary: "border-secondary/30 bg-secondary/15 text-secondary",
-  highlight: "border-highlight/30 bg-highlight/15 text-highlight",
+  default: "border-white/10 bg-white/[0.04] text-muted",
+  primary: "border-primary/30 bg-primary/[0.08] text-primary",
+  secondary: "border-white/12 bg-white/[0.06] text-secondary",
+  highlight: "border-white/12 bg-white/[0.05] text-secondary",
 };
 
 export function Badge({

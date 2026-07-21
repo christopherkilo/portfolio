@@ -4,18 +4,19 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { buttonTransition, springHover } from "@/lib/animation";
 import { cn } from "@/lib/utils";
+import { Shimmer } from "@/components/ui/Shimmer";
 
 type Variant = "primary" | "secondary" | "ghost" | "outline";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-primary text-white shadow-[0_0_0_1px_rgba(124,58,237,0.4),0_10px_30px_-12px_var(--glow-primary)] hover:brightness-110",
+    "bg-white text-[#0a0a0a] hover:bg-primary hover:shadow-[0_0_28px_-6px_var(--glow-yellow)]",
   secondary:
-    "bg-secondary/15 text-secondary border border-secondary/30 hover:bg-secondary/25",
+    "border border-white/10 bg-white/[0.04] text-secondary hover:border-white/20 hover:bg-white/[0.07] hover:text-text",
   ghost: "bg-transparent text-text hover:bg-white/5",
   outline:
-    "border border-border bg-transparent text-text hover:border-primary/50 hover:bg-primary/10",
+    "border border-white/12 bg-transparent text-text hover:border-primary/50 hover:text-primary",
 };
 
 const sizes: Record<Size, string> = {
@@ -35,7 +36,71 @@ type ButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
   "aria-label"?: string;
+  /** Reserved for GitHub / signature interactions */
+  shimmer?: boolean;
 };
+
+function ButtonShell({
+  classes,
+  ariaLabel,
+  children,
+  href,
+  external,
+  type,
+  onClick,
+  disabled,
+  shimmer,
+}: {
+  classes: string;
+  ariaLabel?: string;
+  children: React.ReactNode;
+  href?: string;
+  external?: boolean;
+  type: "button" | "submit" | "reset";
+  onClick?: () => void;
+  disabled?: boolean;
+  shimmer?: boolean;
+}) {
+  const content = (
+    <span className="relative z-[1] inline-flex items-center gap-2 [&_svg]:transition-transform [&_svg]:duration-200 group-hover/btn:[&_svg]:translate-x-0.5">
+      {children}
+    </span>
+  );
+
+  const inner = href ? (
+    external ? (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(classes, "group/btn")}
+        aria-label={ariaLabel}
+      >
+        {content}
+      </a>
+    ) : (
+      <Link href={href} className={cn(classes, "group/btn")} aria-label={ariaLabel}>
+        {content}
+      </Link>
+    )
+  ) : (
+    <button
+      type={type}
+      className={cn(classes, "group/btn")}
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={ariaLabel}
+    >
+      {content}
+    </button>
+  );
+
+  if (shimmer) {
+    return <Shimmer className="inline-flex rounded-2xl">{inner}</Shimmer>;
+  }
+
+  return inner;
+}
 
 export function Button({
   variant = "primary",
@@ -48,58 +113,37 @@ export function Button({
   onClick,
   disabled,
   "aria-label": ariaLabel,
+  shimmer,
 }: ButtonProps) {
+  const isGithub =
+    shimmer ?? Boolean(href?.includes("github.com"));
+
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
+    "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl font-semibold transition-[colors,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
     variants[variant],
     sizes[size],
     className,
   );
 
-  if (href) {
-    if (external) {
-      return (
-        <motion.a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={classes}
-          whileHover={{ y: -1 }}
-          whileTap={{ scale: 0.98 }}
-          transition={springHover}
-          aria-label={ariaLabel}
-        >
-          {children}
-        </motion.a>
-      );
-    }
-
-    return (
-      <motion.div
-        className="inline-flex"
-        whileHover={{ y: -1 }}
-        whileTap={{ scale: 0.98 }}
-        transition={springHover}
-      >
-        <Link href={href} className={classes} aria-label={ariaLabel}>
-          {children}
-        </Link>
-      </motion.div>
-    );
-  }
-
   return (
-    <motion.button
-      type={type}
-      className={classes}
-      whileHover={{ y: -1 }}
-      whileTap={{ scale: 0.98 }}
-      transition={buttonTransition}
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={ariaLabel}
+    <motion.div
+      className="inline-flex"
+      whileHover={{ y: -2, scale: 1.02 }}
+      whileTap={{ scale: 0.96, y: 1 }}
+      transition={href ? springHover : buttonTransition}
     >
-      {children}
-    </motion.button>
+      <ButtonShell
+        classes={classes}
+        ariaLabel={ariaLabel}
+        href={href}
+        external={external}
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        shimmer={isGithub}
+      >
+        {children}
+      </ButtonShell>
+    </motion.div>
   );
 }

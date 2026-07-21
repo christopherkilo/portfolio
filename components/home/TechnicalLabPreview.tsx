@@ -81,10 +81,10 @@ export function TroubleshootingDemo() {
   }, []);
 
   return (
-    <div className="rounded-2xl border border-border bg-surface/80 p-5 md:p-6">
+    <div className="rounded-2xl border border-white/8 bg-white/[0.04] p-5 backdrop-blur-xl md:p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
             Interactive
           </p>
           <h3 className="mt-1 font-display text-lg font-semibold text-text">
@@ -106,7 +106,7 @@ export function TroubleshootingDemo() {
       <ol className="mb-5 flex flex-wrap gap-2" aria-label="Flow steps">
         {steps.map((id, i) => (
           <li key={id}>
-            <Badge tone={nodeId === id || (i > 0 && nodeId !== "start") ? "secondary" : "default"}>
+            <Badge tone={nodeId === id || (i > 0 && nodeId !== "start") ? "primary" : "default"}>
               {i + 1}. {TREE[id].question.split("?")[0].slice(0, 18)}
             </Badge>
           </li>
@@ -169,7 +169,7 @@ export function TechnicalLabPreview() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {LAB_CASE_STUDIES.map((study, i) => (
           <Reveal key={study.id} delay={i * 0.04}>
-            <article className="h-full rounded-2xl border border-border bg-surface/70 p-5 transition hover:border-secondary/35">
+            <article className="gradient-border h-full rounded-2xl border border-white/8 bg-white/[0.03] p-5 backdrop-blur-xl transition hover:bg-white/[0.05]">
               <h3 className="font-display text-lg font-semibold text-text">
                 {study.title}
               </h3>

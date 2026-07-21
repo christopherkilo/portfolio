@@ -22,7 +22,7 @@ export default function LabPage() {
         {LAB_CASE_STUDIES.map((study) => (
           <article
             key={study.id}
-            className="rounded-2xl border border-border bg-surface/70 p-6"
+            className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl"
           >
             <h2 className="font-display text-xl font-semibold text-text">
               {study.title}
@@ -32,9 +32,7 @@ export default function LabPage() {
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {study.tags.map((tag) => (
-                <Badge key={tag} tone="secondary">
-                  {tag}
-                </Badge>
+                <Badge key={tag}>{tag}</Badge>
               ))}
             </div>
           </article>

@@ -35,17 +35,23 @@ export function CustomCursor() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[90] hidden mix-blend-difference md:block"
+      className="pointer-events-none fixed left-0 top-0 z-[90] hidden md:block"
       animate={{
         x: pos.x - (hovering ? 18 : 8),
         y: pos.y - (hovering ? 18 : 8),
         width: hovering ? 36 : 16,
         height: hovering ? 36 : 16,
-        opacity: 0.55,
+        opacity: hovering ? 0.7 : 0.4,
       }}
       transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.35 }}
     >
-      <div className="size-full rounded-full border border-white/70 bg-white/10" />
+      <div
+        className={`size-full rounded-full border ${
+          hovering
+            ? "border-primary/70 bg-primary/10 shadow-[0_0_14px_var(--glow-yellow)]"
+            : "border-white/40 bg-white/5"
+        }`}
+      />
     </motion.div>
   );
 }

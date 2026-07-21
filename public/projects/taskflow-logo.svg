@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#0B0B0F"/>
+  <rect x="48" y="48" width="1104" height="654" rx="32" fill="none" stroke="#60A5FA" stroke-opacity="0.18" stroke-width="2"/>
+  
+      <rect x="470" y="190" width="260" height="260" rx="56" fill="#60A5FA"/>
+      <path d="M545 325 L600 380 L695 255" fill="none" stroke="#0B0B0F" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="600" y="620" text-anchor="middle" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="52" font-weight="700">TaskFlow</text>
+</svg>

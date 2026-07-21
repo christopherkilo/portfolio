@@ -46,7 +46,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           />
           <motion.nav
             aria-label="Mobile"
-            className="absolute inset-x-3 top-[calc(var(--nav-height)+0.5rem)] overflow-hidden rounded-2xl border border-border bg-surface/95 p-4 shadow-2xl backdrop-blur-xl"
+            className="absolute inset-x-3 top-[calc(var(--nav-height)+0.5rem)] overflow-hidden rounded-2xl border border-white/10 bg-black/80 p-4 shadow-2xl backdrop-blur-2xl"
             initial={reducedMotion ? false : { y: -16, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={reducedMotion ? undefined : { y: -12, opacity: 0 }}
@@ -75,7 +75,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                     href={link.href}
                     onClick={onClose}
                     className={cn(
-                      "block rounded-xl px-3 py-3 text-base font-medium text-text transition hover:bg-primary/10 hover:text-white",
+                      "block rounded-xl px-3 py-3 text-base font-medium text-text transition hover:bg-white/5 hover:text-white",
                     )}
                   >
                     {link.label}

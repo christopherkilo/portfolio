@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -22,9 +23,12 @@ export function FeaturedProject() {
       />
 
       <Reveal>
-        <Spotlight className="rounded-3xl border border-border bg-surface/60">
-          <div className="grid items-center gap-8 p-5 md:grid-cols-[1.15fr_0.85fr] md:gap-10 md:p-8 lg:p-10">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-surface-elevated">
+        <Spotlight className="gradient-border glass-panel overflow-hidden rounded-[1.5rem]">
+          <Link
+            href={`/projects/${project.id}`}
+            className="grid items-center gap-8 p-5 md:grid-cols-[1.15fr_0.85fr] md:gap-10 md:p-8 lg:p-10"
+          >
+            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/10 bg-surface-elevated">
               <Image
                 src={project.image}
                 alt={`${project.title} screenshot`}
@@ -32,6 +36,7 @@ export function FeaturedProject() {
                 sizes="(max-width: 768px) 100vw, 60vw"
                 className="object-cover"
                 priority
+                unoptimized
               />
             </div>
 
@@ -42,22 +47,26 @@ export function FeaturedProject() {
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {project.technologies.map((tech) => (
-                  <Badge key={tech} tone="primary">
-                    {tech}
-                  </Badge>
+                  <Badge key={tech}>{tech}</Badge>
                 ))}
               </div>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Button href={project.liveDemo} external>
-                  <ExternalLink className="size-4" aria-hidden />
-                  Live Demo
-                </Button>
-                <Button href={project.github} external variant="outline">
-                  <GithubIcon className="size-4" />
-                  GitHub
-                </Button>
-              </div>
+              <p className="mt-6 text-sm font-medium text-secondary">
+                Open full case study →
+              </p>
             </div>
+          </Link>
+          <div className="flex flex-wrap gap-3 border-t border-white/8 px-5 py-4 md:px-8 lg:px-10">
+            <Button href={`/projects/${project.id}`}>
+              Read case study
+            </Button>
+            <Button href={project.liveDemo} external variant="outline">
+              <ExternalLink className="size-4" aria-hidden />
+              Live Demo
+            </Button>
+            <Button href={project.github} external variant="outline">
+              <GithubIcon className="size-4" />
+              GitHub
+            </Button>
           </div>
         </Spotlight>
       </Reveal>

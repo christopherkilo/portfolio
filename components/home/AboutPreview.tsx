@@ -39,9 +39,9 @@ export function AboutPreview() {
             <motion.div
               key={role.id}
               variants={staggerItem}
-              className="rounded-2xl border border-border bg-surface/70 p-6 transition hover:border-primary/35"
+              className="group gradient-border rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl transition hover:bg-white/[0.05]"
             >
-              <div className="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <div className="mb-4 inline-flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-secondary transition group-hover:text-primary">
                 <Icon className="size-5" aria-hidden />
               </div>
               <h3 className="font-display text-lg font-semibold text-text">

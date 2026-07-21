@@ -60,7 +60,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       label: p.title,
       hint: "Project",
       icon: <FolderKanban className="size-4" />,
-      action: () => router.push(`/projects#${p.id}`),
+      action: () => router.push(`/projects/${p.id}`),
       keywords: `${p.title} ${p.category} ${p.technologies.join(" ")}`,
     }));
 
@@ -185,7 +185,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                       className={cn(
                         "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition",
                         i === active
-                          ? "bg-primary/20 text-white"
+                          ? "bg-white/[0.08] text-text ring-1 ring-primary/40"
                           : "text-muted hover:bg-white/5 hover:text-text",
                       )}
                       onMouseEnter={() => setActive(i)}
@@ -194,7 +194,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                         onOpenChange(false);
                       }}
                     >
-                      <span className="text-secondary">{item.icon}</span>
+                      <span
+                        className={cn(
+                          "transition-colors",
+                          i === active ? "text-primary" : "text-secondary",
+                        )}
+                      >
+                        {item.icon}
+                      </span>
                       <span className="flex-1 font-medium text-text">
                         {item.label}
                       </span>

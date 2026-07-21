@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#070B14"/>
+  <circle cx="1040" cy="-40" r="280" fill="#22D3EE" fill-opacity="0.12"/>
+  <circle cx="80" cy="820" r="320" fill="#FB923C" fill-opacity="0.08"/>
+  <g transform="translate(120 210)">
+    
+    <circle cx="90" cy="90" r="78" stroke="#22D3EE" stroke-width="10" fill="none" opacity="0.9"/>
+    <circle cx="90" cy="90" r="48" stroke="#22D3EE" stroke-width="6" fill="none" opacity="0.45"/>
+    <circle cx="90" cy="90" r="18" fill="#FB923C"/>
+    <path d="M20 90 H70" stroke="#22D3EE" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+  
+  </g>
+  <text x="120" y="520" fill="#E8EEF7" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="56" font-weight="700">Event Horizon</text>
+  <text x="120" y="575" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="500">Event discovery</text>
+</svg>

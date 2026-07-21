@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <rect width="1200" height="750" fill="#12141A"/>
+  <rect x="48" y="48" width="1104" height="654" rx="32" fill="none" stroke="#FBBF24" stroke-opacity="0.18" stroke-width="2"/>
+  
+      <circle cx="600" cy="320" r="120" fill="none" stroke="#FBBF24" stroke-width="16" opacity="0.3"/>
+      <path d="M500 320 A100 100 0 0 1 700 320" fill="none" stroke="#FBBF24" stroke-width="20" stroke-linecap="round"/>
+      <path d="M600 320 L665 240" stroke="#FBBF24" stroke-width="16" stroke-linecap="round"/>
+      <circle cx="600" cy="320" r="16" fill="#FBBF24"/>
+  <text x="600" y="620" text-anchor="middle" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="52" font-weight="700">Bench Diagnostics</text>
+</svg>

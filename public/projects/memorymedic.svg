@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750">
+  <rect width="1200" height="750" fill="#070707"/>
+  <path d="M0 100h1200M0 200h1200M0 300h1200M0 400h1200M0 500h1200M0 600h1200M100 0v750M200 0v750M300 0v750M400 0v750M500 0v750M600 0v750M700 0v750M800 0v750M900 0v750M1000 0v750M1100 0v750" stroke="#fff" stroke-opacity=".035"/>
+  <rect x="78" y="76" width="1044" height="598" rx="30" fill="#0d0d0d" stroke="#fff" stroke-opacity=".1"/>
+  <rect x="122" y="124" width="956" height="250" rx="22" fill="#101010" stroke="#fff" stroke-opacity=".08"/>
+  <path d="M156 310c60-30 97-84 158-63s80-30 135-20 83 58 138 28 84-82 146-48 88 15 138-18 93 33 159-12 77-15 112-5" fill="none" stroke="#f8e71c" stroke-width="5"/>
+  <path d="M156 310c60-30 97-84 158-63s80-30 135-20 83 58 138 28 84-82 146-48 88 15 138-18 93 33 159-12 77-15 112-5v130H156z" fill="#f8e71c" opacity=".06"/>
+  <g fill="#151515" stroke="#fff" stroke-opacity=".08"><rect x="122" y="406" width="956" height="58" rx="14"/><rect x="122" y="478" width="956" height="58" rx="14"/><rect x="122" y="550" width="956" height="58" rx="14"/></g>
+  <g fill="#777"><circle cx="154" cy="435" r="8"/><circle cx="154" cy="507" r="8"/><circle cx="154" cy="579" r="8"/></g>
+  <g fill="#333"><rect x="820" y="429" width="220" height="12" rx="6"/><rect x="820" y="501" width="220" height="12" rx="6"/><rect x="820" y="573" width="220" height="12" rx="6"/></g>
+  <g fill="#f8e71c"><rect x="820" y="429" width="164" height="12" rx="6"/><rect x="820" y="501" width="112" height="12" rx="6"/><rect x="820" y="573" width="72" height="12" rx="6"/></g>
+  <text x="130" y="62" fill="#f8e71c" font-family="monospace" font-size="18" letter-spacing="4">KILO TOOLKIT</text>
+  <text x="156" y="178" fill="#f4f4f4" font-family="system-ui" font-size="30" font-weight="700">MEMORYMEDIC</text>
+  <text x="156" y="210" fill="#777" font-family="system-ui" font-size="16">Usage patterns · Processes · Upgrade guidance</text>
+</svg>

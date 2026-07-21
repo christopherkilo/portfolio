@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -10,7 +11,12 @@ import { CustomCursor } from "@/components/shared/CustomCursor";
 import { PageTransition } from "@/components/shared/PageTransition";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [commandOpen, setCommandOpen] = useState(false);
+
+  if (pathname.startsWith("/toolkit")) {
+    return <>{children}</>;
+  }
 
   return (
     <>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750">
+  <rect width="1200" height="750" fill="#070707"/>
+  <path d="M0 90h1200M0 180h1200M0 270h1200M0 360h1200M0 450h1200M0 540h1200M0 630h1200M120 0v750M240 0v750M360 0v750M480 0v750M600 0v750M720 0v750M840 0v750M960 0v750M1080 0v750" stroke="#fff" stroke-opacity=".035"/>
+  <rect x="78" y="76" width="1044" height="598" rx="30" fill="#0d0d0d" stroke="#fff" stroke-opacity=".1"/>
+  <g stroke="#fff" stroke-opacity=".13" stroke-width="3"><path d="M600 286L308 470M600 286l0 256M600 286l294 184M600 286L330 218M600 286l280-70"/></g>
+  <g fill="#111" stroke="#fff" stroke-opacity=".14" stroke-width="2"><circle cx="600" cy="286" r="72" stroke="#f8e71c" stroke-opacity=".55"/><circle cx="308" cy="470" r="44"/><circle cx="600" cy="542" r="44"/><circle cx="894" cy="470" r="44"/><circle cx="330" cy="218" r="44"/><circle cx="880" cy="216" r="44"/></g>
+  <g fill="#f8e71c"><circle cx="600" cy="286" r="8"/><circle cx="308" cy="470" r="5"/><circle cx="600" cy="542" r="5"/><circle cx="894" cy="470" r="5"/><circle cx="330" cy="218" r="5"/><circle cx="880" cy="216" r="5"/></g>
+  <text x="130" y="62" fill="#f8e71c" font-family="monospace" font-size="18" letter-spacing="4">KILO TOOLKIT</text>
+  <text x="536" y="282" fill="#f4f4f4" font-family="system-ui" font-size="20" font-weight="700">NETCHECK</text>
+  <text x="498" y="309" fill="#777" font-family="system-ui" font-size="13">94 / 100 CONNECTION</text>
+  <rect x="122" y="590" width="956" height="46" rx="14" fill="#151515" stroke="#fff" stroke-opacity=".08"/>
+  <rect x="142" y="607" width="760" height="12" rx="6" fill="#f8e71c" opacity=".72"/>
+</svg>

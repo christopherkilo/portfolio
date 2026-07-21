@@ -14,7 +14,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { NAV_LINKS, SITE } from "@/lib/constants";
-import { projects } from "@/lib/projectData";
+import { getProjectHref, projects } from "@/lib/projectData";
 import { cn } from "@/lib/utils";
 
 type CommandItem = {
@@ -60,7 +60,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       label: p.title,
       hint: "Project",
       icon: <FolderKanban className="size-4" />,
-      action: () => router.push(`/projects/${p.id}`),
+      action: () => router.push(getProjectHref(p)),
       keywords: `${p.title} ${p.category} ${p.technologies.join(" ")}`,
     }));
 

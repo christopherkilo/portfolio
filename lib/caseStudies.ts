@@ -687,5 +687,5 @@ export function getCaseStudy(projectId: string): (CaseStudy & { project: Project
 }
 
 export function getAllCaseStudyIds(): string[] {
-  return projects.map((p) => p.id);
+  return projects.filter((project) => Boolean(studies[project.id])).map((project) => project.id);
 }

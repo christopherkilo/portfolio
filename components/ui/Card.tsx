@@ -11,7 +11,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import type { Project } from "@/lib/projectData";
+import { getProjectHref, type Project } from "@/lib/projectData";
 import { springHover } from "@/lib/animation";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
   const router = useRouter();
   const ref = useRef<HTMLElement>(null);
   const [hovered, setHovered] = useState(false);
-  const href = `/projects/${project.id}`;
+  const href = getProjectHref(project);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -77,7 +77,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
       ref={ref}
       role="link"
       tabIndex={0}
-      aria-label={`Open case study: ${project.title}`}
+      aria-label={`Open project: ${project.title}`}
       onClick={openCaseStudy}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -146,7 +146,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         </div>
 
         <p className="mt-auto pt-1 text-xs font-medium text-muted transition group-hover:text-primary">
-          Open case study →
+          Open project →
         </p>
       </div>
     </motion.article>

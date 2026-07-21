@@ -10,6 +10,7 @@ export interface Project {
   github: string;
   liveDemo: string;
   featured: boolean;
+  href?: string;
 }
 
 export const projects: Project[] = [
@@ -50,18 +51,6 @@ export const projects: Project[] = [
     featured: false,
   },
   {
-    id: "signal-board",
-    title: "Signal Board",
-    category: "web",
-    description:
-      "Collaborative status board for incident response with live presence and structured postmortems.",
-    technologies: ["React", "Node.js", "WebSockets", "PostgreSQL"],
-    image: "/projects/signal-logo.svg",
-    github: "https://github.com/christopherkilo/signal-board",
-    liveDemo: "https://signal.example.com",
-    featured: false,
-  },
-  {
     id: "northline-identity",
     title: "Northline Identity",
     category: "design",
@@ -98,53 +87,56 @@ export const projects: Project[] = [
     featured: false,
   },
   {
-    id: "edge-lab-network",
-    title: "Edge Lab Network",
+    id: "systemscope",
+    title: "SystemScope",
     category: "it",
     description:
-      "Segmented lab network with monitored switches, documented VLANs, and repeatable restore procedures.",
-    technologies: ["Networking", "VLAN", "Monitoring"],
-    image: "/projects/edge-logo.svg",
-    github: "https://github.com/christopherkilo/edge-lab",
-    liveDemo: "https://edge.example.com",
+      "Hardware inventory, live performance simulation, storage health, and diagnostic findings inside Kilo Toolkit.",
+    technologies: ["Next.js", "TypeScript", "Hardware", "Diagnostics"],
+    image: "/projects/systemscope.svg",
+    github: "https://github.com/christopherkilo/portfolio",
+    liveDemo: "/toolkit/system",
     featured: false,
+    href: "/toolkit/system",
   },
   {
-    id: "fleet-image-pipeline",
-    title: "Fleet Image Pipeline",
+    id: "memorymedic",
+    title: "MemoryMedic",
     category: "it",
     description:
-      "Automated Windows imaging pipeline reducing workstation setup from hours to under twenty minutes.",
-    technologies: ["MDT", "PowerShell", "Drivers"],
-    image: "/projects/fleet-logo.svg",
-    github: "https://github.com/christopherkilo/fleet-image",
-    liveDemo: "https://fleet.example.com",
+      "Memory timelines, process analysis, findings, and workload-aware RAM guidance inside Kilo Toolkit.",
+    technologies: ["TypeScript", "Recharts", "Memory", "Troubleshooting"],
+    image: "/projects/memorymedic.svg",
+    github: "https://github.com/christopherkilo/portfolio",
+    liveDemo: "/toolkit/memory",
     featured: false,
+    href: "/toolkit/memory",
   },
   {
-    id: "bench-diagnostics",
-    title: "Bench Diagnostics Suite",
+    id: "netcheck",
+    title: "NetCheck",
     category: "it",
     description:
-      "Standardized hardware triage checklists and tooling notes for rapid no-POST and storage failures.",
-    technologies: ["Hardware", "Diagnostics", "Documentation"],
-    image: "/projects/bench-logo.svg",
-    github: "https://github.com/christopherkilo/bench-diagnostics",
-    liveDemo: "https://bench.example.com",
+      "Connection testing, adapter inspection, DNS comparison, device mapping, and guided network troubleshooting.",
+    technologies: ["TypeScript", "Networking", "DNS", "Decision Trees"],
+    image: "/projects/netcheck.svg",
+    github: "https://github.com/christopherkilo/portfolio",
+    liveDemo: "/toolkit/network",
     featured: false,
+    href: "/toolkit/network",
   },
 ];
 
 export const categoryLabels: Record<ProjectCategory, string> = {
   web: "Web Projects",
   design: "Graphic Design Projects",
-  it: "IT Projects",
+  it: "Kilo Toolkit",
 };
 
 export const categoryDescriptions: Record<ProjectCategory, string> = {
   web: "Product interfaces and web apps with polish, performance, and maintainable architecture.",
   design: "Brand systems, visual narratives, and design artifacts with a quiet premium finish.",
-  it: "Infrastructure, deployments, and hands-on systems work documented with clarity.",
+  it: "One cohesive diagnostics suite for system health, memory analysis, network testing, and guided troubleshooting.",
 };
 
 export function getFeaturedProject(): Project {
@@ -157,4 +149,8 @@ export function getProjectsByCategory(category: ProjectCategory): Project[] {
 
 export function getProjectById(id: string): Project | undefined {
   return projects.find((p) => p.id === id);
+}
+
+export function getProjectHref(project: Project): string {
+  return project.href ?? `/projects/${project.id}`;
 }

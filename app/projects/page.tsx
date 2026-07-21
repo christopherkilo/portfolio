@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import {
   categoryLabels,
+  getProjectHref,
   projects,
   type ProjectCategory,
 } from "@/lib/projectData";
@@ -12,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Web, design, and IT projects — open any card for a full case study.",
+    "Web and design case studies alongside direct access to Kilo Toolkit diagnostic modules.",
 };
 
 const order: ProjectCategory[] = ["web", "design", "it"];
@@ -23,7 +24,7 @@ export default function ProjectsPage() {
       <SectionHeader
         eyebrow="Projects"
         title="Selected work across disciplines"
-        description="Click any project to open its case study—with live demo access, GitHub, and high-resolution result charts."
+        description="Open web and design case studies, or launch the SystemScope, MemoryMedic, and NetCheck modules inside Kilo Toolkit."
       />
 
       {order.map((category) => {
@@ -38,7 +39,7 @@ export default function ProjectsPage() {
                 <Link
                   id={project.id}
                   key={project.id}
-                  href={`/projects/${project.id}`}
+                  href={getProjectHref(project)}
                   className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-xl transition hover:border-white/16 hover:bg-white/[0.05]"
                 >
                   <div className="relative aspect-[16/10] bg-surface-elevated">
@@ -67,7 +68,7 @@ export default function ProjectsPage() {
                       ))}
                     </div>
                     <p className="text-xs font-medium text-muted transition group-hover:text-primary">
-                      Open case study →
+                      Open project →
                     </p>
                   </div>
                 </Link>

@@ -176,16 +176,3 @@ export type ToolkitSettings = {
   notifications: boolean;
 };
 
-export interface SystemDataProvider {
-  getSnapshot(): Promise<SystemSnapshot>;
-  getLiveMetrics(previous?: SystemSnapshot["metrics"]): Promise<SystemSnapshot["metrics"]>;
-}
-
-export interface MemoryDataProvider {
-  getSnapshot(): Promise<MemorySnapshot>;
-}
-
-export interface NetworkDataProvider {
-  getSnapshot(): Promise<NetworkSnapshot>;
-  runConnectionTest(): Promise<NetworkSnapshot["quality"]>;
-}

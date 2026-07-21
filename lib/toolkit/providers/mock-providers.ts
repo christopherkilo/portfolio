@@ -1,12 +1,12 @@
 import type {
-  MemoryDataProvider,
   MemorySnapshot,
   MetricPoint,
-  NetworkDataProvider,
   NetworkSnapshot,
-  SystemDataProvider,
   SystemSnapshot,
 } from "@/lib/toolkit/types";
+import type { MemoryDataProvider } from "@/lib/toolkit/providers/memory-provider";
+import type { NetworkDataProvider } from "@/lib/toolkit/providers/network-provider";
+import type { SystemDataProvider } from "@/lib/toolkit/providers/system-provider";
 
 const wait = (ms = 180) => new Promise((resolve) => setTimeout(resolve, ms));
 

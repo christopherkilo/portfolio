@@ -433,3 +433,25 @@ a:hover .icon-interactive {
 .reveal-accents[data-revealed="true"] {
   --accent-reveal: 1;
 }
+
+/* Kilo Toolkit preference-driven presentation */
+.toolkit-root[data-density="compact"] #toolkit-content {
+  padding: 1rem;
+}
+
+.toolkit-root[data-density="compact"] #toolkit-content .space-y-8 {
+  gap: 1rem;
+}
+
+.toolkit-root[data-density="compact"] #toolkit-content article,
+.toolkit-root[data-density="compact"] #toolkit-content section.rounded-3xl {
+  padding: 0.9rem;
+}
+
+.toolkit-root[data-animations="off"] *,
+.toolkit-root[data-animations="off"] *::before,
+.toolkit-root[data-animations="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

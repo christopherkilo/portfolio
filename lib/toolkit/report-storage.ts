@@ -34,16 +34,27 @@ const reportSchema: z.ZodType<DiagnosticReport> = z.object({
 
 const reportsSchema = z.array(reportSchema);
 
-export function readReports(): DiagnosticReport[] {
-  if (typeof window === "undefined") return [];
+export type ReportReadResult = {
+  reports: DiagnosticReport[];
+  status: "ready" | "empty" | "malformed" | "unavailable";
+};
+
+export function readReportsResult(): ReportReadResult {
+  if (typeof window === "undefined") return { reports: [], status: "unavailable" };
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) return { reports: [], status: "empty" };
     const result = reportsSchema.safeParse(JSON.parse(raw));
-    return result.success ? result.data : [];
+    return result.success
+      ? { reports: result.data, status: "ready" }
+      : { reports: [], status: "malformed" };
   } catch {
-    return [];
+    return { reports: [], status: "malformed" };
   }
+}
+
+export function readReports(): DiagnosticReport[] {
+  return readReportsResult().reports;
 }
 
 export function writeReports(reports: DiagnosticReport[]) {

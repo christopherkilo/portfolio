@@ -1,10 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { DEFAULT_SETTINGS } from "@/lib/toolkit/constants";
 import { toolkitProviders } from "@/lib/toolkit/providers/mock-providers";
-import { readReports, writeReports } from "@/lib/toolkit/report-storage";
+import { readReportsResult, writeReports, type ReportReadResult } from "@/lib/toolkit/report-storage";
 import type {
   DiagnosticReport,
   MemorySnapshot,
@@ -14,6 +14,7 @@ import type {
 } from "@/lib/toolkit/types";
 
 const SETTINGS_KEY = "kilo-toolkit-settings-v1";
+const SESSION_KEY = "kilo-toolkit-session-v1";
 const settingsSchema = z.object({
   refreshSpeed: z.union([z.literal(1000), z.literal(2000), z.literal(4000)]),
   animations: z.boolean(),
@@ -26,6 +27,8 @@ type ToolkitState = {
   memory: MemorySnapshot | null;
   network: NetworkSnapshot | null;
   loading: boolean;
+  providerError: string | null;
+  reportStorageStatus: ReportReadResult["status"];
   settings: ToolkitSettings;
   reports: DiagnosticReport[];
   sessionLabel: string;
@@ -43,25 +46,40 @@ export function ToolkitProvider({ children }: { children: React.ReactNode }) {
   const [network, setNetwork] = useState<NetworkSnapshot | null>(null);
   const [reports, setReportState] = useState<DiagnosticReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [providerError, setProviderError] = useState<string | null>(null);
+  const [reportStorageStatus, setReportStorageStatus] = useState<ReportReadResult["status"]>("empty");
   const [settings, setSettings] = useState<ToolkitSettings>(DEFAULT_SETTINGS);
+  const [sessionLabel, setSessionLabel] = useState("Session initializing");
 
-  async function refreshAll() {
+  const refreshAll = useCallback(async () => {
     setLoading(true);
-    const [nextSystem, nextMemory, nextNetwork] = await Promise.all([
-      toolkitProviders.system.getSnapshot(),
-      toolkitProviders.memory.getSnapshot(),
-      toolkitProviders.network.getSnapshot(),
-    ]);
-    setSystem(nextSystem);
-    setMemory(nextMemory);
-    setNetwork(nextNetwork);
-    setLoading(false);
-  }
+    setProviderError(null);
+    try {
+      const [nextSystem, nextMemory, nextNetwork] = await Promise.all([
+        toolkitProviders.system.getSnapshot(),
+        toolkitProviders.memory.getSnapshot(),
+        toolkitProviders.network.getSnapshot(),
+      ]);
+      setSystem(nextSystem);
+      setMemory(nextMemory);
+      setNetwork(nextNetwork);
+    } catch {
+      setProviderError("The simulated diagnostic provider is unavailable. Retry the session to restore Demo Mode data.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void refreshAll();
-      setReportState(readReports());
+      const storedReports = readReportsResult();
+      setReportState(storedReports.reports);
+      setReportStorageStatus(storedReports.status);
+      const existingSession = window.localStorage.getItem(SESSION_KEY);
+      const session = existingSession ?? `KT-DEMO-${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
+      window.localStorage.setItem(SESSION_KEY, session);
+      setSessionLabel(`Session ${session}`);
       try {
         const raw = window.localStorage.getItem(SETTINGS_KEY);
         if (raw) {
@@ -73,24 +91,27 @@ export function ToolkitProvider({ children }: { children: React.ReactNode }) {
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [refreshAll]);
 
-  function updateSettings(next: Partial<ToolkitSettings>) {
+  const updateSettings = useCallback((next: Partial<ToolkitSettings>) => {
     setSettings((current) => {
       const updated = { ...current, ...next };
       window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
       return updated;
     });
-  }
+  }, []);
 
-  function refreshReports() {
-    setReportState(readReports());
-  }
+  const refreshReports = useCallback(() => {
+    const result = readReportsResult();
+    setReportState(result.reports);
+    setReportStorageStatus(result.status);
+  }, []);
 
-  function setReports(next: DiagnosticReport[]) {
+  const setReports = useCallback((next: DiagnosticReport[]) => {
     writeReports(next);
     setReportState(next);
-  }
+    setReportStorageStatus(next.length ? "ready" : "empty");
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -98,15 +119,17 @@ export function ToolkitProvider({ children }: { children: React.ReactNode }) {
       memory,
       network,
       loading,
+      providerError,
+      reportStorageStatus,
       settings,
       reports,
-      sessionLabel: loading ? "Collecting simulated data" : "Session KT-DEMO-0721",
+      sessionLabel: loading ? "Collecting simulated data" : sessionLabel,
       updateSettings,
       refreshReports,
       setReports,
       refreshAll,
     }),
-    [system, memory, network, loading, settings, reports],
+    [system, memory, network, loading, providerError, reportStorageStatus, settings, reports, sessionLabel, updateSettings, refreshReports, setReports, refreshAll],
   );
 
   return <ToolkitContext.Provider value={value}>{children}</ToolkitContext.Provider>;

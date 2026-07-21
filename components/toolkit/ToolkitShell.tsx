@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "framer-motion";
 import {
   Bell,
   ChevronLeft,
@@ -16,10 +16,10 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { DEMO_DISCLOSURE, SCAN_STAGES, TOOLKIT_NAV } from "@/lib/toolkit/constants";
-import { saveReport } from "@/lib/toolkit/report-storage";
+import { exportReport, saveReport } from "@/lib/toolkit/report-storage";
 import type { DiagnosticReport } from "@/lib/toolkit/types";
 import { ToolkitProvider, useToolkit } from "@/components/toolkit/ToolkitContext";
 import { DemoModeBadge } from "@/components/toolkit/ToolkitUI";
@@ -36,7 +36,18 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const reducedMotion = useReducedMotion();
-  const { system, memory, network, sessionLabel, refreshReports } = useToolkit();
+  const {
+    system,
+    memory,
+    network,
+    sessionLabel,
+    settings,
+    reports,
+    providerError,
+    reportStorageStatus,
+    refreshReports,
+    refreshAll,
+  } = useToolkit();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
@@ -45,18 +56,16 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
   const [scanState, setScanState] = useState<"idle" | "running" | "cancelled" | "complete">("idle");
   const [stage, setStage] = useState(0);
 
-  const commands = useMemo(
-    () => [
-      ...TOOLKIT_NAV.map((item) => ({
-        label: `Open ${item.label}`,
-        hint: item.href,
-        action: () => router.push(item.href),
-      })),
-      { label: "Run full diagnostic scan", hint: "Action", action: () => setScannerOpen(true) },
-      { label: "Open portfolio", hint: "Navigation", action: () => router.push("/") },
-    ],
-    [router],
-  );
+  const commands = [
+    ...TOOLKIT_NAV.map((item) => ({
+      label: `Open ${item.label}`,
+      hint: item.href,
+      action: () => router.push(item.href),
+    })),
+    { label: "Run full diagnostic scan", hint: "Action", action: startScan },
+    ...(reports[0] ? [{ label: "Export latest report", hint: "JSON", action: () => exportReport(reports[0]) }] : []),
+    { label: "Open portfolio", hint: "Navigation", action: () => router.push("/") },
+  ];
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
@@ -95,9 +104,9 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
       }, 0);
       return () => window.clearTimeout(timer);
     }
-    const timer = window.setTimeout(() => setStage((value) => value + 1), reducedMotion ? 120 : 520);
+    const timer = window.setTimeout(() => setStage((value) => value + 1), reducedMotion || !settings.animations ? 120 : 520);
     return () => window.clearTimeout(timer);
-  }, [scanState, stage, system, memory, network, refreshReports, reducedMotion]);
+  }, [scanState, stage, system, memory, network, refreshReports, reducedMotion, settings.animations]);
 
   function startScan() {
     setStage(0);
@@ -106,7 +115,12 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="toolkit-root min-h-screen bg-[#050505] text-text">
+    <MotionConfig reducedMotion={settings.animations ? "user" : "always"}>
+    <div
+      className="toolkit-root min-h-screen bg-[#050505] text-text"
+      data-density={settings.density}
+      data-animations={settings.animations ? "on" : "off"}
+    >
       <a href="#toolkit-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-3 focus:py-2 focus:text-black">
         Skip to toolkit content
       </a>
@@ -147,15 +161,30 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
           </button>
           <div className="hidden items-center gap-2 text-xs text-muted xl:flex"><span className="size-1.5 rounded-full bg-emerald-400" />{sessionLabel}</div>
           <DemoModeBadge compact />
-          <button type="button" onClick={() => setNotificationsOpen((value) => !value)} className="relative rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text" aria-label="Open notifications">
-            <Bell className="size-4" /><span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary" />
+          <button type="button" disabled={!settings.notifications} onClick={() => setNotificationsOpen((value) => !value)} className="relative rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text disabled:cursor-not-allowed disabled:opacity-40" aria-label={settings.notifications ? "Open notifications" : "Notifications disabled in settings"}>
+            <Bell className="size-4" />{settings.notifications ? <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary" /> : null}
+          </button>
+          <button type="button" disabled={!reports[0]} onClick={() => reports[0] && exportReport(reports[0])} className="hidden rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text disabled:cursor-not-allowed disabled:opacity-35 sm:block" aria-label={reports[0] ? `Export latest report: ${reports[0].name}` : "No report available to export"} title="Export latest report">
+            <Download className="size-4" />
           </button>
           <button type="button" onClick={startScan} className="hidden items-center gap-2 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-black transition hover:bg-primary sm:flex">
             <Play className="size-4" />Run Full Scan
           </button>
         </header>
 
-        {notificationsOpen ? (
+        {providerError ? (
+          <div role="alert" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-400/20 bg-rose-400/[0.06] px-4 py-3 text-sm text-rose-100 sm:mx-6 lg:mx-8">
+            <span>{providerError}</span>
+            <button type="button" onClick={() => void refreshAll()} className="rounded-lg border border-rose-300/20 px-3 py-1.5 font-medium hover:bg-rose-300/10">Retry providers</button>
+          </div>
+        ) : null}
+        {reportStorageStatus === "malformed" ? (
+          <div role="alert" className="mx-4 mt-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm text-amber-100 sm:mx-6 lg:mx-8">
+            Saved report data was malformed and could not be loaded. Clear saved reports in Settings to reset local storage safely.
+          </div>
+        ) : null}
+
+        {notificationsOpen && settings.notifications ? (
           <aside className="fixed right-4 top-20 z-50 w-[min(360px,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0b0b0b]/95 p-4 shadow-2xl backdrop-blur-2xl" aria-label="Notifications">
             <div className="flex items-center justify-between"><h2 className="font-display font-semibold">Notifications</h2><button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X className="size-4" /></button></div>
             <div className="mt-4 space-y-3 text-sm"><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Storage check</span>Primary-drive utilization is above 70%.</p><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Demo provider ready</span>All three simulated diagnostic providers are available.</p></div>
@@ -180,20 +209,147 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
       <CommandDialog open={commandOpen} onClose={() => setCommandOpen(false)} commands={commands} />
       <ScanDialog open={scannerOpen} onClose={() => setScannerOpen(false)} state={scanState} stage={stage} onStart={startScan} onCancel={() => setScanState("cancelled")} />
     </div>
+    </MotionConfig>
   );
+}
+
+function useDialogFocus(open: boolean, onClose: () => void) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    previousFocus.current = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      panelRef.current?.querySelector<HTMLElement>(
+        "input, button, a[href], select, textarea, [tabindex]:not([tabindex='-1'])",
+      )?.focus();
+    }, 0);
+
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const focusable = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(
+          "input, button:not([disabled]), a[href], select, textarea, [tabindex]:not([tabindex='-1'])",
+        ),
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = previousOverflow;
+      previousFocus.current?.focus();
+    };
+  }, [open]);
+
+  return panelRef;
 }
 
 function CommandDialog({ open, onClose, commands }: { open: boolean; onClose: () => void; commands: { label: string; hint: string; action: () => void }[] }) {
   const [query, setQuery] = useState("");
+  const [active, setActive] = useState(0);
   const filtered = commands.filter((item) => item.label.toLowerCase().includes(query.toLowerCase()));
+  const panelRef = useDialogFocus(open, close);
+
+  function close() {
+    setQuery("");
+    setActive(0);
+    onClose();
+  }
+
+  function runCommand(index: number) {
+    const command = filtered[index];
+    if (!command) return;
+    command.action();
+    close();
+  }
+
   return (
-    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[90] flex items-start justify-center bg-black/70 px-4 pt-[12vh] backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} role="dialog" aria-modal="true" aria-label="Toolkit command palette"><motion.div className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b]" initial={{ y: -10, scale: .98 }} animate={{ y: 0, scale: 1 }} onClick={(event) => event.stopPropagation()}><div className="flex items-center gap-3 border-b border-white/8 px-4 py-3"><Command className="size-4 text-muted" /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search toolkit…" className="w-full bg-transparent text-sm outline-none placeholder:text-muted" /></div><div className="max-h-80 overflow-y-auto p-2">{filtered.length ? filtered.map((item) => <button type="button" key={item.label} onClick={() => { item.action(); onClose(); }} className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm hover:bg-white/[0.06]"><span className="flex-1">{item.label}</span><span className="text-xs text-muted">{item.hint}</span></button>) : <p className="p-6 text-center text-sm text-muted">No matching actions</p>}</div></motion.div></motion.div> : null}</AnimatePresence>
+    <AnimatePresence>
+      {open ? (
+        <motion.div className="fixed inset-0 z-[90] flex items-start justify-center bg-black/70 px-4 pt-[12vh] backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={close} role="dialog" aria-modal="true" aria-labelledby="toolkit-command-title">
+          <motion.div ref={panelRef} className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b]" initial={{ y: -10, scale: .98 }} animate={{ y: 0, scale: 1 }} onClick={(event) => event.stopPropagation()}>
+            <h2 id="toolkit-command-title" className="sr-only">Toolkit command palette</h2>
+            <div className="flex items-center gap-3 border-b border-white/8 px-4 py-3">
+              <Command className="size-4 text-muted" />
+              <input
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setActive(0);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    setActive((index) => Math.min(index + 1, Math.max(filtered.length - 1, 0)));
+                  } else if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    setActive((index) => Math.max(index - 1, 0));
+                  } else if (event.key === "Enter") {
+                    event.preventDefault();
+                    runCommand(active);
+                  }
+                }}
+                placeholder="Search toolkit…"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
+                role="combobox"
+                aria-expanded="true"
+                aria-controls="toolkit-command-results"
+                aria-activedescendant={filtered[active] ? `toolkit-command-${active}` : undefined}
+              />
+            </div>
+            <div id="toolkit-command-results" role="listbox" className="max-h-80 overflow-y-auto p-2">
+              {filtered.length ? filtered.map((item, index) => (
+                <button
+                  type="button"
+                  id={`toolkit-command-${index}`}
+                  role="option"
+                  aria-selected={index === active}
+                  key={item.label}
+                  onMouseEnter={() => setActive(index)}
+                  onClick={() => runCommand(index)}
+                  className={cn("flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm", index === active ? "bg-white/[0.07] text-text" : "text-muted hover:bg-white/[0.05] hover:text-text")}
+                >
+                  <span className="flex-1">{item.label}</span><span className="text-xs text-muted">{item.hint}</span>
+                </button>
+              )) : <p className="p-6 text-center text-sm text-muted">No matching actions</p>}
+            </div>
+            <p className="border-t border-white/8 px-4 py-2 text-[11px] text-muted">↑↓ navigate · Enter select · Esc close</p>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
 function ScanDialog({ open, onClose, state, stage, onStart, onCancel }: { open: boolean; onClose: () => void; state: "idle" | "running" | "cancelled" | "complete"; stage: number; onStart: () => void; onCancel: () => void }) {
   const progress = Math.min(100, Math.round((stage / SCAN_STAGES.length) * 100));
+  const panelRef = useDialogFocus(open, onClose);
   return (
-    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[95] grid place-items-center bg-black/75 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Full diagnostic scan"><motion.div className="w-full max-w-xl rounded-3xl border border-white/10 bg-[#0b0b0b] p-6 shadow-2xl" initial={{ scale: .97, y: 10 }} animate={{ scale: 1, y: 0 }}><div className="flex items-start justify-between"><div><DemoModeBadge compact /><h2 className="mt-3 font-display text-2xl font-semibold">Full diagnostic scan</h2><p className="mt-2 text-sm text-muted">{state === "complete" ? "Scan complete. A simulated report was saved." : state === "cancelled" ? "Scan cancelled. No report was created." : "Reviewing all simulated diagnostic providers."}</p></div><button type="button" onClick={onClose} aria-label="Close scan"><X className="size-5 text-muted" /></button></div><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]"><motion.div className="h-full bg-primary" animate={{ width: `${state === "complete" ? 100 : progress}%` }} /></div><p className="mt-2 text-right font-mono text-xs text-muted">{state === "complete" ? 100 : progress}%</p><ol className="mt-5 space-y-2">{SCAN_STAGES.map((item, index) => <li key={item.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", index === stage && state === "running" ? "bg-white/[0.05] text-text" : index < stage || state === "complete" ? "text-secondary" : "text-muted")}><span className={cn("size-2 rounded-full border border-white/20", (index < stage || state === "complete") && "border-primary bg-primary")} />{item.label}</li>)}</ol><p className="mt-5 rounded-xl border border-white/7 bg-white/[0.025] p-3 text-xs leading-relaxed text-muted">{DEMO_DISCLOSURE}</p><div className="mt-5 flex justify-end gap-3">{state === "running" ? <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-muted hover:text-text">Cancel scan</button> : <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-primary"><RotateCcw className="size-4" />{state === "idle" ? "Start scan" : "Run again"}</button>}{state === "complete" ? <Link href="/toolkit/reports" onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm"><Download className="size-4" />View report</Link> : null}</div></motion.div></motion.div> : null}</AnimatePresence>
+    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[95] grid place-items-center bg-black/75 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-labelledby="diagnostic-scan-title"><motion.div ref={panelRef} className="w-full max-w-xl rounded-3xl border border-white/10 bg-[#0b0b0b] p-6 shadow-2xl" initial={{ scale: .97, y: 10 }} animate={{ scale: 1, y: 0 }}><div className="flex items-start justify-between"><div><DemoModeBadge compact /><h2 id="diagnostic-scan-title" className="mt-3 font-display text-2xl font-semibold">Full diagnostic scan</h2><p className="mt-2 text-sm text-muted">{state === "complete" ? "Scan complete. A simulated report was saved." : state === "cancelled" ? "Scan cancelled. No report was created." : "Reviewing all simulated diagnostic providers."}</p></div><button type="button" onClick={onClose} aria-label="Close scan"><X className="size-5 text-muted" /></button></div><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]" role="progressbar" aria-label="Diagnostic scan progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={state === "complete" ? 100 : progress}><motion.div className="h-full bg-primary" animate={{ width: `${state === "complete" ? 100 : progress}%` }} /></div><p className="mt-2 text-right font-mono text-xs text-muted" aria-live="polite">{state === "complete" ? 100 : progress}%</p><ol className="mt-5 space-y-2">{SCAN_STAGES.map((item, index) => <li key={item.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", index === stage && state === "running" ? "bg-white/[0.05] text-text" : index < stage || state === "complete" ? "text-secondary" : "text-muted")}><span className={cn("size-2 rounded-full border border-white/20", (index < stage || state === "complete") && "border-primary bg-primary")} />{item.label}</li>)}</ol><p className="mt-5 rounded-xl border border-white/7 bg-white/[0.025] p-3 text-xs leading-relaxed text-muted">{DEMO_DISCLOSURE}</p><div className="mt-5 flex justify-end gap-3">{state === "running" ? <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-muted hover:text-text">Cancel scan</button> : <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-primary"><RotateCcw className="size-4" />{state === "idle" ? "Start scan" : "Run again"}</button>}{state === "complete" ? <Link href="/toolkit/reports" onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm"><Download className="size-4" />View report</Link> : null}</div></motion.div></motion.div> : null}</AnimatePresence>
   );
 }

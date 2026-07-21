@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, Filter, Search } from "lucide-react";
 import { useToolkit } from "@/components/toolkit/ToolkitContext";
 import { ChartPanel, FindingCard, LoadingPanel, MetricCard, ModuleHeader, StatusBadge } from "@/components/toolkit/ToolkitUI";
+import { recommendRam } from "@/lib/toolkit/recommendation-engine";
 import type { ProcessRecord } from "@/lib/toolkit/types";
 
 const workloads = ["Office and browsing", "Programming", "Graphic design", "Gaming", "Video editing", "Virtual machines", "Mixed professional use"];
@@ -36,9 +37,15 @@ export default function MemoryMedicPage() {
 
   if (loading || !memory) return <LoadingPanel label="Loading MemoryMedic…" />;
 
-  const intensive = vms || creative || ["Video editing", "Virtual machines"].includes(workload);
-  const recommended = intensive && appCount > 10 ? 64 : intensive || gaming || appCount > 10 ? 32 : 16;
-  const guidance = recommended === 64 ? "64 GB may be appropriate for advanced workloads" : recommended === 32 ? "32 GB is ideal" : ram < 16 ? "8 GB is functional but limited" : "16 GB is recommended";
+  const recommendation = recommendRam({
+    installedGb: ram,
+    workload,
+    applicationCount: appCount,
+    gaming,
+    virtualMachines: vms,
+    creativeWork: creative,
+    futureWorkload: future as "Similar" | "Moderately heavier" | "Significantly heavier",
+  });
 
   return (
     <div className="space-y-8">
@@ -87,7 +94,7 @@ export default function MemoryMedicPage() {
           <label className="text-sm text-muted">Expected future workload<select value={future} onChange={(event) => setFuture(event.target.value)} className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"><option>Similar</option><option>Moderately heavier</option><option>Significantly heavier</option></select></label>
         </div>
         <button type="button" onClick={() => setShowRecommendation(true)} className="mt-6 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-primary">Generate recommendation</button>
-        {showRecommendation ? <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/[0.05] p-5"><p className="font-display text-xl font-semibold">{guidance}</p><p className="mt-2 text-sm leading-relaxed text-muted">Your {workload.toLowerCase()} workload, approximately {appCount} concurrent applications{intensive ? ", and memory-intensive use" : ""} point toward {recommended} GB for comfortable headroom. Your current {ram} GB configuration {ram >= recommended ? "already meets this general target" : "may become constrained during peak multitasking"}.</p><p className="mt-3 text-xs text-muted">General guidance only. Verify motherboard, processor, module type, speed, capacity, and vendor compatibility before purchasing RAM.</p></div> : null}
+        {showRecommendation ? <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/[0.05] p-5"><p className="font-display text-xl font-semibold">{recommendation.headline}</p><p className="mt-2 text-sm leading-relaxed text-muted">Your {recommendation.reasoning} Your current {ram} GB configuration {recommendation.meetsTarget ? "already meets this general target" : "may become constrained during peak multitasking"}.</p><p className="mt-3 text-xs text-muted">General guidance only. Verify motherboard, processor, module type, speed, capacity, and vendor compatibility before purchasing RAM.</p></div> : null}
       </section>
     </div>
   );

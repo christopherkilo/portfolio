@@ -46,18 +46,8 @@ export function BlueprintBackground() {
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       aria-hidden
     >
-      <div className="absolute inset-0 bg-[#050505]" />
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,255,255,0.04), transparent 55%),
-            radial-gradient(ellipse 50% 40% at 100% 50%, rgba(255,255,255,0.025), transparent 50%),
-            radial-gradient(ellipse 45% 35% at 0% 80%, rgba(255,255,255,0.02), transparent 50%),
-            linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #050505 100%)
-          `,
-        }}
-      />
+      <div className="absolute inset-0 bg-bg" />
+      <div className="blueprint-atmosphere absolute inset-0" />
       <div className="blueprint-grid absolute inset-0 opacity-50" />
       <div className="noise-overlay absolute inset-0" />
 

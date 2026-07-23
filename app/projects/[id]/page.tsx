@@ -10,7 +10,7 @@ import {
   getAllCaseStudyIds,
   getCaseStudy,
 } from "@/lib/caseStudies";
-import { categoryLabels } from "@/lib/projectData";
+import { categoryLabels, hasLiveDemo, isInternalHref } from "@/lib/projectData";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -45,7 +45,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
           className="inline-flex items-center gap-2 text-sm text-muted transition hover:text-text"
         >
           <ArrowLeft className="size-4" aria-hidden />
-          Back to portfolio projects
+          Back to Projects
         </Link>
         <Link
           href="/"
@@ -73,17 +73,27 @@ export default async function CaseStudyPage({ params }: PageProps) {
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button href={project.liveDemo} external size="lg">
-            <ExternalLink className="size-4" aria-hidden />
-            Live demo
-          </Button>
-          <Button href={project.github} external variant="outline" size="lg">
-            <GithubIcon className="size-4" />
-            GitHub
-          </Button>
+          {hasLiveDemo(project.liveDemo) ? (
+            <Button
+              href={project.liveDemo}
+              external={!isInternalHref(project.liveDemo)}
+              size="lg"
+            >
+              {isInternalHref(project.liveDemo) ? null : (
+                <ExternalLink className="size-4" aria-hidden />
+              )}
+              Open Live Demo
+            </Button>
+          ) : null}
+          {project.github ? (
+            <Button href={project.github} external variant="outline" size="lg">
+              <GithubIcon className="size-4" />
+              GitHub
+            </Button>
+          ) : null}
           <Button href="/projects" variant="ghost" size="lg">
             <ArrowLeft className="size-4" aria-hidden />
-            All projects
+            All Projects
           </Button>
         </div>
       </header>
@@ -222,19 +232,36 @@ export default async function CaseStudyPage({ params }: PageProps) {
       <footer className="flex flex-col gap-4 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="font-display text-lg font-semibold text-text">
-            Explore the live build
+            {hasLiveDemo(project.liveDemo)
+              ? "Explore the live build"
+              : "Continue exploring"}
           </p>
           <p className="mt-1 text-sm text-muted">
-            Open the demo, then return here anytime via the portfolio nav.
+            {hasLiveDemo(project.liveDemo)
+              ? "Open the demo, then return here anytime via the demo chrome or browser Back."
+              : "Return to the projects index or open the repository when available."}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button href={project.liveDemo} external>
-            <ExternalLink className="size-4" aria-hidden />
-            Live demo
-          </Button>
+          {hasLiveDemo(project.liveDemo) ? (
+            <Button
+              href={project.liveDemo}
+              external={!isInternalHref(project.liveDemo)}
+            >
+              {isInternalHref(project.liveDemo) ? null : (
+                <ExternalLink className="size-4" aria-hidden />
+              )}
+              Open Live Demo
+            </Button>
+          ) : null}
+          {project.github && !hasLiveDemo(project.liveDemo) ? (
+            <Button href={project.github} external>
+              <GithubIcon className="size-4" />
+              GitHub
+            </Button>
+          ) : null}
           <Button href="/projects" variant="outline">
-            Back to portfolio
+            Back to Projects
           </Button>
         </div>
       </footer>

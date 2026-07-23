@@ -33,6 +33,7 @@ export default function SettingsPage() {
         <article className="rounded-3xl border border-white/8 bg-white/[0.03] p-5">
           <div className="flex items-center gap-3"><MonitorCog className="size-5 text-secondary" /><h2 className="font-display text-xl font-semibold">Experience</h2></div>
           <div className="mt-5 space-y-5">
+            <label className="block text-sm text-muted">Color theme<select value={settings.theme} onChange={(event) => updateSettings({ theme: event.target.value as "light" | "dark" })} className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"><option value="dark">Dark mode</option><option value="light">Light mode</option></select></label>
             <label className="block text-sm text-muted">Simulation refresh speed<select value={settings.refreshSpeed} onChange={(event) => updateSettings({ refreshSpeed: Number(event.target.value) as 1000 | 2000 | 4000 })} className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"><option value={1000}>Fast · every second</option><option value={2000}>Balanced · every 2 seconds</option><option value={4000}>Quiet · every 4 seconds</option></select></label>
             <label className="block text-sm text-muted">Content density<select value={settings.density} onChange={(event) => updateSettings({ density: event.target.value as "comfortable" | "compact" })} className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
             <Toggle label="Toolkit animations" detail="System reduced-motion preferences always take priority." checked={settings.animations} onChange={(value) => updateSettings({ animations: value })} />
@@ -58,5 +59,5 @@ export default function SettingsPage() {
 }
 
 function Toggle({ label, detail, checked, onChange }: { label: string; detail: string; checked: boolean; onChange: (value: boolean) => void }) {
-  return <label className="flex items-center justify-between gap-5 rounded-xl border border-white/8 p-3"><span className="text-sm text-muted"><strong className="block font-medium text-text">{label}</strong>{detail}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-4 shrink-0 accent-[#f8e71c]" /></label>;
+  return <label className="flex items-center justify-between gap-5 rounded-xl border border-white/8 p-3"><span className="text-sm text-muted"><strong className="block font-medium text-text">{label}</strong>{detail}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-4 shrink-0 accent-primary" /></label>;
 }

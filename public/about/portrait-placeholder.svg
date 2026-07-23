@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Portrait placeholder</title>
+  <desc id="desc">Placeholder silhouette for a future profile photo</desc>
+  <rect width="800" height="1000" fill="#0f0f0f"/>
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="800" y2="1000">
+      <stop stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.01"/>
+    </linearGradient>
+    <linearGradient id="figure" x1="400" y1="220" x2="400" y2="860">
+      <stop stop-color="#c4c4c4" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#c4c4c4" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#wash)"/>
+  <circle cx="400" cy="360" r="118" fill="url(#figure)"/>
+  <path d="M170 880c40-170 120-260 230-260s190 90 230 260" fill="url(#figure)"/>
+  <rect x="48" y="48" width="704" height="904" rx="28" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+  <text x="400" y="930" text-anchor="middle" fill="#8a8a8a" font-family="ui-sans-serif, system-ui, sans-serif" font-size="22" letter-spacing="4">PHOTO COMING SOON</text>
+</svg>

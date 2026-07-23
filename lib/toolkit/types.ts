@@ -174,5 +174,6 @@ export type ToolkitSettings = {
   animations: boolean;
   density: "comfortable" | "compact";
   notifications: boolean;
+  theme: "light" | "dark";
 };
 

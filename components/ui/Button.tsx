@@ -11,7 +11,7 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-white text-[#0a0a0a] hover:bg-primary hover:shadow-[0_0_28px_-6px_var(--glow-yellow)]",
+    "bg-text text-bg hover:bg-primary hover:text-[var(--on-primary)] hover:shadow-[0_0_28px_-6px_var(--glow-yellow)]",
   secondary:
     "border border-white/10 bg-white/[0.04] text-secondary hover:border-white/20 hover:bg-white/[0.07] hover:text-text",
   ghost: "bg-transparent text-text hover:bg-white/5",
@@ -62,7 +62,7 @@ function ButtonShell({
   shimmer?: boolean;
 }) {
   const content = (
-    <span className="relative z-[1] inline-flex items-center gap-2 [&_svg]:transition-transform [&_svg]:duration-200 group-hover/btn:[&_svg]:translate-x-0.5">
+    <span className="relative z-[1] inline-flex items-center gap-2 [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:transition-transform [&_svg]:duration-200 group-hover/btn:[&_svg]:translate-x-0.5">
       {children}
     </span>
   );
@@ -119,7 +119,7 @@ export function Button({
     shimmer ?? Boolean(href?.includes("github.com"));
 
   const classes = cn(
-    "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl font-semibold transition-[colors,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
+    "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl font-semibold transition-[colors,box-shadow] duration-[var(--duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
     variants[variant],
     sizes[size],
     className,
@@ -129,7 +129,7 @@ export function Button({
     <motion.div
       className="inline-flex"
       whileHover={{ y: -2, scale: 1.02 }}
-      whileTap={{ scale: 0.96, y: 1 }}
+      whileTap={{ scale: 0.97, y: 1 }}
       transition={href ? springHover : buttonTransition}
     >
       <ButtonShell

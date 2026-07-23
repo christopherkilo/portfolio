@@ -1,0 +1,19 @@
+<svg width="1200" height="750" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title">
+  <title id="title">Signal Magazine Issue 01 cover</title>
+  <rect width="1200" height="750" fill="#1A1917"/>
+  <rect x="90" y="70" width="420" height="610" fill="#F7F4EF"/>
+  <rect x="90" y="70" width="160" height="610" fill="#121212"/>
+  <text x="110" y="140" fill="#F7F4EF" font-family="ui-sans-serif,system-ui,sans-serif" font-size="36" font-weight="700" letter-spacing="4">SIGNAL</text>
+  <text x="110" y="175" fill="#E85D04" font-family="ui-monospace,monospace" font-size="14" letter-spacing="3">ISSUE 01</text>
+  <text x="110" y="360" fill="#F7F4EF" font-family="ui-sans-serif,system-ui,sans-serif" font-size="34" font-weight="600">HUMAN</text>
+  <text x="110" y="402" fill="#E85D04" font-family="ui-sans-serif,system-ui,sans-serif" font-size="34" font-weight="600">/ MACHINE</text>
+  <circle cx="390" cy="280" r="70" fill="#2F4F8A" fill-opacity="0.25"/>
+  <circle cx="420" cy="310" r="42" fill="#E85D04" fill-opacity="0.28"/>
+  <text x="280" y="560" fill="#121212" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20" font-weight="600">The New Creative Machine</text>
+  <text x="280" y="590" fill="#8A847A" font-family="ui-sans-serif,system-ui,sans-serif" font-size="14">Spring 2026</text>
+  <text x="580" y="220" fill="#F7F4EF" font-family="ui-sans-serif,system-ui,sans-serif" font-size="64" font-weight="700" letter-spacing="6">SIGNAL</text>
+  <rect x="580" y="250" width="48" height="5" fill="#E85D04"/>
+  <text x="580" y="320" fill="#C8C2B8" font-family="ui-sans-serif,system-ui,sans-serif" font-size="28">Editorial design system</text>
+  <text x="580" y="370" fill="#8A847A" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20">Typography · Grid · Information design</text>
+  <text x="580" y="450" fill="#8A847A" font-family="ui-monospace,monospace" font-size="16" letter-spacing="2">ISSUE 01 — HUMAN / MACHINE</text>
+</svg>

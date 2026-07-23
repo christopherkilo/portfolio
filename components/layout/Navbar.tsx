@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Command, Menu } from "lucide-react";
-import { NAV_LINKS, SITE } from "@/lib/constants";
+import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { MobileMenu, useMobileMenu } from "@/components/layout/MobileMenu";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 type NavbarProps = {
   onOpenCommand?: () => void;
@@ -30,16 +31,17 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
         className={cn(
           "sticky top-0 z-50 h-[var(--nav-height)] border-b transition-colors duration-300",
           scrolled
-            ? "border-white/[0.06] bg-black/55 backdrop-blur-2xl"
+            ? "border-border bg-[var(--nav-scrolled)] backdrop-blur-2xl"
             : "border-transparent bg-transparent",
         )}
       >
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="group font-display text-lg font-semibold tracking-tight text-text transition hover:text-white"
+            className="group font-display text-lg font-semibold tracking-tight text-text transition hover:opacity-90"
+            aria-label="Christopher Kilo"
           >
-            {SITE.name}
+            CHRISTOPHER KILO
             <span className="text-muted transition-colors group-hover:text-primary">
               .
             </span>
@@ -75,6 +77,8 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
                 ⌘K
               </kbd>
             </button>
+
+            <ThemeToggle className="hidden md:inline-flex" />
 
             <button
               type="button"

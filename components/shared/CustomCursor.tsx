@@ -1,18 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+
+function subscribeFinePointer(onChange: () => void) {
+  const mq = window.matchMedia("(pointer: fine)");
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getFinePointer() {
+  return window.matchMedia("(pointer: fine)").matches;
+}
+
+function getServerFinePointer() {
+  return false;
+}
 
 export function CustomCursor() {
   const reducedMotion = useReducedMotion();
-  const [enabled, setEnabled] = useState(false);
+  const finePointer = useSyncExternalStore(
+    subscribeFinePointer,
+    getFinePointer,
+    getServerFinePointer,
+  );
+  const enabled = finePointer && !reducedMotion;
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [hovering, setHovering] = useState(false);
-
-  useEffect(() => {
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    setEnabled(fine && !reducedMotion);
-  }, [reducedMotion]);
 
   useEffect(() => {
     if (!enabled) return;

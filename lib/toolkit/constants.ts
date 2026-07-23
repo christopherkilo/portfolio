@@ -32,6 +32,7 @@ export const DEFAULT_SETTINGS: ToolkitSettings = {
   animations: true,
   density: "comfortable",
   notifications: true,
+  theme: "dark",
 };
 
 export const DEMO_DISCLOSURE =

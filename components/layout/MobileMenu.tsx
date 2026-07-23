@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import Link from "next/link";
-import { NAV_LINKS, SITE } from "@/lib/constants";
+import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 type MobileMenuProps = {
   open: boolean;
@@ -53,7 +54,9 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm text-muted">{SITE.name}</p>
+              <p className="text-sm text-muted" aria-label="Christopher Kilo">
+                CHRISTOPHER KILO
+              </p>
               <button
                 type="button"
                 onClick={onClose}
@@ -75,7 +78,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                     href={link.href}
                     onClick={onClose}
                     className={cn(
-                      "block rounded-xl px-3 py-3 text-base font-medium text-text transition hover:bg-white/5 hover:text-white",
+                      "block rounded-xl px-3 py-3 text-base font-medium text-text transition hover:bg-white/5",
                     )}
                   >
                     {link.label}
@@ -83,6 +86,9 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                 </motion.li>
               ))}
             </ul>
+            <div className="mt-4 border-t border-white/8 pt-4">
+              <ThemeToggle showLabel />
+            </div>
           </motion.nav>
         </motion.div>
       ) : null}

@@ -4,7 +4,9 @@ export const durations = {
   button: 0.15,
   card: 0.25,
   section: 0.5,
-  page: 0.3,
+  /** Page fade/up — keep under 300ms for seamless navigation */
+  page: 0.28,
+  image: 0.35,
 } as const;
 
 export const easings = {
@@ -72,7 +74,7 @@ export const staggerItem: Variants = {
 };
 
 export const pageVariants: Variants = {
-  initial: { opacity: 0, y: 8 },
+  initial: { opacity: 0, y: 10 },
   animate: {
     opacity: 1,
     y: 0,
@@ -80,7 +82,7 @@ export const pageVariants: Variants = {
   },
   exit: {
     opacity: 0,
-    y: -6,
-    transition: pageTransition,
+    y: -4,
+    transition: { duration: durations.page * 0.85, ease: easings.out },
   },
 };

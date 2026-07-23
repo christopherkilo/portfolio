@@ -159,7 +159,7 @@ export function TroubleshootingDemo() {
 
 export function TechnicalLabPreview() {
   return (
-    <section id="lab" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <section id="lab" className="mx-auto max-w-6xl scroll-mt-[var(--scroll-mt)] px-4 py-[var(--section-y)] sm:px-6 lg:px-8">
       <SectionHeader
         eyebrow="Technical Lab"
         title="Systems thinking, documented"

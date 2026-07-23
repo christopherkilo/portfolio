@@ -40,25 +40,33 @@ export default function ProjectsPage() {
                   id={project.id}
                   key={project.id}
                   href={getProjectHref(project)}
-                  className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-xl transition hover:border-white/16 hover:bg-white/[0.05]"
+                  className="group scroll-mt-[var(--scroll-mt)] overflow-hidden rounded-[var(--radius)] border border-white/8 bg-white/[0.03] backdrop-blur-xl transition duration-[var(--duration-card)] hover:border-white/16 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
-                  <div className="relative aspect-[16/10] bg-surface-elevated">
-                    <Image
-                      src={project.image}
-                      alt={`${project.title} preview`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
-                      loading="lazy"
-                      unoptimized
-                    />
+                  <div className="relative aspect-[16/10] overflow-hidden bg-surface-elevated">
+                    {project.image ? (
+                      <Image
+                        src={project.image}
+                        alt={project.imageAlt ?? `${project.title} preview`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                        loading="lazy"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                          No preview
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-4 p-5">
+                  <div className="space-y-4 p-[var(--pad-card)]">
                     <div>
-                      <h3 className="font-display text-lg font-semibold text-text transition group-hover:text-white">
+                      <h3 className="font-display text-lg font-semibold text-text transition duration-[var(--duration-fast)] group-hover:text-primary">
                         {project.title}
                       </h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                      <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted">
                         {project.description}
                       </p>
                     </div>
@@ -67,8 +75,10 @@ export default function ProjectsPage() {
                         <Badge key={tech}>{tech}</Badge>
                       ))}
                     </div>
-                    <p className="text-xs font-medium text-muted transition group-hover:text-primary">
-                      Open project →
+                    <p className="text-xs font-medium text-muted transition duration-[var(--duration-fast)] group-hover:text-primary">
+                      {project.category === "it"
+                        ? "Open Toolkit →"
+                        : "View Case Study →"}
                     </p>
                   </div>
                 </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -15,13 +15,14 @@ import {
 } from "lucide-react";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { getProjectHref, projects } from "@/lib/projectData";
+import { durations, easings } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 
 type CommandItem = {
   id: string;
   label: string;
   hint?: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   action: () => void;
   keywords?: string;
 };
@@ -31,7 +32,7 @@ type CommandPaletteProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-const iconMap: Record<string, React.ReactNode> = {
+const iconMap: Record<string, ReactNode> = {
   home: <Home className="size-4" />,
   projects: <FolderKanban className="size-4" />,
   lab: <Wrench className="size-4" />,
@@ -44,6 +45,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const reducedMotion = useReducedMotion();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const [prevOpen, setPrevOpen] = useState(open);
+
+  // Reset search session when the palette opens (render-time sync, not an effect).
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setQuery("");
+      setActive(0);
+    }
+  }
 
   const items = useMemo<CommandItem[]>(() => {
     const navItems: CommandItem[] = NAV_LINKS.map((link) => ({
@@ -98,9 +109,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       .includes(q);
   });
 
-  useEffect(() => {
-    setActive(0);
-  }, [query, open]);
+  const cappedActive = Math.min(active, Math.max(filtered.length - 1, 0));
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -115,10 +124,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   }, [open, onOpenChange]);
 
   useEffect(() => {
-    if (!open) {
-      setQuery("");
-      return;
-    }
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onOpenChange(false);
       if (e.key === "ArrowDown") {
@@ -129,15 +135,15 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         e.preventDefault();
         setActive((i) => Math.max(i - 1, 0));
       }
-      if (e.key === "Enter" && filtered[active]) {
+      if (e.key === "Enter" && filtered[cappedActive]) {
         e.preventDefault();
-        filtered[active].action();
+        filtered[cappedActive].action();
         onOpenChange(false);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, filtered, active, onOpenChange]);
+  }, [open, filtered, cappedActive, onOpenChange]);
 
   return (
     <AnimatePresence>
@@ -147,18 +153,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.18 }}
+          transition={{ duration: reducedMotion ? 0 : durations.button }}
           onClick={() => onOpenChange(false)}
           role="dialog"
           aria-modal="true"
           aria-label="Command palette"
         >
           <motion.div
-            className="glass w-full max-w-lg overflow-hidden rounded-2xl shadow-2xl"
-            initial={reducedMotion ? false : { opacity: 0, y: -10, scale: 0.98 }}
+            className="glass w-full max-w-lg overflow-hidden rounded-[var(--radius)] shadow-2xl"
+            initial={reducedMotion ? false : { opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reducedMotion ? undefined : { opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            exit={reducedMotion ? undefined : { opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: durations.card, ease: easings.out }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 border-b border-border px-4 py-3">
@@ -166,7 +172,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <input
                 autoFocus
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActive(0);
+                }}
                 placeholder="Search pages, projects, actions…"
                 className="w-full bg-transparent text-sm text-text outline-none placeholder:text-muted"
                 aria-label="Command search"
@@ -179,12 +188,12 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 </li>
               ) : (
                 filtered.map((item, i) => (
-                  <li key={item.id} role="option" aria-selected={i === active}>
+                  <li key={item.id} role="option" aria-selected={i === cappedActive}>
                     <button
                       type="button"
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition",
-                        i === active
+                        "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition duration-[var(--duration-fast)]",
+                        i === cappedActive
                           ? "bg-white/[0.08] text-text ring-1 ring-primary/40"
                           : "text-muted hover:bg-white/5 hover:text-text",
                       )}
@@ -196,8 +205,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     >
                       <span
                         className={cn(
-                          "transition-colors",
-                          i === active ? "text-primary" : "text-secondary",
+                          "transition-colors duration-[var(--duration-fast)]",
+                          i === cappedActive ? "text-primary" : "text-secondary",
                         )}
                       >
                         {item.icon}

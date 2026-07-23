@@ -1,0 +1,33 @@
+<svg width="1200" height="750" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title">
+  <title id="title">Voltline brand identity cover</title>
+  <rect width="1200" height="750" fill="#0A0A0A"/>
+  <defs>
+    <linearGradient id="vl-g" x1="0" y1="0" x2="1200" y2="750">
+      <stop stop-color="#C8FF3D" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
+    <linearGradient id="vl-mark" x1="180" y1="180" x2="320" y2="320">
+      <stop stop-color="#C8FF3D"/>
+      <stop offset="1" stop-color="#F5F5F5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#vl-g)"/>
+  <g stroke="#ffffff" stroke-opacity="0.07">
+    <path d="M80 120h1040M80 240h1040M80 360h1040M80 480h1040M80 600h1040"/>
+    <path d="M200 60v630M360 60v630M520 60v630M680 60v630M840 60v630M1000 60v630"/>
+  </g>
+  <rect x="160" y="160" width="220" height="220" rx="28" fill="#111" stroke="#C8FF3D" stroke-opacity="0.45"/>
+  <path d="M220 230h48l28 84 28-84h48L316 450h-36L220 230Z" fill="url(#vl-mark)"/>
+  <text x="430" y="250" fill="#F5F5F5" font-family="ui-sans-serif,system-ui,sans-serif" font-size="92" font-weight="700" letter-spacing="14">VOLTLINE</text>
+  <rect x="430" y="280" width="72" height="8" fill="#C8FF3D"/>
+  <text x="430" y="340" fill="#9A9A9A" font-family="ui-sans-serif,system-ui,sans-serif" font-size="24" letter-spacing="4">PRECISION TOOLS FOR HIGH-PERFORMANCE WORK</text>
+  <text x="430" y="400" fill="#666" font-family="ui-monospace,monospace" font-size="16" letter-spacing="3">BRAND IDENTITY SYSTEM — 2026</text>
+  <g fill="#F5F5F5" fill-opacity="0.9">
+    <rect x="430" y="460" width="140" height="90" rx="10" fill="#151515" stroke="#ffffff" stroke-opacity="0.08"/>
+    <rect x="590" y="460" width="140" height="90" rx="10" fill="#151515" stroke="#ffffff" stroke-opacity="0.08"/>
+    <rect x="750" y="460" width="140" height="90" rx="10" fill="#151515" stroke="#ffffff" stroke-opacity="0.08"/>
+  </g>
+  <text x="450" y="512" fill="#C8FF3D" font-family="ui-monospace,monospace" font-size="12">LOGO</text>
+  <text x="610" y="512" fill="#C8FF3D" font-family="ui-monospace,monospace" font-size="12">PACK</text>
+  <text x="770" y="512" fill="#C8FF3D" font-family="ui-monospace,monospace" font-size="12">TYPE</text>
+</svg>

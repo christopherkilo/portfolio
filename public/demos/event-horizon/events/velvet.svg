@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1200" y2="750">
+      <stop stop-color="#F472B6" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="#101826"/>
+  <rect width="1200" height="750" fill="url(#g)"/>
+  <circle cx="980" cy="120" r="140" fill="#F472B6" fill-opacity="0.2"/>
+  <circle cx="160" cy="620" r="180" fill="#22D3EE" fill-opacity="0.16"/>
+  <rect x="80" y="240" width="1040" height="280" rx="24" fill="rgba(7,11,20,0.45)" stroke="rgba(148,163,184,0.2)"/>
+  <text x="110" y="340" fill="#F4F7FB" font-family="ui-sans-serif,system-ui" font-size="44" font-weight="700">Velvet Room Sessions</text>
+  <text x="110" y="390" fill="#94A3B8" font-family="ui-sans-serif,system-ui" font-size="22">Event Horizon placeholder</text>
+</svg>

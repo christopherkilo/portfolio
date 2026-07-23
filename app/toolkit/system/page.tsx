@@ -75,7 +75,7 @@ export default function SystemScopePage() {
         </div>
       </section>
 
-      <section id="storage" className="scroll-mt-24">
+      <section id="storage" className="scroll-mt-[var(--scroll-mt)]">
         <h2 className="mb-4 font-display text-xl font-semibold">Storage</h2>
         <div className="grid gap-4 lg:grid-cols-2">
           {system.drives.map((drive) => {

@@ -23,7 +23,7 @@ type CarouselProps = {
   autoPlayMs?: number;
 };
 
-const DRAG_THRESHOLD = 10;
+const DRAG_THRESHOLD = 48;
 
 export function Carousel({
   children,
@@ -111,6 +111,11 @@ export function Carousel({
   function onPointerDown(e: React.PointerEvent) {
     // Ignore non-primary buttons; let links receive clean clicks
     if (e.button !== 0) return;
+    // Don't steal gestures that start on interactive controls (GitHub, etc.)
+    const target = e.target as HTMLElement | null;
+    if (target?.closest("a, button, input, textarea, select, [role='button']")) {
+      return;
+    }
     activePointer.current = e.pointerId;
     didDrag.current = false;
     setIsDragging(true);

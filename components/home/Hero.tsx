@@ -11,20 +11,111 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SignatureName } from "@/components/home/SignatureName";
-import { SITE, TECH_BADGES } from "@/lib/constants";
+import { SITE } from "@/lib/constants";
 
-const floatingPositions = [
-  { top: "6%", left: "4%", rotate: -8 },
-  { top: "18%", right: "2%", rotate: 6 },
-  { top: "42%", left: "-2%", rotate: 4 },
-  { bottom: "28%", right: "0%", rotate: -5 },
-  { bottom: "8%", left: "10%", rotate: 7 },
-  { top: "58%", right: "18%", rotate: -3 },
-  { top: "8%", left: "38%", rotate: 5 },
-  { bottom: "18%", left: "36%", rotate: -6 },
-  { top: "32%", right: "28%", rotate: 8 },
-  { bottom: "36%", left: "58%", rotate: -4 },
-  { top: "70%", right: "42%", rotate: 3 },
+/**
+ * Floating tech labels live only in protected gutters around the code panels.
+ * Panel interiors (terminal / editor / diagnostics / status) are off-limits.
+ * Motion travel stays within each slot so labels cannot drift into code.
+ */
+type FloatingLabel = {
+  text: string;
+  /** Tailwind placement + responsive visibility */
+  slot: string;
+  rotate: number;
+  motion: { x: number; y: number };
+  delay: number;
+};
+
+const floatingLabels: FloatingLabel[] = [
+  {
+    text: "Next.js",
+    // NW gutter — above terminal panel
+    slot: "top-0 left-0",
+    rotate: -6,
+    motion: { x: 3, y: -3 },
+    delay: 0,
+  },
+  {
+    text: "TypeScript",
+    // NE gutter — above editor panel
+    slot: "top-0 right-0",
+    rotate: 5,
+    motion: { x: -3, y: -2 },
+    delay: 0.15,
+  },
+  {
+    text: "Tailwind",
+    // West mid gap — left of editor, below terminal
+    slot: "top-[44%] left-0 -translate-y-1/2",
+    rotate: -4,
+    motion: { x: 2, y: 3 },
+    delay: 0.3,
+  },
+  {
+    text: "JavaScript",
+    // East mid — right edge below editor body
+    slot: "top-[60%] right-0 -translate-y-1/2 hidden sm:block",
+    rotate: 4,
+    motion: { x: -2, y: 3 },
+    delay: 0.45,
+  },
+  {
+    text: "CompTIA A+",
+    // SW gutter — clear of diagnostics content
+    slot: "bottom-0 left-0",
+    rotate: 5,
+    motion: { x: 2, y: -2 },
+    delay: 0.2,
+  },
+  {
+    text: "Networking",
+    // SE gutter — above status chip
+    slot: "bottom-[20%] right-0 hidden md:block",
+    rotate: -5,
+    motion: { x: -3, y: 2 },
+    delay: 0.35,
+  },
+  {
+    text: "Graphic Design",
+    // North-center strip — above both panel crowns
+    slot: "top-0 left-1/2 -translate-x-1/2 hidden lg:block",
+    rotate: 3,
+    motion: { x: 2, y: -3 },
+    delay: 0.5,
+  },
+  {
+    text: "HTML",
+    // West gap twin — below Tailwind slot, still left of editor
+    slot: "top-[52%] left-0 hidden sm:block",
+    rotate: -7,
+    motion: { x: 3, y: 2 },
+    delay: 0.25,
+  },
+  {
+    text: "CSS",
+    // East upper strip — right edge above editor body
+    slot: "top-[12%] right-0 hidden md:block",
+    rotate: 6,
+    motion: { x: -2, y: 2 },
+    delay: 0.4,
+  },
+  {
+    text: "Git",
+    // Lower-east gap — between diagnostics right edge and status
+    slot: "bottom-[12%] right-[28%] hidden lg:block",
+    rotate: -3,
+    motion: { x: 2, y: -2 },
+    delay: 0.55,
+  },
+  {
+    text: "Framer Motion",
+    // Lower-west gap — above diagnostics, left of editor
+    slot: "top-[66%] left-0 hidden lg:block",
+    rotate: 4,
+    motion: { x: 3, y: -2 },
+    delay: 0.6,
+  },
 ];
 
 const heroEntrance = {
@@ -39,7 +130,7 @@ export function Hero() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <section className="relative flex min-h-[100svh] items-center pb-16 pt-[calc(var(--nav-height)+1rem)]">
+    <section className="relative flex min-h-[100svh] items-center overflow-x-clip pb-16 pt-[calc(var(--nav-height)+1rem)]">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8">
         <motion.div
           className="relative z-10"
@@ -70,41 +161,51 @@ export function Hero() {
         </motion.div>
 
         <div className="relative mx-auto h-[420px] w-full max-w-lg sm:h-[480px] lg:h-[520px]">
-          {!reducedMotion
-            ? TECH_BADGES.map((tech, i) => {
-                const pos = floatingPositions[i % floatingPositions.length];
-                return (
-                  <motion.div
-                    key={tech}
-                    className="absolute z-20"
-                    style={pos}
-                    animate={{
-                      y: [0, i % 2 === 0 ? -10 : 10, 0],
-                      x: [0, i % 3 === 0 ? 6 : -6, 0],
-                    }}
-                    transition={{
-                      duration: 6 + (i % 5),
+          {/* Labels stay in gutters; z below panels so glass never reveals them through content */}
+          {floatingLabels.map((label, i) => (
+            <motion.div
+              key={label.text}
+              aria-hidden="true"
+              className={`pointer-events-none absolute z-[5] ${label.slot}`}
+              style={{ rotate: label.rotate }}
+              animate={
+                reducedMotion
+                  ? undefined
+                  : {
+                      x: [-label.motion.x, label.motion.x, -label.motion.x],
+                      y: [-label.motion.y, label.motion.y, -label.motion.y],
+                    }
+              }
+              transition={
+                reducedMotion
+                  ? undefined
+                  : {
+                      // Shared phase family so floats feel synced, not random
+                      duration: 8.5,
                       repeat: Infinity,
                       ease: "easeInOut",
-                      delay: i * 0.2,
-                    }}
-                  >
-                    <Badge
-                      tone={i % 2 === 0 ? "secondary" : "default"}
-                      className="glass shadow-lg"
-                    >
-                      {tech}
-                    </Badge>
-                  </motion.div>
-                );
-              })
-            : null}
+                      delay: label.delay * 0.65,
+                    }
+              }
+            >
+              <Badge
+                tone={i % 2 === 0 ? "secondary" : "default"}
+                className="glass shadow-lg"
+              >
+                {label.text}
+              </Badge>
+            </motion.div>
+          ))}
 
           <motion.div
-            className="code-panel glass absolute left-2 top-8 z-10 w-[78%] -rotate-3 overflow-hidden rounded-2xl p-4 shadow-2xl sm:left-4"
-            initial={{ opacity: 0, y: 20 }}
+            className="code-panel glass absolute left-2 top-8 z-10 w-[min(78%,20rem)] -rotate-3 overflow-hidden rounded-[var(--radius-md)] p-4 shadow-2xl sm:left-4 sm:w-[78%]"
+            initial={reducedMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: 0.45, delay: 0.12, ease: [0.22, 1, 0.36, 1] }
+            }
           >
             <div className="mb-3 flex items-center gap-2">
               <Terminal className="size-4 text-secondary" />
@@ -129,10 +230,14 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            className="code-panel glass absolute right-0 top-28 z-[11] w-[72%] rotate-2 overflow-hidden rounded-2xl border border-white/10 p-4 shadow-2xl"
-            initial={{ opacity: 0, y: 24 }}
+            className="code-panel glass absolute right-0 top-28 z-[11] w-[min(72%,18rem)] rotate-2 overflow-hidden rounded-[var(--radius-md)] border border-white/10 p-4 shadow-2xl sm:w-[72%]"
+            initial={reducedMotion ? false : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.28 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: 0.45, delay: 0.22, ease: [0.22, 1, 0.36, 1] }
+            }
           >
             <div className="mb-3 flex items-center justify-between">
               <span className="font-mono text-xs text-muted">editor.tsx</span>
@@ -166,10 +271,14 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            className="glass absolute bottom-10 left-6 z-[12] w-[70%] -rotate-2 rounded-2xl p-4 shadow-2xl"
-            initial={{ opacity: 0, y: 28 }}
+            className="glass absolute bottom-10 left-6 z-[12] w-[min(70%,18rem)] -rotate-2 rounded-[var(--radius-md)] p-4 shadow-2xl sm:w-[70%]"
+            initial={reducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: 0.45, delay: 0.32, ease: [0.22, 1, 0.36, 1] }
+            }
           >
             <div className="mb-3 flex items-center gap-2">
               <Activity className="size-4 text-secondary" />
@@ -193,12 +302,18 @@ export function Hero() {
 
           <motion.div
             className="glass absolute bottom-2 right-4 z-[13] flex items-center gap-3 rounded-xl px-3 py-2 -rotate-1"
-            animate={
-              reducedMotion ? undefined : { y: [0, -6, 0] }
-            }
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            animate={reducedMotion ? undefined : { y: [0, -3, 0] }}
+            transition={{
+              duration: 8.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.4,
+            }}
           >
             <span className="relative flex size-2.5">
+              {!reducedMotion ? (
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-secondary/40 opacity-60" />
+              ) : null}
               <span className="relative inline-flex size-2.5 rounded-full bg-secondary/70" />
             </span>
             <div>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Voltline stacked logo</title>
+  <path d="M118 16h16l9 28 9-28h16L152 84h-12L118 16Z" fill="#F5F5F5"/>
+  <path d="M168 48h14v4h-5v12h-4V48Z" fill="#C8FF3D"/>
+  <text x="28" y="148" fill="#F5F5F5" font-family="ui-sans-serif,system-ui,sans-serif" font-size="44" font-weight="700" letter-spacing="10">VOLTLINE</text>
+  <rect x="28" y="160" width="32" height="4" fill="#C8FF3D"/>
+</svg>

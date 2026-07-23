@@ -20,6 +20,7 @@ const settingsSchema = z.object({
   animations: z.boolean(),
   density: z.enum(["comfortable", "compact"]),
   notifications: z.boolean(),
+  theme: z.enum(["light", "dark"]).default("dark"),
 });
 
 type ToolkitState = {
@@ -84,7 +85,17 @@ export function ToolkitProvider({ children }: { children: React.ReactNode }) {
         const raw = window.localStorage.getItem(SETTINGS_KEY);
         if (raw) {
           const parsed = settingsSchema.safeParse(JSON.parse(raw));
-          if (parsed.success) setSettings(parsed.data);
+          if (parsed.success) {
+            setSettings(parsed.data);
+            document.documentElement.dataset.toolkitTheme = parsed.data.theme;
+          }
+        } else {
+          const systemTheme: ToolkitSettings["theme"] =
+            window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          const initialSettings = { ...DEFAULT_SETTINGS, theme: systemTheme };
+          setSettings(initialSettings);
+          document.documentElement.dataset.toolkitTheme = systemTheme;
+          window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(initialSettings));
         }
       } catch {
         setSettings(DEFAULT_SETTINGS);
@@ -97,6 +108,7 @@ export function ToolkitProvider({ children }: { children: React.ReactNode }) {
     setSettings((current) => {
       const updated = { ...current, ...next };
       window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
+      if (next.theme) document.documentElement.dataset.toolkitTheme = next.theme;
       return updated;
     });
   }, []);

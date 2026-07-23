@@ -32,7 +32,21 @@ const statusStyles: Record<HealthStatus, string> = {
 
 export function StatusBadge({ status }: { status: HealthStatus }) {
   return (
-    <span className={cn("inline-flex rounded-full border px-2 py-1 text-[11px] font-semibold capitalize", statusStyles[status])}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold capitalize",
+        statusStyles[status],
+      )}
+    >
+      <span
+        className={cn(
+          "size-1.5 rounded-full",
+          status === "healthy" && "bg-emerald-300",
+          status === "attention" && "bg-amber-200",
+          status === "critical" && "bg-rose-300",
+        )}
+        aria-hidden
+      />
       {status}
     </span>
   );
@@ -169,25 +183,25 @@ export function ChartPanel({
   summary: string;
 }) {
   return (
-    <section className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
-      <div className="mb-4">
+    <section className="rounded-[var(--radius)] border border-white/8 bg-white/[0.03] p-5">
+      <div className="mb-5">
         <h3 className="font-display text-base font-semibold text-text">{title}</h3>
         <p className="sr-only">{summary}</p>
       </div>
-      <div className="h-52 min-w-0" aria-hidden>
+      <div className="h-56 min-w-0" aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
               <linearGradient id={`toolkit-${title.replaceAll(" ", "-")}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f8e71c" stopOpacity={0.24} />
-                <stop offset="100%" stopColor="#f8e71c" stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.24} />
+                <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid stroke="rgba(255,255,255,.05)" vertical={false} />
             <XAxis dataKey="time" hide />
             <YAxis width={30} tick={{ fill: "#777", fontSize: 10 }} axisLine={false} tickLine={false} unit={unit} />
             <Tooltip contentStyle={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12 }} />
-            <Area type="monotone" dataKey="value" stroke="#f8e71c" strokeWidth={2} fill={`url(#toolkit-${title.replaceAll(" ", "-")})`} isAnimationActive />
+            <Area type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={2} fill={`url(#toolkit-${title.replaceAll(" ", "-")})`} isAnimationActive />
           </AreaChart>
         </ResponsiveContainer>
       </div>

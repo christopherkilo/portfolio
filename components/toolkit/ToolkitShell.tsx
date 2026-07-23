@@ -9,11 +9,13 @@ import {
   Command,
   Download,
   Menu,
+  Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Play,
   RotateCcw,
   Search,
+  Sun,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -47,6 +49,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
     reportStorageStatus,
     refreshReports,
     refreshAll,
+    updateSettings,
   } = useToolkit();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -120,6 +123,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
       className="toolkit-root min-h-screen bg-[#050505] text-text"
       data-density={settings.density}
       data-animations={settings.animations ? "on" : "off"}
+      data-theme={settings.theme}
     >
       <a href="#toolkit-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-3 focus:py-2 focus:text-black">
         Skip to toolkit content
@@ -145,6 +149,10 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="border-t border-white/7 p-3">
           {!collapsed ? <div className="mb-3 rounded-xl bg-white/[0.03] p-3"><DemoModeBadge compact /><p className="mt-2 text-[11px] leading-relaxed text-muted">No system data is read from this device.</p></div> : null}
+          <Link href="/" title={collapsed ? "Back to portfolio" : undefined} className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-text">
+            <ChevronLeft className="size-4 shrink-0" />
+            {!collapsed ? <span>Back to portfolio</span> : <span className="sr-only">Back to portfolio</span>}
+          </Link>
           <button type="button" onClick={() => setCollapsed((value) => !value)} className="flex w-full items-center justify-center rounded-xl p-2 text-muted hover:bg-white/5 hover:text-text" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
             {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
           </button>
@@ -161,6 +169,18 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
           </button>
           <div className="hidden items-center gap-2 text-xs text-muted xl:flex"><span className="size-1.5 rounded-full bg-emerald-400" />{sessionLabel}</div>
           <DemoModeBadge compact />
+          <Link href="/" className="hidden items-center gap-1.5 rounded-lg px-2 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-text xl:flex">
+            <ChevronLeft className="size-4" />Portfolio
+          </Link>
+          <button
+            type="button"
+            onClick={() => updateSettings({ theme: settings.theme === "dark" ? "light" : "dark" })}
+            className="rounded-lg p-2 text-muted transition hover:bg-white/5 hover:text-text"
+            aria-label={`Switch to ${settings.theme === "dark" ? "light" : "dark"} mode`}
+            title={`Switch to ${settings.theme === "dark" ? "light" : "dark"} mode`}
+          >
+            {settings.theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </button>
           <button type="button" disabled={!settings.notifications} onClick={() => setNotificationsOpen((value) => !value)} className="relative rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text disabled:cursor-not-allowed disabled:opacity-40" aria-label={settings.notifications ? "Open notifications" : "Notifications disabled in settings"}>
             <Bell className="size-4" />{settings.notifications ? <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary" /> : null}
           </button>

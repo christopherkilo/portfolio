@@ -1,0 +1,32 @@
+<svg width="1200" height="750" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title">
+  <title id="title">NightShift campaign cover</title>
+  <rect width="1200" height="750" fill="#07070C"/>
+  <defs>
+    <linearGradient id="ns-glow" x1="200" y1="80" x2="1000" y2="700">
+      <stop stop-color="#6B4DFF" stop-opacity="0.4"/>
+      <stop offset="0.55" stop-color="#34E8FF" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#07070C" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="ns-orb" cx="78%" cy="28%" r="42%">
+      <stop stop-color="#34E8FF" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#07070C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#ns-glow)"/>
+  <rect width="1200" height="750" fill="url(#ns-orb)"/>
+  <g stroke="#EDEDF2" stroke-opacity="0.08">
+    <path d="M60 100h1080M60 220h1080M60 340h1080M60 460h1080M60 580h1080"/>
+    <path d="M180 40v670M360 40v670M540 40v670M720 40v670M900 40v670M1080 40v670"/>
+  </g>
+  <rect x="780" y="120" width="320" height="420" rx="18" fill="#0B0B14" stroke="#34E8FF" stroke-opacity="0.35"/>
+  <text x="810" y="180" fill="#34E8FF" font-family="ui-monospace,monospace" font-size="14" letter-spacing="3">FESTIVAL</text>
+  <text x="810" y="280" fill="#EDEDF2" font-family="ui-sans-serif,system-ui,sans-serif" font-size="54" font-weight="800">NIGHT</text>
+  <text x="810" y="340" fill="#EDEDF2" font-family="ui-sans-serif,system-ui,sans-serif" font-size="54" font-weight="800">SHIFT</text>
+  <text x="810" y="400" fill="#C8CDDA" font-family="ui-sans-serif,system-ui,sans-serif" font-size="16">One weekend. Infinite after-hours.</text>
+  <rect x="810" y="430" width="40" height="4" fill="#34E8FF"/>
+  <path d="M120 180h420" stroke="#34E8FF" stroke-width="3"/>
+  <text x="120" y="290" fill="#EDEDF2" font-family="ui-sans-serif,system-ui,sans-serif" font-size="110" font-weight="800" letter-spacing="-2">NIGHT</text>
+  <text x="120" y="400" fill="#EDEDF2" font-family="ui-sans-serif,system-ui,sans-serif" font-size="110" font-weight="800" letter-spacing="-2">SHIFT</text>
+  <text x="120" y="470" fill="#34E8FF" font-family="ui-sans-serif,system-ui,sans-serif" font-size="28" letter-spacing="8">CREATE AFTER DARK.</text>
+  <text x="120" y="540" fill="#9AA0B5" font-family="ui-monospace,monospace" font-size="18" letter-spacing="3">OCT 17-18 · HARBOR ARTS DISTRICT</text>
+</svg>

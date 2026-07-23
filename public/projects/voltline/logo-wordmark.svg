@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 96" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Voltline primary wordmark</title>
+  <path d="M12 18h14l8 24 8-24h14L40 78H28L12 18Z" fill="#F5F5F5"/>
+  <path d="M66 50h12v4h-4v14h-4V50Z" fill="#C8FF3D"/>
+  <text x="100" y="68" fill="#F5F5F5" font-family="ui-sans-serif,system-ui,sans-serif" font-size="52" font-weight="700" letter-spacing="12">VOLTLINE</text>
+</svg>

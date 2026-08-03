@@ -33,12 +33,20 @@ export function Footer() {
 
         <div className="flex flex-col gap-3 border-t border-border pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>{SITE.copyright}</p>
-          <p>
-            Built with{" "}
-            <span className="text-text">Next.js</span>,{" "}
-            <span className="text-text">Tailwind</span>, and{" "}
-            <span className="text-text">Framer Motion</span>
-          </p>
+          <div className="flex flex-col gap-2 sm:items-end">
+            <a
+              href={`mailto:${SITE.email}`}
+              className="text-muted transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {SITE.email}
+            </a>
+            <p>
+              Built with{" "}
+              <span className="text-text">Next.js</span>,{" "}
+              <span className="text-text">Tailwind</span>, and{" "}
+              <span className="text-text">Framer Motion</span>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

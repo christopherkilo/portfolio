@@ -7,11 +7,13 @@ import {
   CheckSquare,
   FolderKanban,
   LayoutDashboard,
+  ScrollText,
   Settings,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/demos/taskflow/data";
+import { useActiveWorkspaceId } from "@/lib/demos/taskflow/api/hooks";
 import { cn } from "@/lib/demos/taskflow/utils";
 
 const icons: Record<string, LucideIcon> = {
@@ -20,11 +22,14 @@ const icons: Record<string, LucideIcon> = {
   CheckSquare,
   CalendarDays,
   Users,
+  ScrollText,
   Settings,
 };
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { workspace, workspaces, setWorkspaceId, isLoading } =
+    useActiveWorkspaceId();
 
   return (
     <aside className="flex h-full w-[var(--sidebar)] flex-col border-r border-border bg-surface">
@@ -32,7 +37,10 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         <span className="inline-flex size-7 items-center justify-center rounded-md bg-accent text-xs font-bold text-bg">
           TF
         </span>
-        <Link href="/demos/taskflow/dashboard" className="font-display text-sm font-semibold tracking-tight">
+        <Link
+          href="/demos/taskflow/dashboard"
+          className="font-display text-sm font-semibold tracking-tight"
+        >
           TaskFlow
         </Link>
       </div>
@@ -59,8 +67,29 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
       <div className="border-t border-border p-4">
-        <p className="text-xs text-muted">Workspace</p>
-        <p className="mt-1 text-sm font-medium">Nova Labs</p>
+        <label htmlFor="taskflow-workspace" className="text-xs text-muted">
+          Workspace
+        </label>
+        {isLoading ? (
+          <p className="mt-1 text-sm text-muted">Loading…</p>
+        ) : workspaces.length > 1 ? (
+          <select
+            id="taskflow-workspace"
+            className="mt-1 w-full rounded-md border border-border bg-bg px-2 py-1.5 text-sm font-medium text-ink"
+            value={workspace?.id ?? ""}
+            onChange={(event) => setWorkspaceId(event.target.value || null)}
+          >
+            {workspaces.map((row) => (
+              <option key={row.id} value={row.id}>
+                {row.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="mt-1 text-sm font-medium">
+            {workspace?.name ?? "No workspace"}
+          </p>
+        )}
       </div>
     </aside>
   );

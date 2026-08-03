@@ -4,7 +4,7 @@ import { SITE } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Contact ${SITE.name} — email, LinkedIn, GitHub, and a message form.`,
+  description: `Contact ${SITE.name} at ${SITE.email} — collaborations, product builds, and software roles.`,
 };
 
 export default function ContactPage() {

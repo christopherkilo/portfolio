@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getAllCaseStudyIds, getCaseStudy } from "./caseStudies";
 import {
+  getHomepageFeaturedProjects,
+  getPortfolioProjects,
   getProjectById,
   getProjectHref,
   getProjectsByCategory,
@@ -81,10 +83,41 @@ describe("web project routing metadata", () => {
     expect(hasLiveDemo("https://example.com/demo")).toBe(true);
   });
 
-  it("still lists three web projects for category filters", () => {
-    expect(getProjectsByCategory("web").map((p) => p.id)).toEqual([
+  it("lists three featured web applications", () => {
+    expect(getProjectsByCategory("web").map((p) => p.id)).toEqual([...WEB_IDS]);
+  });
+
+  it("features three web apps on the homepage and keeps toolkit separate", () => {
+    expect(getHomepageFeaturedProjects().map((p) => p.id)).toEqual([...WEB_IDS]);
+    expect(getPortfolioProjects().map((p) => p.id)).toEqual([
       ...WEB_IDS,
+      "kilo-toolkit",
+      "voltline",
+      "nightshift",
+      "signal-magazine",
     ]);
+  });
+
+  it("routes Kilo Toolkit to the live suite, not a web case-study page", () => {
+    const toolkit = getProjectById("kilo-toolkit")!;
+    expect(toolkit.category).toBe("it");
+    expect(getProjectHref(toolkit)).toBe("/toolkit");
+    expect(toolkit.liveDemo).toBe("/toolkit");
+  });
+
+  it("keeps toolkit module deep-links without listing them on portfolio grids", () => {
+    for (const id of ["systemscope", "memorymedic", "netcheck"] as const) {
+      const project = getProjectById(id);
+      expect(project).toBeDefined();
+      expect(project?.portfolioVisible).toBe(false);
+      expect(project?.href).toMatch(/^\/toolkit\//);
+    }
+  });
+
+  it("exposes the professional contact email from site constants", async () => {
+    const { SITE } = await import("./constants");
+    expect(SITE.email).toBe("christopherkilo.pro@gmail.com");
+    expect(SITE.email).not.toContain("hello@");
   });
 
   it("keeps cards pointed at case studies rather than demos", () => {

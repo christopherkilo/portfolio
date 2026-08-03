@@ -2,7 +2,6 @@ import type { Transition, Variants } from "framer-motion";
 
 export const durations = {
   fast: 0.15,
-  medium: 0.25,
   section: 0.5,
 } as const;
 

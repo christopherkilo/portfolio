@@ -142,6 +142,27 @@ html[data-theme="dark"] [data-demo="novatech"],
   background-size: 28px 28px;
 }
 
+/* NovaTech — keyboard focus + reduced-motion comfort */
+[data-demo="novatech"] :focus {
+  outline: none;
+}
+
+[data-demo="novatech"] :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-demo="novatech"] *,
+  [data-demo="novatech"] *::before,
+  [data-demo="novatech"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 [data-demo="taskflow"] {
   --bg: #09090b;
   --surface: #111113;
@@ -235,4 +256,37 @@ html[data-theme="dark"] [data-demo="taskflow"] .theme-icon-dark,
 html[data-theme="light"] [data-demo="taskflow"] .theme-icon-light,
 [data-demo="taskflow"][data-theme="light"] .theme-icon-light {
   display: none;
+}
+
+/* Event Horizon — visible keyboard focus + reduced-motion comfort */
+[data-demo="event-horizon"] :focus {
+  outline: none;
+}
+
+[data-demo="event-horizon"] :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[data-demo="event-horizon"] .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-demo="event-horizon"] *,
+  [data-demo="event-horizon"] *::before,
+  [data-demo="event-horizon"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

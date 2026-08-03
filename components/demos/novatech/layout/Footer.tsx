@@ -17,18 +17,20 @@ export function Footer() {
           <p className="text-sm font-semibold uppercase tracking-wider text-footer-ink/60">
             Explore
           </p>
-          <ul className="mt-4 space-y-2">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm text-footer-ink/75 transition hover:text-footer-ink"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <nav aria-label="Footer" className="mt-4">
+            <ul className="space-y-2">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-footer-ink/75 transition hover:text-footer-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-footer-accent"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider text-footer-ink/60">

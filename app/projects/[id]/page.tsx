@@ -10,7 +10,8 @@ import {
   getAllCaseStudyIds,
   getCaseStudy,
 } from "@/lib/caseStudies";
-import { categoryLabels, hasLiveDemo, isInternalHref } from "@/lib/projectData";
+import { categoryBadgeLabels, hasLiveDemo, isInternalHref } from "@/lib/projectData";
+import { isSvgImageSrc } from "@/lib/utils";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -57,7 +58,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
 
       <header className="mb-10">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-muted">
-          Case study · {categoryLabels[project.category]}
+          Case study · {categoryBadgeLabels[project.category]}
         </p>
         <h1 className="font-display text-4xl font-semibold tracking-tight text-text md:text-5xl">
           {project.title}
@@ -82,7 +83,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
               {isInternalHref(project.liveDemo) ? null : (
                 <ExternalLink className="size-4" aria-hidden />
               )}
-              Open Live Demo
+              Live Demo
             </Button>
           ) : null}
           {project.github ? (
@@ -93,7 +94,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
           ) : null}
           <Button href="/projects" variant="ghost" size="lg">
             <ArrowLeft className="size-4" aria-hidden />
-            All Projects
+            Back to Projects
           </Button>
         </div>
       </header>
@@ -104,7 +105,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
           alt={`${project.title} visual`}
           fill
           priority
-          unoptimized
+          unoptimized={isSvgImageSrc(project.image)}
           className="object-cover"
           sizes="(max-width: 1200px) 100vw, 1100px"
         />
@@ -251,7 +252,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
               {isInternalHref(project.liveDemo) ? null : (
                 <ExternalLink className="size-4" aria-hidden />
               )}
-              Open Live Demo
+              Live Demo
             </Button>
           ) : null}
           {project.github && !hasLiveDemo(project.liveDemo) ? (

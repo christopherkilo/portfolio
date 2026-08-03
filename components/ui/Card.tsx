@@ -12,25 +12,39 @@ import {
   useTransform,
 } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { getProjectHref, type Project } from "@/lib/projectData";
+import {
+  getProjectCtaLabel,
+  getProjectHref,
+  type Project,
+} from "@/lib/projectData";
 import { durations, springHover } from "@/lib/animation";
 import { Badge } from "@/components/ui/Badge";
 import { GithubIcon } from "@/components/ui/BrandIcons";
 import { Shimmer } from "@/components/ui/Shimmer";
-import { cn } from "@/lib/utils";
+import { cn, isSvgImageSrc } from "@/lib/utils";
+
+export type ProjectCardVariant = "carousel" | "grid";
 
 type ProjectCardProps = {
   project: Project;
   className?: string;
+  /** `carousel` keeps fixed widths for the homepage strip; `grid` fills the cell. */
+  variant?: ProjectCardVariant;
 };
 
-function ProjectCardComponent({ project, className }: ProjectCardProps) {
+function ProjectCardComponent({
+  project,
+  className,
+  variant = "carousel",
+}: ProjectCardProps) {
   const ref = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
   const [hovered, setHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const href = getProjectHref(project);
   const hasImage = Boolean(project.image);
+  const ctaLabel = getProjectCtaLabel(project);
+  const isGrid = variant === "grid";
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -74,9 +88,6 @@ function ProjectCardComponent({ project, className }: ProjectCardProps) {
     y.set(0);
   }
 
-  const ctaLabel =
-    project.category === "it" ? "Open Toolkit" : "View Case Study";
-
   return (
     <motion.article
       ref={ref}
@@ -96,7 +107,10 @@ function ProjectCardComponent({ project, className }: ProjectCardProps) {
             }
       }
       className={cn(
-        "gradient-border glass-panel group relative flex h-full w-[min(100%,300px)] shrink-0 flex-col overflow-hidden rounded-[var(--radius)] sm:w-[340px]",
+        "gradient-border glass-panel group relative flex h-full flex-col overflow-hidden rounded-[var(--radius)]",
+        isGrid
+          ? "w-full min-w-0"
+          : "w-[min(100%,300px)] shrink-0 sm:w-[340px]",
         hovered &&
           "brightness-[1.05] shadow-[0_28px_60px_-28px_rgba(0,0,0,0.45),0_0_40px_-20px_var(--glow-yellow)]",
         className,
@@ -133,7 +147,6 @@ function ProjectCardComponent({ project, className }: ProjectCardProps) {
       ) : null}
 
       <div className="pointer-events-none relative aspect-[16/10] overflow-hidden bg-surface-elevated">
-        {/* Skeleton placeholder — reserved aspect box prevents CLS */}
         <div
           className={cn(
             "absolute inset-0 bg-gradient-to-br from-white/[0.06] via-white/[0.02] to-transparent transition-opacity duration-[var(--duration-card)]",
@@ -163,10 +176,14 @@ function ProjectCardComponent({ project, className }: ProjectCardProps) {
               src={project.image}
               alt={project.imageAlt ?? `${project.title} project cover`}
               fill
-              sizes="(max-width: 640px) 300px, 340px"
+              sizes={
+                isGrid
+                  ? "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                  : "(max-width: 640px) 300px, 340px"
+              }
               className="object-cover"
-              loading="eager"
-              unoptimized
+              loading={isGrid ? "lazy" : "eager"}
+              unoptimized={isSvgImageSrc(project.image)}
               onLoad={() => setImageLoaded(true)}
             />
           </motion.div>
@@ -182,7 +199,7 @@ function ProjectCardComponent({ project, className }: ProjectCardProps) {
         )}
 
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
-        <span className="absolute right-3 top-3 inline-flex size-8 items-center justify-center rounded-full border border-white/10 bg-black/40 text-text opacity-0 backdrop-blur-md transition duration-[var(--duration-card)] group-hover:opacity-100">
+        <span className="absolute right-3 top-3 inline-flex size-8 items-center justify-center rounded-full border border-white/10 bg-black/40 text-text opacity-0 backdrop-blur-md transition duration-[var(--duration-card)] group-hover:opacity-100 group-focus-within:opacity-100">
           <ArrowUpRight className="size-4" aria-hidden />
         </span>
       </div>

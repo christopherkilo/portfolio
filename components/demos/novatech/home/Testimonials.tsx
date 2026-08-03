@@ -1,12 +1,14 @@
 "use client";
 
 import { Quote } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { TESTIMONIALS } from "@/lib/demos/novatech/constants";
 import { SectionHeader } from "@/components/demos/novatech/ui/SectionHeader";
 import { staggerContainer, staggerItem } from "@/lib/demos/novatech/animation";
 
 export function Testimonials() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <section className="bg-surface py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -19,15 +21,15 @@ export function Testimonials() {
 
         <motion.div
           className="grid gap-5 md:grid-cols-3"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
+          variants={reducedMotion ? undefined : staggerContainer}
+          initial={reducedMotion ? false : "hidden"}
+          whileInView={reducedMotion ? undefined : "visible"}
           viewport={{ once: true, margin: "-80px" }}
         >
           {TESTIMONIALS.map((item) => (
             <motion.blockquote
               key={item.id}
-              variants={staggerItem}
+              variants={reducedMotion ? undefined : staggerItem}
               className="flex h-full flex-col rounded-2xl border border-border bg-bg p-6"
             >
               <Quote className="size-6 text-accent" aria-hidden />

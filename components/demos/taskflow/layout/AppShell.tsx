@@ -1,39 +1,53 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Sidebar } from "@/components/demos/taskflow/layout/Sidebar";
 import { TopNav } from "@/components/demos/taskflow/layout/TopNav";
 import { CommandPalette } from "@/components/demos/taskflow/shared/CommandPalette";
 import { pageVariants } from "@/lib/demos/taskflow/animation";
-import { NAV_ITEMS } from "@/lib/demos/taskflow/data";
+import { DEMO_BASE, NAV_ITEMS } from "@/lib/demos/taskflow/data";
+import { ShortcutHelpModal } from "@/components/demos/taskflow/shared/ShortcutHelpModal";
+import { ConflictDialog } from "@/components/demos/taskflow/collaboration/ConflictDialog";
+import { useTaskflowShortcuts } from "@/lib/demos/taskflow/shortcuts";
+import { useTaskflowUiStore } from "@/lib/demos/taskflow/store";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [commandOpen, setCommandOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const mobilePanelRef = useRef<HTMLDivElement>(null);
+  const density = useTaskflowUiStore((state) => state.settings.density);
+  const isChromeLess =
+    pathname.startsWith(`${DEMO_BASE}/signin`) ||
+    pathname.startsWith(`${DEMO_BASE}/invite`);
 
   const title =
     NAV_ITEMS.find((item) => pathname.startsWith(item.href))?.label ??
     "TaskFlow";
 
-  useEffect(() => {
-    try {
-      const settings = JSON.parse(
-        localStorage.getItem("taskflow-settings") ?? "{}",
-      );
-      document.documentElement.dataset.density =
-        settings.density ?? "comfortable";
-    } catch {
-      document.documentElement.dataset.density = "comfortable";
-    }
-  }, []);
+  const openCreateTask = useCallback(() => {
+    router.push(`${DEMO_BASE}/tasks?create=1`);
+  }, [router]);
+
+  useTaskflowShortcuts({
+    onNewTask: openCreateTask,
+    onOpenCommand: () => setCommandOpen(true),
+    onOpenShortcuts: () => setShortcutsOpen(true),
+    enabled: !isChromeLess,
+  });
 
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (isChromeLess) return;
+    document.documentElement.dataset.density = density;
+  }, [density, isChromeLess]);
+
+  useEffect(() => {
+    if (!mobileOpen || isChromeLess) return;
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     const onKey = (event: KeyboardEvent) => {
@@ -67,7 +81,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       document.removeEventListener("keydown", onKey);
       previousFocus?.focus();
     };
-  }, [mobileOpen]);
+  }, [mobileOpen, isChromeLess]);
+
+  if (isChromeLess) {
+    return (
+      <main id="main" className="min-h-screen bg-bg">
+        {children}
+      </main>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-bg">
@@ -113,7 +135,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           onOpenCommand={() => setCommandOpen(true)}
           onOpenMobile={() => setMobileOpen(true)}
         />
-        <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+        <CommandPalette
+          open={commandOpen}
+          onOpenChange={setCommandOpen}
+          onCreateTask={openCreateTask}
+        />
+        <ShortcutHelpModal
+          open={shortcutsOpen}
+          onClose={() => setShortcutsOpen(false)}
+        />
+        <ConflictDialog />
         {reducedMotion ? (
           <main id="main" className="flex-1 p-4 sm:p-6">
             {children}

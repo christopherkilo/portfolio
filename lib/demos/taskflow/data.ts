@@ -16,11 +16,15 @@ export interface Project {
   name: string;
   description: string;
   status: ProjectStatus;
+  /** Seed hint only — UI should derive progress from tasks. */
   progress: number;
   dueDate: string;
   members: string[];
   color: string;
+  /** Seed hint only — UI should derive counts from tasks. */
   taskCount: number;
+  archived?: boolean;
+  version?: number;
 }
 
 export interface Task {
@@ -33,14 +37,26 @@ export interface Task {
   assigneeId: string;
   dueDate: string;
   labels: string[];
+  estimate?: number;
+  archived?: boolean;
+  version?: number;
 }
 
 export interface ActivityItem {
   id: string;
   userId: string;
+  /** Verb key, e.g. moved | created | completed | assigned */
   action: string;
+  /** Fallback plain-text entity label for older entries */
   target: string;
   timestamp: string;
+  entityType?: "task" | "project" | "member" | "workspace";
+  entityId?: string;
+  entityTitle?: string;
+  oldValue?: string;
+  newValue?: string;
+  /** Concise human summary; preferred for rendering when present */
+  summary?: string;
 }
 
 export const TEAM: TeamMember[] = [
@@ -295,21 +311,35 @@ export const ACTIVITY: ActivityItem[] = [
     id: "a1",
     userId: "u2",
     action: "moved",
-    target: "Ship command palette shortcuts → Review",
+    target: "Ship command palette shortcuts",
+    entityType: "task",
+    entityId: "t2",
+    entityTitle: "Ship command palette shortcuts",
+    oldValue: "In Progress",
+    newValue: "Review",
+    summary: "moved Ship command palette shortcuts from In Progress to Review",
     timestamp: "2026-07-20T14:20:00",
   },
   {
     id: "a2",
     userId: "u3",
-    action: "commented on",
+    action: "commented",
     target: "Refine sidebar information architecture",
+    entityType: "task",
+    entityId: "t1",
+    entityTitle: "Refine sidebar information architecture",
+    summary: "commented on Refine sidebar information architecture",
     timestamp: "2026-07-20T13:05:00",
   },
   {
     id: "a3",
     userId: "u1",
     action: "created",
-    target: "Docs Site project",
+    target: "Docs Site",
+    entityType: "project",
+    entityId: "p3",
+    entityTitle: "Docs Site",
+    summary: "created project Docs Site",
     timestamp: "2026-07-20T11:40:00",
   },
   {
@@ -317,20 +347,33 @@ export const ACTIVITY: ActivityItem[] = [
     userId: "u4",
     action: "completed",
     target: "Progress chart polish",
+    entityType: "task",
+    entityId: "t9",
+    entityTitle: "Progress chart polish",
+    summary: "completed Progress chart polish",
     timestamp: "2026-07-19T17:15:00",
   },
   {
     id: "a5",
-    userId: "u5",
-    action: "updated",
-    target: "Billing Pipeline due date",
+    userId: "u1",
+    action: "due-changed",
+    target: "Billing Pipeline",
+    entityType: "project",
+    entityTitle: "Billing Pipeline",
+    oldValue: "Jul 12",
+    newValue: "Jul 28",
+    summary: "changed Billing Pipeline due date from Jul 12 to Jul 28",
     timestamp: "2026-07-19T15:50:00",
   },
   {
     id: "a6",
     userId: "u2",
     action: "assigned",
-    target: "Session revocation API → Jordan Blake",
+    target: "Session revocation API",
+    entityType: "task",
+    entityTitle: "Session revocation API",
+    newValue: "Jordan Blake",
+    summary: "assigned Session revocation API to Jordan Blake",
     timestamp: "2026-07-19T10:12:00",
   },
 ];
@@ -363,5 +406,6 @@ export const NAV_ITEMS = [
   { href: `${DEMO_BASE}/tasks`, label: "Tasks", icon: "CheckSquare" },
   { href: `${DEMO_BASE}/calendar`, label: "Calendar", icon: "CalendarDays" },
   { href: `${DEMO_BASE}/team`, label: "Team", icon: "Users" },
+  { href: `${DEMO_BASE}/audit`, label: "Audit", icon: "ScrollText" },
   { href: `${DEMO_BASE}/settings`, label: "Settings", icon: "Settings" },
 ] as const;

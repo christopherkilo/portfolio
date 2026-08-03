@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { buttonTransition, springHover } from "@/lib/demos/novatech/animation";
 import { cn } from "@/lib/demos/novatech/utils";
 
@@ -49,6 +49,7 @@ export function Button({
   "aria-label": ariaLabel,
   "aria-expanded": ariaExpanded,
 }: ButtonProps) {
+  const reducedMotion = useReducedMotion();
   const classes = cn(
     "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
     variants[variant],
@@ -57,6 +58,14 @@ export function Button({
   );
 
   if (href) {
+    if (reducedMotion) {
+      return (
+        <Link href={href} className={classes} aria-label={ariaLabel} onClick={onClick}>
+          {children}
+        </Link>
+      );
+    }
+
     return (
       <motion.div
         className="inline-flex"
@@ -64,10 +73,30 @@ export function Button({
         whileTap={{ scale: 0.98 }}
         transition={springHover}
       >
-        <Link href={href} className={classes} aria-label={ariaLabel}>
+        <Link
+          href={href}
+          className={classes}
+          aria-label={ariaLabel}
+          onClick={onClick}
+        >
           {children}
         </Link>
       </motion.div>
+    );
+  }
+
+  if (reducedMotion) {
+    return (
+      <button
+        type={type}
+        className={classes}
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        aria-expanded={ariaExpanded}
+      >
+        {children}
+      </button>
     );
   }
 

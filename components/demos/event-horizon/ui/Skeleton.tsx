@@ -15,12 +15,15 @@ export function EventCardSkeleton() {
   );
 }
 
+/** Accessible label used by event grid loading skeletons. */
+export const EVENT_GRID_LOADING_LABEL = "Loading events";
+
 export function EventGridSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div
       className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
       aria-busy="true"
-      aria-label="Loading events"
+      aria-label={EVENT_GRID_LOADING_LABEL}
     >
       {Array.from({ length: count }).map((_, i) => (
         <EventCardSkeleton key={i} />
@@ -28,3 +31,7 @@ export function EventGridSkeleton({ count = 6 }: { count?: number }) {
     </div>
   );
 }
+
+/** Accessible label used by event detail loading placeholders. */
+export const EVENT_DETAIL_LOADING_LABEL = "Loading event";
+

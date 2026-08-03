@@ -42,7 +42,7 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
               aria-label={`Show image ${i + 1}`}
               aria-current={active === i}
               className={cn(
-                "relative size-20 overflow-hidden rounded-xl border transition",
+                "relative size-20 overflow-hidden rounded-xl border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                 active === i
                   ? "border-accent ring-2 ring-accent/30"
                   : "border-border opacity-80 hover:opacity-100",

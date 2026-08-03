@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { FAQ_ITEMS } from "@/lib/demos/novatech/constants";
@@ -20,20 +20,34 @@ export function Accordion({ items = FAQ_ITEMS }: AccordionProps) {
   const [openId, setOpenId] = useState<string | null>(items[0]?.id ?? null);
   const reducedMotion = useReducedMotion();
 
+  useEffect(() => {
+    function syncFromHash() {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (!hash) return;
+      if (items.some((item) => item.id === hash)) {
+        setOpenId(hash);
+      }
+    }
+
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, [items]);
+
   return (
-    <div className="space-y-3" role="list">
+    <div className="space-y-3">
       {items.map((item) => {
         const open = openId === item.id;
         return (
           <div
             key={item.id}
-            role="listitem"
-            className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm"
+            id={item.id}
+            className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm scroll-mt-28"
           >
             <h3>
               <button
                 type="button"
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-ink transition hover:bg-bg"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-ink transition hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
                 aria-expanded={open}
                 aria-controls={`faq-panel-${item.id}`}
                 id={`faq-button-${item.id}`}

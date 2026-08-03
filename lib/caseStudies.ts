@@ -265,7 +265,7 @@ const studies: Record<string, Omit<CaseStudy, "projectId">> = {
       "Add authentication, workspace isolation, and role-based authorization",
       "Replace fixtures with validated server APIs and derive counts instead of duplicating them",
       "Add persistent task/project CRUD with optimistic updates and conflict handling",
-      "Replace placeholder drag and drop with accessible keyboard and touch interactions",
+      "Improve drag-and-drop interactions with accessible keyboard and touch support",
       "Persist settings and make density and week-start controls affect the interface",
       "Define and instrument real dashboard metrics before presenting analytics",
       "Add unit, integration, end-to-end, and automated accessibility tests",

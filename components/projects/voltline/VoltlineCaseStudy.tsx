@@ -7,7 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Check, Copy, X } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/shared/Reveal";
-import { cn } from "@/lib/utils";
+import { cn, isSvgImageSrc } from "@/lib/utils";
 import {
   VOLTLINE,
   VOLTLINE_COLORS,
@@ -147,7 +147,7 @@ function VoltlineMark({
       width={variant === "symbol" ? 64 : variant === "stacked" ? 300 : 560}
       height={variant === "symbol" ? 64 : variant === "stacked" ? 180 : 96}
       className={cn(item.className, onLight && "brightness-0", className)}
-      unoptimized
+      unoptimized={isSvgImageSrc(item.src)}
     />
   );
 }
@@ -246,7 +246,7 @@ export function VoltlineCaseStudy() {
                 width={1200}
                 height={750}
                 priority
-                unoptimized
+                unoptimized={isSvgImageSrc("/projects/voltline/cover.svg")}
                 className="h-auto w-full"
               />
             </div>
@@ -385,7 +385,7 @@ export function VoltlineCaseStudy() {
                         alt="Voltline early logo concept explorations"
                         width={900}
                         height={620}
-                        unoptimized
+                        unoptimized={isSvgImageSrc("/projects/voltline/images/concept-explorations.svg")}
                         className="h-full w-full object-cover"
                       />
                     </div>

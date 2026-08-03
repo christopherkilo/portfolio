@@ -4,7 +4,8 @@ import { SITE } from "@/lib/demos/novatech/constants";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Fictional ${SITE.name} inquiry form demo.`,
+  description: `Request a consultation in the fictional ${SITE.name} demo. Entries are validated locally and are not sent or stored.`,
+  robots: { index: false, follow: false },
 };
 
 export default function ContactPage() {

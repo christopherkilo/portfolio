@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/demos/novatech/home/Hero";
 import { ServiceCards } from "@/components/demos/novatech/home/ServiceCards";
 import { Testimonials } from "@/components/demos/novatech/home/Testimonials";
@@ -5,43 +6,35 @@ import { CtaBand } from "@/components/demos/novatech/home/CtaBand";
 import { Accordion } from "@/components/demos/novatech/ui/Accordion";
 import { SectionHeader } from "@/components/demos/novatech/ui/SectionHeader";
 import { Button } from "@/components/demos/novatech/ui/Button";
-import { ABOUT_STATS, FAQ_ITEMS } from "@/lib/demos/novatech/constants";
+import {
+  ABOUT_STATS,
+  CTA,
+  DEMO_BASE,
+  FAQ_ITEMS,
+  PROCESS_STEPS,
+  SITE,
+} from "@/lib/demos/novatech/constants";
 import { Reveal } from "@/components/demos/novatech/shared/Reveal";
 
-const PROCESS_STEPS = [
-  {
-    step: "01",
-    title: "Discover",
-    detail: "Map systems, priorities, and risk so the engagement starts with clarity.",
-  },
-  {
-    step: "02",
-    title: "Stabilize",
-    detail: "Close urgent gaps in backup, patching, and access before expanding scope.",
-  },
-  {
-    step: "03",
-    title: "Operate",
-    detail: "Run monitoring, help desk, and reporting on a predictable monthly cadence.",
-  },
-  {
-    step: "04",
-    title: "Improve",
-    detail: "Iterate on security, cloud, and productivity with documented roadmap reviews.",
-  },
-] as const;
+export const metadata: Metadata = {
+  title: "Home",
+  description: SITE.description,
+};
 
 export default function NovaTechDemoHome() {
   return (
     <>
       <Hero />
-      <ServiceCards />
+      <ServiceCards
+        title="Services shaped around business continuity"
+        description="Open a service to see the problems it addresses, what an engagement looks like, and what outcomes it is designed to support."
+      />
 
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <SectionHeader
-          eyebrow="Why teams choose us"
-          title="Trust indicators for modern IT"
-          description="Illustrative operating principles that frame how a managed partner earns confidence."
+          eyebrow="Who it’s for"
+          title="Built for teams that need IT to stay out of the way"
+          description="NovaTech is framed for growing organizations without a full-time IT bench—where downtime, unclear ownership, and reactive vendor support slow the business."
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ABOUT_STATS.map((stat, i) => (
@@ -58,11 +51,11 @@ export default function NovaTechDemoHome() {
       </section>
 
       <section className="border-y border-border bg-surface/60">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <SectionHeader
             eyebrow="Process"
-            title="A clear path from audit to operations"
-            description="A four-stage engagement model designed for this fictional MSP demo."
+            title="A clear path from discovery to operations"
+            description="Trust comes from a repeatable sequence: understand the environment, stabilize risk, operate predictably, then improve on purpose."
           />
           <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {PROCESS_STEPS.map((item, i) => (
@@ -79,20 +72,28 @@ export default function NovaTechDemoHome() {
               </Reveal>
             ))}
           </ol>
+          <div className="mt-8">
+            <Button href={`${DEMO_BASE}/about`} variant="outline">
+              {CTA.learnProcess}
+            </Button>
+          </div>
         </div>
       </section>
 
       <Testimonials />
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <SectionHeader
           eyebrow="FAQ"
           title="Common questions"
-          description="Quick answers about managed IT, security, and how engagement typically works."
+          description="Quick answers about Managed IT, Cybersecurity, and how engagement typically works in this demo."
         />
         <Accordion items={FAQ_ITEMS.slice(0, 4)} />
-        <div className="mt-8">
-          <Button href="/demos/novatech-solutions/faq" variant="outline">
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button href={`${DEMO_BASE}/faq`} variant="outline">
             View all FAQs
+          </Button>
+          <Button href={`${DEMO_BASE}/portfolio`} variant="ghost">
+            {CTA.viewWork}
           </Button>
         </div>
       </section>

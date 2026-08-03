@@ -6,7 +6,8 @@ import { SITE } from "@/lib/demos/novatech/constants";
 
 export const metadata: Metadata = {
   title: "FAQ",
-  description: `Illustrative FAQ for fictional ${SITE.name}.`,
+  description: `Illustrative FAQ for the fictional ${SITE.name} managed IT demo.`,
+  robots: { index: false, follow: false },
 };
 
 export default function FaqPage() {
@@ -16,7 +17,7 @@ export default function FaqPage() {
         <SectionHeader
           eyebrow="FAQ"
           title="Answers before the kickoff call"
-          description="Explore practical answers about support, security, remote work, and onboarding."
+          description="Explore practical answers about Managed IT, Cybersecurity, remote work, and onboarding in this demo model."
           align="center"
           headingLevel="h1"
         />

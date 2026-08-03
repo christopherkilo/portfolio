@@ -19,10 +19,11 @@ export function ThemeToggle({
       type="button"
       onClick={toggleTheme}
       className={cn(
-        "inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-surface/70 px-2.5 text-muted transition-colors hover:bg-surface-elevated hover:text-ink",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-surface/70 px-2.5 text-muted transition-colors hover:bg-surface-elevated hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
         showLabel && "w-full justify-start px-3",
         className,
       )}
+      aria-pressed={theme === "dark" ? true : false}
       aria-label={label}
       title={label}
     >

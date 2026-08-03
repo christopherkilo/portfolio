@@ -37,6 +37,7 @@ export function FeaturedCarousel({ events }: FeaturedCarouselProps) {
       role="region"
       aria-roledescription="carousel"
       aria-label="Featured events"
+      aria-live={paused || reducedMotion ? "polite" : "off"}
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -62,16 +63,18 @@ export function FeaturedCarousel({ events }: FeaturedCarouselProps) {
               Featured · {current.category}
             </p>
             <h3 className="mt-3 font-display text-2xl font-semibold md:text-3xl">
+              <span className="sr-only">Slide {index + 1} of {count}: </span>
               {current.title}
             </h3>
             <p className="mt-3 text-sm text-muted md:text-base">
-              {current.description}
+              {current.shortDescription}
             </p>
             <p className="mt-4 text-sm text-muted">
-              {formatEventDate(current.date)} · {current.venue}, {current.city}
+              {formatEventDate(current.startDateTime, current.timezone)} ·{" "}
+              {current.venue}, {current.city}
             </p>
             <Link
-              href={`/demos/event-horizon/events/${current.id}`}
+              href={`/demos/event-horizon/events/${current.slug}`}
               className="mt-6 inline-flex h-11 w-fit items-center rounded-xl bg-accent px-5 text-sm font-semibold text-on-accent transition hover:bg-accent-strong"
             >
               View event
@@ -84,18 +87,18 @@ export function FeaturedCarousel({ events }: FeaturedCarouselProps) {
         <button
           type="button"
           aria-label="Previous featured event"
-          className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-bg/70 text-ink backdrop-blur hover:bg-bg"
+          className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-bg/70 text-ink backdrop-blur hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           onClick={() => setIndex((i) => (i - 1 + count) % count)}
         >
-          <ChevronLeft className="size-4" />
+          <ChevronLeft className="size-4" aria-hidden />
         </button>
         <button
           type="button"
           aria-label="Next featured event"
-          className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-bg/70 text-ink backdrop-blur hover:bg-bg"
+          className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-bg/70 text-ink backdrop-blur hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           onClick={() => setIndex((i) => (i + 1) % count)}
         >
-          <ChevronRight className="size-4" />
+          <ChevronRight className="size-4" aria-hidden />
         </button>
       </div>
     </div>

@@ -23,7 +23,7 @@ export function AboutPreview() {
       <SectionHeader
         eyebrow="About"
         title="Three disciplines, one craft"
-        description={`${SITE.name} bridges product engineering, visual design, and hands-on IT—so ideas ship cleanly and systems stay reliable.`}
+        description={`${SITE.name} builds full-stack applications, visual systems, and practical IT utilities—with an eye for maintainable architecture and clear user experience.`}
       />
 
       <motion.div
@@ -57,7 +57,7 @@ export function AboutPreview() {
 
       <Reveal className="mt-8">
         <Button href="/about" variant="outline">
-          More about me
+          About Me
         </Button>
       </Reveal>
     </section>

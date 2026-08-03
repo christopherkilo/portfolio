@@ -4,10 +4,11 @@ import { Code2, Cpu, Palette } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ROLES, SITE } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
+import { isSvgImageSrc } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `About ${SITE.name} — developer, designer, and IT professional.`,
+  description: `About ${SITE.name} — full-stack developer with a background in IT and web design.`,
 };
 
 const icons = {
@@ -21,8 +22,8 @@ export default function AboutPage() {
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
       <SectionHeader
         eyebrow="About"
-        title={`Meet ${SITE.name}`}
-        description="Placeholder biography for an experienced builder who moves fluidly between code, craft, and infrastructure."
+        title={`Hi, I'm ${SITE.name}.`}
+        description="Full-stack developer with a background in IT and web design, focused on software that solves practical problems."
       />
 
       <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
@@ -30,38 +31,44 @@ export default function AboutPage() {
           <div className="gradient-border relative aspect-[4/5] overflow-hidden rounded-[1.5rem] border border-white/8 bg-white/[0.03] backdrop-blur-xl">
             <Image
               src="/about/portrait-placeholder.svg"
-              alt={`Portrait placeholder for ${SITE.name}`}
+              alt={`${SITE.name}`}
               fill
               sizes="(max-width: 1024px) 320px, 360px"
               className="object-cover"
               priority
-              unoptimized
+              unoptimized={isSvgImageSrc("/about/portrait-placeholder.svg")}
             />
           </div>
-          <figcaption className="mt-3 text-center text-xs tracking-[0.16em] text-muted uppercase lg:text-left">
-            Photo coming soon
-          </figcaption>
         </figure>
 
         <div className="space-y-8">
           <div className="space-y-5 text-base leading-relaxed text-muted">
             <p>
-              I design and ship interfaces that feel calm under complexity—
-              pairing strong TypeScript foundations with motion that earns its
-              place. When the work calls for it, I step into brand systems and
-              visual direction with the same restraint.
+              My projects range from customer-facing applications and business
+              automation platforms to collaborative software and IT utilities.
             </p>
             <p>
-              On the IT side, I diagnose hardware, deploy fleets, and document
-              networks so the next person inherits clarity instead of folklore.
-              The through-line is craft: careful decisions, readable systems, and
-              polish that doesn&apos;t shout.
+              I enjoy designing systems that are maintainable, scalable, and
+              focused on delivering a great user experience while being supported
+              by solid backend architecture.
             </p>
             <p>
-              This site uses placeholder copy and assets so real projects,
-              credentials, and case studies can drop in with minimal friction.
+              Throughout these projects I&apos;ve worked with technologies
+              including React, Next.js, TypeScript, PostgreSQL, Supabase, Prisma,
+              Auth.js, HubSpot, TanStack Query, and modern backend patterns
+              centered around security, validation, and collaboration.
             </p>
-            <Button href="/contact">Start a conversation</Button>
+            <p>
+              I&apos;m currently seeking opportunities where I can continue
+              growing as a software developer while contributing to meaningful
+              products and learning from experienced engineering teams.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Button href="/contact">Contact Me</Button>
+              <Button href={`mailto:${SITE.email}`} variant="outline">
+                {SITE.email}
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-4">

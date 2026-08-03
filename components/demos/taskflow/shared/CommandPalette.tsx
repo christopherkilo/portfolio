@@ -4,44 +4,169 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { NAV_ITEMS, PROJECTS, TASKS } from "@/lib/demos/taskflow/data";
-import { cn } from "@/lib/demos/taskflow/utils";
+import { DEMO_BASE, NAV_ITEMS } from "@/lib/demos/taskflow/data";
+import { cn, todayDateOnly } from "@/lib/demos/taskflow/utils";
+import {
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useUpdateTaskMutation,
+  useWorkspaceData,
+} from "@/lib/demos/taskflow/api/hooks";
+import {
+  activeTasks,
+  recentActivity,
+} from "@/lib/demos/taskflow/store/selectors";
+import { describeActivity } from "@/lib/demos/taskflow/store/selectors";
 
-type Item = { id: string; label: string; hint?: string; href: string };
+type Item = {
+  id: string;
+  label: string;
+  hint?: string;
+  href?: string;
+  run?: () => void;
+};
 
 export function CommandPalette({
   open,
   onOpenChange,
+  onCreateTask,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreateTask?: () => void;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const { projects, tasks, members, activity, workspaceId } = useWorkspaceData();
+  const createProject = useCreateProjectMutation(workspaceId);
+  const updateProject = useUpdateProjectMutation(workspaceId);
+  const updateTask = useUpdateTaskMutation(workspaceId);
+
   const items = useMemo<Item[]>(() => {
-    const nav = NAV_ITEMS.map((n) => ({
-      id: `nav-${n.href}`,
-      label: n.label,
+    const actions: Item[] = [
+      {
+        id: "action-create-task",
+        label: "Create task",
+        hint: "Action",
+        run: () => onCreateTask?.(),
+      },
+      {
+        id: "action-create-project",
+        label: "Create project",
+        hint: "Action",
+        run: () => {
+          if (!workspaceId) return;
+          void createProject
+            .mutateAsync({
+              workspaceId,
+              name: "New project",
+              description: "Created from command palette",
+              dueDate: todayDateOnly(),
+              color: "#60A5FA",
+              status: "planning",
+            })
+            .then((created) => {
+              router.push(
+                `${DEMO_BASE}/projects?project=${encodeURIComponent(created.id)}`,
+              );
+            });
+        },
+      },
+      {
+        id: "action-calendar",
+        label: "Open calendar",
+        hint: "Action",
+        href: `${DEMO_BASE}/calendar`,
+      },
+    ];
+
+    const openTask = activeTasks(tasks).find((task) => task.status !== "done");
+    if (openTask) {
+      actions.push({
+        id: `action-complete-${openTask.id}`,
+        label: `Mark complete: ${openTask.title}`,
+        hint: "Action",
+        run: () => {
+          void updateTask.mutateAsync({
+            id: openTask.id,
+            status: "done",
+            expectedVersion: openTask.version ?? 1,
+          });
+        },
+      });
+    }
+
+    const liveProject = projects.find((project) => !project.archived);
+    if (liveProject) {
+      actions.push({
+        id: `action-archive-${liveProject.id}`,
+        label: `Archive project: ${liveProject.name}`,
+        hint: "Action",
+        run: () => {
+          void updateProject.mutateAsync({
+            id: liveProject.id,
+            archived: true,
+            expectedVersion: liveProject.version ?? 1,
+          });
+        },
+      });
+    }
+
+    const nav = NAV_ITEMS.map((item) => ({
+      id: `nav-${item.href}`,
+      label: item.label,
       hint: "Navigate",
-      href: n.href,
+      href: item.href,
     }));
-    const projects = PROJECTS.map((p) => ({
-      id: `proj-${p.id}`,
-      label: p.name,
-      hint: "Project",
-      href: `/demos/taskflow/projects?project=${p.id}`,
-    }));
-    const tasks = TASKS.slice(0, 8).map((t) => ({
-      id: `task-${t.id}`,
-      label: t.title,
+    const liveProjects = projects
+      .filter((project) => !project.archived)
+      .map((project) => ({
+        id: `proj-${project.id}`,
+        label: project.name,
+        hint: "Project",
+        href: `${DEMO_BASE}/projects?project=${project.id}`,
+      }));
+    const liveTasks = activeTasks(tasks).map((task) => ({
+      id: `task-${task.id}`,
+      label: task.title,
       hint: "Task",
-      href: `/demos/taskflow/tasks?task=${t.id}`,
+      href: `${DEMO_BASE}/tasks?task=${task.id}`,
     }));
-    return [...nav, ...projects, ...tasks];
-  }, []);
+    const people = members.map((member) => ({
+      id: `member-${member.id}`,
+      label: member.name,
+      hint: "Member",
+      href: `${DEMO_BASE}/team`,
+    }));
+    const recent = recentActivity(activity, 6).map((item) => ({
+      id: `activity-${item.id}`,
+      label: describeActivity(item),
+      hint: "Recent",
+      href: `${DEMO_BASE}/dashboard`,
+    }));
+    return [
+      ...actions,
+      ...nav,
+      ...liveProjects,
+      ...liveTasks,
+      ...people,
+      ...recent,
+    ];
+  }, [
+    projects,
+    tasks,
+    members,
+    activity,
+    onCreateTask,
+    workspaceId,
+    createProject,
+    updateTask,
+    updateProject,
+    router,
+  ]);
 
   const filtered = items.filter((item) =>
     `${item.label} ${item.hint}`.toLowerCase().includes(query.toLowerCase()),
@@ -53,13 +178,21 @@ export function CommandPalette({
     onOpenChange(false);
   }, [onOpenChange]);
 
+  const runItem = useCallback(
+    (item: Item) => {
+      if (item.run) item.run();
+      else if (item.href) router.push(item.href);
+      closePalette();
+    },
+    [closePalette, router],
+  );
+
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        if (open) {
-          closePalette();
-        } else {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (open) closePalette();
+        else {
           setQuery("");
           setActive(0);
           onOpenChange(true);
@@ -72,25 +205,26 @@ export function CommandPalette({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closePalette();
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActive((i) => Math.min(i + 1, Math.max(filtered.length - 1, 0)));
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closePalette();
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setActive((index) =>
+          Math.min(index + 1, Math.max(filtered.length - 1, 0)),
+        );
       }
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActive((i) => Math.max(i - 1, 0));
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setActive((index) => Math.max(index - 1, 0));
       }
-      if (e.key === "Enter" && filtered[active]) {
-        e.preventDefault();
-        router.push(filtered[active].href);
-        closePalette();
+      if (event.key === "Enter" && filtered[active]) {
+        event.preventDefault();
+        runItem(filtered[active]);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, filtered, active, closePalette, router]);
+  }, [open, filtered, active, closePalette, runItem]);
 
   useEffect(() => {
     if (!open) return;
@@ -129,18 +263,18 @@ export function CommandPalette({
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center gap-3 border-b border-border px-4 py-3">
               <Search className="size-4 text-muted" aria-hidden />
               <input
                 ref={inputRef}
                 value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
+                onChange={(event) => {
+                  setQuery(event.target.value);
                   setActive(0);
                 }}
-                placeholder="Jump to pages, projects, tasks…"
+                placeholder="Search or run an action…"
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
                 aria-label="Command search"
                 role="combobox"
@@ -159,25 +293,24 @@ export function CommandPalette({
             >
               {filtered.length === 0 ? (
                 <li className="px-3 py-6 text-center text-sm text-muted">
-                  No results
+                  No results. Try a project name, task, or “create task”.
                 </li>
               ) : (
-                filtered.map((item, i) => (
+                filtered.map((item, index) => (
                   <li key={item.id}>
                     <button
-                      id={`command-option-${i}`}
+                      id={`command-option-${index}`}
                       type="button"
                       role="option"
-                      aria-selected={i === active}
+                      aria-selected={index === active}
                       className={cn(
                         "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm",
-                        i === active ? "bg-accent/15 text-ink" : "text-muted hover:bg-subtle",
+                        index === active
+                          ? "bg-accent/15 text-ink"
+                          : "text-muted hover:bg-subtle",
                       )}
-                      onMouseEnter={() => setActive(i)}
-                      onClick={() => {
-                        router.push(item.href);
-                        closePalette();
-                      }}
+                      onMouseEnter={() => setActive(index)}
+                      onClick={() => runItem(item)}
                     >
                       <span className="font-medium text-ink">{item.label}</span>
                       <span className="text-xs text-muted">{item.hint}</span>

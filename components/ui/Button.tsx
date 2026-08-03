@@ -68,11 +68,12 @@ function ButtonShell({
   );
 
   const inner = href ? (
-    external ? (
+    external || href.startsWith("mailto:") || href.startsWith("tel:") ? (
       <a
         href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        {...(external
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
         className={cn(classes, "group/btn")}
         aria-label={ariaLabel}
       >

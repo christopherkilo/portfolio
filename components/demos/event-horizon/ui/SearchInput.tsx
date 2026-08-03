@@ -10,6 +10,7 @@ type SearchInputProps = {
   className?: string;
   id?: string;
   onSubmit?: () => void;
+  description?: string;
 };
 
 export function SearchInput({
@@ -19,7 +20,10 @@ export function SearchInput({
   className,
   id = "event-search",
   onSubmit,
+  description = "Results update as you type. Filters stay in the page URL.",
 }: SearchInputProps) {
+  const descriptionId = `${id}-description`;
+
   return (
     <form
       className={cn("relative", className)}
@@ -41,8 +45,13 @@ export function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-12 w-full rounded-2xl border border-border bg-surface pl-11 pr-4 text-sm text-ink outline-none transition placeholder:text-muted focus:border-accent/50 focus:ring-2 focus:ring-accent/30"
+        aria-describedby={descriptionId}
+        autoComplete="off"
+        className="h-12 w-full rounded-2xl border border-border bg-surface pl-11 pr-4 text-sm text-ink outline-none transition placeholder:text-muted focus-visible:border-accent/50 focus-visible:ring-2 focus-visible:ring-accent/30"
       />
+      <p id={descriptionId} className="sr-only">
+        {description}
+      </p>
     </form>
   );
 }

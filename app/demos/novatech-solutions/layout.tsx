@@ -4,9 +4,12 @@ import { SiteShell } from "@/components/demos/novatech/layout/SiteShell";
 import "../demos.css";
 
 export const metadata: Metadata = {
-  title: "NovaTech Solutions Demo",
+  title: {
+    default: "NovaTech Solutions Demo",
+    template: "%s · NovaTech Solutions Demo",
+  },
   description:
-    "Interactive NovaTech Solutions demo — fictional MSP marketing site.",
+    "Fictional managed IT marketing demo for NovaTech Solutions — illustrative services, portfolio concepts, and a frontend consultation inquiry.",
   robots: { index: false, follow: false },
 };
 

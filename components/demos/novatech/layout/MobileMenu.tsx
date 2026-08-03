@@ -5,8 +5,10 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_LINKS, SITE } from "@/lib/demos/novatech/constants";
+import { CTA, NAV_LINKS, SITE } from "@/lib/demos/novatech/constants";
+import { contactHref, isNavActive } from "@/lib/demos/novatech/paths";
 import { cn } from "@/lib/demos/novatech/utils";
+import { Button } from "@/components/demos/novatech/ui/Button";
 
 type MobileMenuProps = {
   open: boolean;
@@ -70,10 +72,10 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: reducedMotion ? 0 : 0.2 }}
         >
-          <button
-            type="button"
+          {/* Non-focusable overlay: click/tap closes; excluded from focus trap. */}
+          <div
             className="absolute inset-0 bg-overlay backdrop-blur-sm"
-            aria-label="Close menu"
+            aria-hidden="true"
             onClick={onClose}
           />
           <motion.div
@@ -98,19 +100,16 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
                 ref={closeButtonRef}
                 type="button"
                 onClick={onClose}
-                className="inline-flex size-9 items-center justify-center rounded-lg border border-border"
+                className="inline-flex size-9 items-center justify-center rounded-lg border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Close navigation"
               >
-                <X className="size-4" />
+                <X className="size-4" aria-hidden />
               </button>
             </div>
             <nav aria-label="Mobile">
               <ul className="space-y-1">
                 {NAV_LINKS.map((link) => {
-                  const active =
-                    link.href === "/demos/novatech-solutions"
-                      ? pathname === "/demos/novatech-solutions"
-                      : pathname.startsWith(link.href);
+                  const active = isNavActive(pathname, link.href);
                   return (
                     <li key={link.href}>
                       <Link
@@ -118,7 +117,7 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
                         onClick={onClose}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "block rounded-lg px-3 py-3 text-base font-medium transition",
+                          "block rounded-lg px-3 py-3 text-base font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                           active
                             ? "bg-primary/10 text-primary"
                             : "text-ink hover:bg-bg",
@@ -131,6 +130,15 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
                 })}
               </ul>
             </nav>
+            <div className="mt-4 border-t border-border pt-4">
+              <Button
+                href={contactHref()}
+                className="w-full"
+                onClick={onClose}
+              >
+                {CTA.primary}
+              </Button>
+            </div>
           </motion.div>
         </motion.div>
       ) : null}

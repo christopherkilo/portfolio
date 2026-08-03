@@ -31,6 +31,16 @@ describe("SignatureName shimmer sequencing", () => {
     expect(source).toContain('data-kilo-final={showKiloLit ? "lit" : "pending"}');
   });
 
+  it("plays the startup shimmer only once (independent of resize/layout)", () => {
+    expect(source).toContain('data-shimmer-once="true"');
+    expect(source).toContain("nameShimmerFinished");
+    expect(source).toContain("stackedLayout");
+    // Animation effect must not depend on responsive layout state.
+    expect(source).toMatch(/\}, \[reducedMotion, kilo\]\);/);
+    expect(source).not.toMatch(/\}, \[reducedMotion, stacked/);
+    expect(source).not.toContain("surfaceRef");
+  });
+
   it("keeps KILO from starting until CHRISTOPHER completes in stacked mode", () => {
     expect(source).toContain('data-shimmer-stage="christopher"');
     expect(source).toContain('data-shimmer-stage="kilo"');
@@ -42,7 +52,7 @@ describe("SignatureName shimmer sequencing", () => {
   it("skips the traveling animation under reduced motion and shows final colors", () => {
     expect(source).toContain("reducedMotion");
     expect(source).toContain("!reducedMotion");
-    expect(source).toMatch(/if \(reducedMotion/);
+    expect(source).toMatch(/reducedMotion === true/);
     expect(source).toContain("Boolean(reducedMotion) || kiloLit");
   });
 

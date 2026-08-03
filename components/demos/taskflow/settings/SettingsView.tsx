@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/demos/taskflow/ui/Button";
 import { cn } from "@/lib/demos/taskflow/utils";
+import {
+  useTaskflowUiStore,
+  type UiSettings,
+} from "@/lib/demos/taskflow/store";
+import { taskflowFetch } from "@/lib/demos/taskflow/api/client";
+import type { NotificationPreferenceRow } from "@/server/taskflow/types/database";
 
 type Tab = "appearance" | "notifications" | "account" | "preferences";
 
@@ -14,44 +21,20 @@ const tabs: { id: Tab; label: string }[] = [
 ];
 
 export function SettingsView() {
+  const settings = useTaskflowUiStore((state) => state.settings);
+  const updateSettings = useTaskflowUiStore((state) => state.updateSettings);
   const [tab, setTab] = useState<Tab>("appearance");
-  const [density, setDensity] = useState("comfortable");
-  const [emailNotifs, setEmailNotifs] = useState(true);
-  const [pushNotifs, setPushNotifs] = useState(false);
-  const [weekStart, setWeekStart] = useState("monday");
-  const [displayName, setDisplayName] = useState("Maya Chen");
-  const [email, setEmail] = useState("maya@taskflow.app");
+  const [draft, setDraft] = useState<UiSettings | null>(null);
   const [saved, setSaved] = useState("");
+  const effective = draft ?? settings;
 
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("taskflow-settings") ?? "{}");
-      document.documentElement.dataset.density = stored.density ?? "comfortable";
-      queueMicrotask(() => {
-        setDensity(stored.density ?? "comfortable");
-        setEmailNotifs(stored.emailNotifs ?? true);
-        setPushNotifs(stored.pushNotifs ?? false);
-        setWeekStart(stored.weekStart ?? "monday");
-        setDisplayName(stored.displayName ?? "Maya Chen");
-        setEmail(stored.email ?? "maya@taskflow.app");
-      });
-    } catch {
-      // Keep safe defaults if local demo data is malformed.
-    }
-  }, []);
+  function patchDraft(patch: Partial<UiSettings>) {
+    setDraft({ ...effective, ...patch });
+  }
 
   function saveSettings(message: string) {
-    const settings = {
-      density,
-      emailNotifs,
-      pushNotifs,
-      weekStart,
-      displayName,
-      email,
-    };
-    localStorage.setItem("taskflow-settings", JSON.stringify(settings));
-    document.documentElement.dataset.density = density;
-    window.dispatchEvent(new CustomEvent("taskflow-settings", { detail: settings }));
+    updateSettings(effective);
+    setDraft(null);
     setSaved(message);
     window.setTimeout(() => setSaved(""), 2500);
   }
@@ -89,18 +72,18 @@ export function SettingsView() {
                 Density
               </legend>
               <div className="mt-2 flex gap-2">
-                {["compact", "comfortable"].map((value) => (
+                {(["compact", "comfortable"] as const).map((value) => (
                   <button
                     key={value}
                     type="button"
-                    onClick={() => setDensity(value)}
+                    onClick={() => patchDraft({ density: value })}
                     className={cn(
                       "rounded-lg border px-3 py-2 text-sm capitalize",
-                      density === value
+                      effective.density === value
                         ? "border-accent/40 bg-accent/15 text-accent"
                         : "border-border text-muted hover:text-ink",
                     )}
-                    aria-pressed={density === value}
+                    aria-pressed={effective.density === value}
                   >
                     {value}
                   </button>
@@ -114,28 +97,7 @@ export function SettingsView() {
           </div>
         ) : null}
 
-        {tab === "notifications" ? (
-          <div className="space-y-5">
-            <Header
-              title="Notifications"
-              description="Choose which product updates you want to see in this demo."
-            />
-            <Toggle
-              label="Email updates"
-              checked={emailNotifs}
-              onChange={setEmailNotifs}
-            />
-            <Toggle
-              label="Push notifications"
-              checked={pushNotifs}
-              onChange={setPushNotifs}
-            />
-            <SaveFeedback
-              saved={saved}
-              onSave={() => saveSettings("Notification preferences saved.")}
-            />
-          </div>
-        ) : null}
+        {tab === "notifications" ? <NotificationPreferencesPanel /> : null}
 
         {tab === "account" ? (
           <div className="space-y-4">
@@ -146,16 +108,18 @@ export function SettingsView() {
             <label className="block text-sm">
               <span className="mb-1.5 block text-muted">Display name</span>
               <input
-                value={displayName}
-                onChange={(event) => setDisplayName(event.target.value)}
+                value={effective.displayName}
+                onChange={(event) =>
+                  patchDraft({ displayName: event.target.value })
+                }
                 className="h-10 w-full max-w-md rounded-lg border border-border bg-elevated px-3 outline-none focus:border-accent/40"
               />
             </label>
             <label className="block text-sm">
               <span className="mb-1.5 block text-muted">Email</span>
               <input
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                value={effective.email}
+                onChange={(event) => patchDraft({ email: event.target.value })}
                 className="h-10 w-full max-w-md rounded-lg border border-border bg-elevated px-3 outline-none focus:border-accent/40"
               />
             </label>
@@ -175,8 +139,12 @@ export function SettingsView() {
             <label className="block text-sm">
               <span className="mb-1.5 block text-muted">Week starts on</span>
               <select
-                value={weekStart}
-                onChange={(e) => setWeekStart(e.target.value)}
+                value={effective.weekStart}
+                onChange={(event) =>
+                  patchDraft({
+                    weekStart: event.target.value as "monday" | "sunday",
+                  })
+                }
                 className="h-10 rounded-lg border border-border bg-elevated px-3 text-sm outline-none focus:border-accent/40"
               >
                 <option value="sunday">Sunday</option>
@@ -194,27 +162,111 @@ export function SettingsView() {
   );
 }
 
-function SaveFeedback({
-  saved,
-  onSave,
-}: {
-  saved: string;
-  onSave: () => void;
-}) {
+function NotificationPreferencesPanel() {
+  const qc = useQueryClient();
+  const prefs = useQuery({
+    queryKey: ["taskflow", "notification-preferences"],
+    queryFn: () =>
+      taskflowFetch<NotificationPreferenceRow>(
+        "/api/taskflow/notification-preferences",
+      ),
+  });
+  const [override, setOverride] = useState<Partial<NotificationPreferenceRow>>(
+    {},
+  );
+  const [saved, setSaved] = useState("");
+
+  const effective: NotificationPreferenceRow | null = prefs.data
+    ? { ...prefs.data, ...override }
+    : null;
+
+  const save = useMutation({
+    mutationFn: (body: {
+      assignments: boolean;
+      comments: boolean;
+      mentions: boolean;
+      dueDates: boolean;
+      projectChanges: boolean;
+    }) =>
+      taskflowFetch<NotificationPreferenceRow>(
+        "/api/taskflow/notification-preferences",
+        { method: "PATCH", body: JSON.stringify(body) },
+      ),
+    onSuccess: () => {
+      setOverride({});
+      void qc.invalidateQueries({
+        queryKey: ["taskflow", "notification-preferences"],
+      });
+      setSaved("In-app notification preferences saved.");
+      window.setTimeout(() => setSaved(""), 2500);
+    },
+  });
+
   return (
-    <div className="flex min-h-10 flex-wrap items-center gap-3">
-      <Button onClick={onSave}>Save changes</Button>
-      <p role="status" aria-live="polite" className="text-sm text-success">
-        {saved}
-      </p>
+    <div className="space-y-5">
+      <Header
+        title="Notifications"
+        description="In-app categories only — email and push delivery are not part of this phase."
+      />
+      {prefs.isLoading || !effective ? (
+        <p className="text-sm text-muted">Loading preferences…</p>
+      ) : (
+        <>
+          {(
+            [
+              ["assignments", "Task assignments"],
+              ["comments", "Comments"],
+              ["mentions", "Mentions"],
+              ["due_dates", "Due dates"],
+              ["project_changes", "Project & membership changes"],
+            ] as const
+          ).map(([rowKey, label]) => (
+            <Toggle
+              key={rowKey}
+              label={label}
+              checked={Boolean(effective[rowKey])}
+              onChange={(value) =>
+                setOverride((prev) => ({ ...prev, [rowKey]: value }))
+              }
+            />
+          ))}
+          <div className="flex items-center gap-3">
+            <Button
+              disabled={save.isPending}
+              onClick={() =>
+                void save.mutateAsync({
+                  assignments: effective.assignments,
+                  comments: effective.comments,
+                  mentions: effective.mentions,
+                  dueDates: effective.due_dates,
+                  projectChanges: effective.project_changes,
+                })
+              }
+            >
+              Save preferences
+            </Button>
+            {saved ? (
+              <p className="text-xs text-accent" role="status">
+                {saved}
+              </p>
+            ) : null}
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-function Header({ title, description }: { title: string; description: string }) {
+function Header({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
     <div>
-      <h2 className="text-base font-semibold">{title}</h2>
+      <h2 className="font-display text-lg font-semibold">{title}</h2>
       <p className="mt-1 text-sm text-muted">{description}</p>
     </div>
   );
@@ -230,7 +282,7 @@ function Toggle({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-lg border border-border bg-elevated/40 px-3 py-3 text-sm">
+    <label className="flex items-center justify-between gap-4 rounded-lg border border-border px-3 py-2.5 text-sm">
       <span>{label}</span>
       <button
         type="button"
@@ -239,16 +291,35 @@ function Toggle({
         onClick={() => onChange(!checked)}
         className={cn(
           "relative h-6 w-11 rounded-full transition",
-          checked ? "bg-accent" : "bg-control-track",
+          checked ? "bg-accent" : "bg-subtle",
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 size-5 rounded-full bg-white transition",
+            "absolute top-0.5 size-5 rounded-full bg-bg transition",
             checked ? "left-5" : "left-0.5",
           )}
         />
       </button>
     </label>
+  );
+}
+
+function SaveFeedback({
+  saved,
+  onSave,
+}: {
+  saved: string;
+  onSave: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <Button onClick={onSave}>Save</Button>
+      {saved ? (
+        <p className="text-xs text-accent" role="status">
+          {saved}
+        </p>
+      ) : null}
+    </div>
   );
 }

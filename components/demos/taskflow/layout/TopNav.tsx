@@ -1,19 +1,41 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   Check,
   Command,
+  LogOut,
   Menu,
   Moon,
   Search,
   Sun,
 } from "lucide-react";
+import { ConnectionIndicator } from "@/components/demos/taskflow/collaboration/ConnectionIndicator";
+import { PresenceAvatars } from "@/components/demos/taskflow/collaboration/PresenceAvatars";
 import { Button } from "@/components/demos/taskflow/ui/Button";
 import { Tooltip } from "@/components/demos/taskflow/ui/Tooltip";
+import { useTaskflowMe } from "@/lib/demos/taskflow/api/hooks";
+import { createTaskflowBrowserClient } from "@/lib/demos/taskflow/supabase/browser";
+import { DEMO_BASE } from "@/lib/demos/taskflow/data";
+import {
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useNotifications,
+} from "@/lib/demos/taskflow/queries";
+import { cn, formatRelativeTime } from "@/lib/demos/taskflow/utils";
 
 type Theme = "light" | "dark";
+
+function initialsFromName(name: string | null | undefined, email: string | null | undefined) {
+  const source = name?.trim() || email?.trim() || "TF";
+  const parts = source.split(/[\s@._-]+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0]![0] ?? ""}${parts[1]![0] ?? ""}`.toUpperCase();
+  }
+  return source.slice(0, 2).toUpperCase();
+}
 
 export function TopNav({
   title,
@@ -25,9 +47,20 @@ export function TopNav({
   onOpenMobile: () => void;
 }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [unread, setUnread] = useState(2);
   const [theme, setTheme] = useState<Theme | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
+  const me = useTaskflowMe();
+  const notifications = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
+
+  const items = notifications.data ?? [];
+  const unreadCount = items.filter((item) => !item.read_at).length;
+
+  const displayName =
+    me.data?.profile.display_name || me.data?.email || "TaskFlow user";
+  const avatar = initialsFromName(me.data?.profile.display_name, me.data?.email);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -117,6 +150,17 @@ export function TopNav({
     setTheme(nextTheme);
   }
 
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      const supabase = createTaskflowBrowserClient();
+      await supabase.auth.signOut();
+      window.location.href = `${DEMO_BASE}/signin`;
+    } catch {
+      setSigningOut(false);
+    }
+  }
+
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-border bg-bg/85 px-4 backdrop-blur-xl sm:px-6">
       <div className="flex items-center gap-3">
@@ -139,6 +183,8 @@ export function TopNav({
       </div>
 
       <div className="flex items-center gap-2">
+        <PresenceAvatars />
+        <ConnectionIndicator />
         <button
           type="button"
           onClick={onOpenCommand}
@@ -167,12 +213,12 @@ export function TopNav({
               variant="ghost"
               size="icon"
               className="relative"
-              aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}
+              aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
               aria-expanded={notificationsOpen}
               onClick={() => setNotificationsOpen((value) => !value)}
             >
               <Bell className="size-4" />
-              {unread ? (
+              {unreadCount ? (
                 <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-danger" />
               ) : null}
             </Button>
@@ -183,28 +229,118 @@ export function TopNav({
                 <p className="text-sm font-semibold">Notifications</p>
                 <button
                   type="button"
-                  onClick={() => setUnread(0)}
-                  className="inline-flex items-center gap-1 rounded-md px-2 text-xs text-accent hover:bg-accent/10"
+                  onClick={() => void markAllRead.mutateAsync()}
+                  disabled={!unreadCount || markAllRead.isPending}
+                  className="inline-flex items-center gap-1 rounded-md px-2 text-xs text-accent hover:bg-accent/10 disabled:opacity-50"
                 >
-                  <Check className="size-3.5" aria-hidden /> Mark read
+                  <Check className="size-3.5" aria-hidden /> Mark all read
                 </button>
               </div>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li className="rounded-lg bg-elevated p-3">Jordan moved “Command palette shortcuts” to Review.</li>
-                <li className="rounded-lg bg-elevated p-3">Atlas Redesign is due in 5 weeks.</li>
-              </ul>
+
+              {notifications.isLoading ? (
+                <p className="mt-3 text-xs text-muted" role="status">
+                  Loading…
+                </p>
+              ) : notifications.isError ? (
+                <p className="mt-3 text-xs text-danger" role="alert">
+                  Couldn’t load notifications.
+                </p>
+              ) : items.length === 0 ? (
+                <div className="mt-3 rounded-lg border border-dashed border-border px-3 py-6 text-center">
+                  <p className="text-xs font-medium text-ink">You’re all caught up</p>
+                  <p className="mt-1 text-xs text-muted">
+                    New mentions and assignments will show up here.
+                  </p>
+                </div>
+              ) : (
+                <ul className="mt-3 max-h-80 space-y-2 overflow-y-auto text-sm">
+                  {items.map((item) => {
+                    const href =
+                      item.entity_type === "task" && item.entity_id
+                        ? `${DEMO_BASE}/tasks?task=${encodeURIComponent(item.entity_id)}`
+                        : null;
+                    const unread = !item.read_at;
+                    const content = (
+                      <>
+                        <p className="text-sm font-medium text-ink">
+                          {item.occurrence_count > 1
+                            ? `${item.occurrence_count}× ${item.title}`
+                            : item.title}
+                        </p>
+                        {item.message ? (
+                          <p className="mt-0.5 text-xs text-muted">{item.message}</p>
+                        ) : null}
+                        <p className="mt-1 text-[11px] text-muted">
+                          {formatRelativeTime(
+                            item.last_occurred_at || item.created_at,
+                          )}
+                        </p>
+                      </>
+                    );
+
+                    return (
+                      <li key={item.id}>
+                        {href ? (
+                          <Link
+                            href={href}
+                            className={cn(
+                              "block rounded-lg p-3 transition hover:bg-subtle/70",
+                              unread ? "bg-accent/10" : "bg-elevated",
+                            )}
+                            onClick={() => {
+                              if (unread) void markRead.mutateAsync(item.id);
+                              setNotificationsOpen(false);
+                            }}
+                          >
+                            {content}
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            className={cn(
+                              "w-full rounded-lg p-3 text-left transition hover:bg-subtle/70",
+                              unread ? "bg-accent/10" : "bg-elevated",
+                            )}
+                            onClick={() => {
+                              if (unread) void markRead.mutateAsync(item.id);
+                            }}
+                          >
+                            {content}
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+
               <p role="status" className="mt-2 text-xs text-muted">
-                {unread ? `${unread} unread updates` : "You’re all caught up."}
+                {unreadCount
+                  ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
+                  : "You’re all caught up."}
               </p>
             </div>
           ) : null}
         </div>
-        <div
-          className="hidden size-8 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent sm:inline-flex"
-          aria-label="Current user Maya Chen"
-        >
-          MC
-        </div>
+        <Tooltip content={displayName}>
+          <div
+            className="hidden size-8 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent sm:inline-flex"
+            aria-label={`Current user ${displayName}`}
+          >
+            {avatar}
+          </div>
+        </Tooltip>
+        <Tooltip content="Sign out">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Sign out"
+            disabled={signingOut}
+            onClick={() => void handleSignOut()}
+          >
+            <LogOut className="size-4" />
+          </Button>
+        </Tooltip>
       </div>
     </header>
   );

@@ -54,7 +54,7 @@ export function ContactCTA() {
     }
 
     setStatus("submitting");
-    // Placeholder latency — swap for real backend later
+    // Client-side acknowledgement until a mail provider is connected.
     await new Promise((r) => setTimeout(r, 650));
     setStatus("sent");
     form.reset();
@@ -70,9 +70,19 @@ export function ContactCTA() {
         id={`${formId}-title`}
         eyebrow="Contact"
         title="Let's build something deliberate"
-        description="Open to thoughtful collaborations, systems work, and product builds."
+        description="Whether you're interested in working together, discussing a project, or have an opportunity you'd like to share, I'd be happy to hear from you."
       />
 
+      <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted">
+        Reach me directly at{" "}
+        <a
+          href={`mailto:${SITE.email}`}
+          className="text-text underline decoration-white/20 underline-offset-2 transition hover:decoration-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          {SITE.email}
+        </a>
+        .
+      </p>
       <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <Reveal>
           <div className="glass space-y-4 rounded-[var(--radius)] p-6">
@@ -215,7 +225,14 @@ export function ContactCTA() {
                   role="status"
                 >
                   <CheckCircle2 className="size-4 shrink-0 text-emerald-300" aria-hidden />
-                  Message queued — wire this to your form backend later.
+                  Thanks — for the fastest reply, email{" "}
+                  <a
+                    href={`mailto:${SITE.email}`}
+                    className="underline decoration-white/20 underline-offset-2 transition hover:text-text hover:decoration-primary/50"
+                  >
+                    {SITE.email}
+                  </a>
+                  .
                 </p>
               ) : null}
               {status === "error" && Object.keys(errors).length > 0 ? (

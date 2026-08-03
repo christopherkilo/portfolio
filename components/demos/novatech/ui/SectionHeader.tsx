@@ -10,7 +10,6 @@ type SectionHeaderProps = {
   description?: string;
   align?: "left" | "center";
   className?: string;
-  light?: boolean;
   headingLevel?: "h1" | "h2";
 };
 
@@ -20,7 +19,6 @@ export function SectionHeader({
   description,
   align = "left",
   className,
-  light = false,
   headingLevel = "h2",
 }: SectionHeaderProps) {
   const reducedMotion = useReducedMotion();
@@ -29,28 +27,17 @@ export function SectionHeader({
   const content = (
     <>
       {eyebrow ? (
-        <p
-          className={cn(
-            "mb-3 text-xs font-semibold uppercase tracking-[0.2em]",
-            light ? "text-band-ink/85" : "text-accent",
-          )}
-        >
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
           {eyebrow}
         </p>
       ) : null}
-      <Heading
-        className={cn(
-          "font-display text-3xl font-semibold tracking-tight md:text-4xl",
-          light ? "text-band-ink" : "text-ink",
-        )}
-      >
+      <Heading className="font-display text-3xl font-semibold tracking-tight text-ink md:text-4xl">
         {title}
       </Heading>
       {description ? (
         <p
           className={cn(
-            "mt-4 max-w-2xl text-base leading-relaxed md:text-lg",
-            light ? "text-band-ink/80" : "text-muted",
+            "mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg",
             align === "center" && "mx-auto",
           )}
         >

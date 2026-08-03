@@ -1,70 +1,172 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Tag } from "lucide-react";
 import {
-  events,
-  filterEvents,
+  DEFAULT_EVENT_FILTERS,
   type EventFilters,
+  type EventItem,
 } from "@/lib/demos/event-horizon/eventData";
+import {
+  buildBrowseHref,
+  parseEventFilters,
+} from "@/lib/demos/event-horizon/filters";
+import {
+  apiGet,
+  type EventsListResponse,
+  type PublicEvent,
+} from "@/lib/demos/event-horizon/apiClient";
 import { SearchInput } from "@/components/demos/event-horizon/ui/SearchInput";
 import { FilterSidebar } from "@/components/demos/event-horizon/events/FilterSidebar";
 import { EventCard } from "@/components/demos/event-horizon/events/EventCard";
 import { EmptyState } from "@/components/demos/event-horizon/ui/EmptyState";
 import { Button } from "@/components/demos/event-horizon/ui/Button";
 import { Modal } from "@/components/demos/event-horizon/ui/Modal";
+import { EventGridSkeleton } from "@/components/demos/event-horizon/ui/Skeleton";
 import { staggerContainer } from "@/lib/demos/event-horizon/animation";
 
-const DEFAULT_FILTERS: EventFilters = {
-  query: "",
-  category: "All",
-  city: "All",
-  date: "",
-  sort: "date-asc",
-};
+function getBrowseEmptyState(filters: EventFilters) {
+  const query = filters.query.trim();
+  if (query) {
+    return {
+      title: `No results for “${query}”`,
+      description:
+        "Try a different keyword, clear your search, or browse by city and category.",
+      icon: Search,
+      actionLabel: "Clear search",
+      secondaryActionLabel: "Clear all filters",
+    };
+  }
+  if (filters.category !== "All") {
+    return {
+      title: `No ${filters.category} events found`,
+      description:
+        "Nothing matches this category with your other filters. Widen the search or pick another category.",
+      icon: Tag,
+      actionLabel: "Clear category",
+      secondaryActionLabel: "Clear all filters",
+    };
+  }
+  return {
+    title: "No events found",
+    description:
+      "Try clearing filters or searching a different keyword to rediscover what’s on.",
+    icon: SlidersHorizontal,
+    actionLabel: "Clear Filters",
+    secondaryActionLabel: "Back home",
+  };
+}
+
+function toEventItem(event: PublicEvent): EventItem {
+  return {
+    ...event,
+    category: event.category as EventItem["category"],
+    status: event.status,
+  };
+}
 
 export function BrowseClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<EventFilters>({
-    ...DEFAULT_FILTERS,
-    query: searchParams.get("q") ?? "",
-  });
+  const [results, setResults] = useState<EventItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const results = useMemo(
-    () => filterEvents(events, filters),
-    [filters],
+  const filters = useMemo(
+    () => parseEventFilters(searchParams),
+    [searchParams],
   );
 
-  function handleSearchChange(value: string) {
-    setFilters((prev) => ({ ...prev, query: value }));
-    const params = new URLSearchParams(searchParams.toString());
-    if (value.trim()) params.set("q", value.trim());
-    else params.delete("q");
-    router.replace(`/demos/event-horizon/browse${params.toString() ? `?${params}` : ""}`);
+  useEffect(() => {
+    const controller = new AbortController();
+    const handle = window.setTimeout(() => {
+      void (async () => {
+        setLoading(true);
+        setError("");
+        const params = new URLSearchParams();
+        if (filters.query.trim()) params.set("q", filters.query.trim());
+        if (filters.category !== "All") params.set("category", filters.category);
+        if (filters.city !== "All") params.set("city", filters.city);
+        if (filters.date) params.set("date", filters.date);
+        if (filters.sort !== DEFAULT_EVENT_FILTERS.sort) {
+          params.set("sort", filters.sort);
+        }
+        if (filters.featured) params.set("featured", "true");
+        params.set("page", "1");
+        params.set("pageSize", "24");
+
+        const result = await apiGet<EventsListResponse>(
+          `/api/events?${params.toString()}`,
+          { signal: controller.signal },
+        );
+
+        if (controller.signal.aborted) return;
+
+        if (!result.ok) {
+          setResults([]);
+          setTotal(0);
+          setError(result.error.message);
+          setLoading(false);
+          return;
+        }
+
+        setResults(result.data.items.map(toEventItem));
+        setTotal(result.data.total);
+        setLoading(false);
+      })();
+    }, filters.query ? 250 : 0);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(handle);
+    };
+  }, [filters]);
+
+  function commitFilters(next: EventFilters) {
+    router.replace(buildBrowseHref(next), { scroll: false });
   }
 
-  function resetBrowse() {
-    setFilters(DEFAULT_FILTERS);
+  function handleSearchChange(value: string) {
+    commitFilters({ ...filters, query: value });
+  }
+
+  function clearFilters() {
+    commitFilters(DEFAULT_EVENT_FILTERS);
     setFiltersOpen(false);
-    router.replace("/demos/event-horizon/browse");
   }
 
   const activeFilterCount = [
     filters.category !== "All",
     filters.city !== "All",
     Boolean(filters.date),
+    filters.featured,
+    filters.sort !== DEFAULT_EVENT_FILTERS.sort,
   ].filter(Boolean).length;
+
+  const empty = getBrowseEmptyState(filters);
+
+  function handleEmptyPrimary() {
+    if (filters.query.trim()) {
+      commitFilters({ ...filters, query: "" });
+      return;
+    }
+    if (filters.category !== "All") {
+      commitFilters({ ...filters, category: "All" });
+      return;
+    }
+    clearFilters();
+  }
 
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[260px_1fr] lg:px-8">
       <FilterSidebar
         filters={filters}
-        onChange={setFilters}
-        onReset={resetBrowse}
+        onChange={commitFilters}
+        onReset={clearFilters}
         className="hidden lg:block"
       />
 
@@ -74,9 +176,14 @@ export function BrowseClient() {
             <h1 className="font-display text-3xl font-semibold tracking-tight">
               Browse events
             </h1>
-            <p className="mt-2 text-sm text-muted">
-              {results.length} event{results.length === 1 ? "" : "s"} match your
-              filters
+            <p
+              className="mt-2 text-sm text-muted"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {loading
+                ? "Loading events…"
+                : `${total} event${total === 1 ? "" : "s"} match your filters`}
             </p>
           </div>
           <SearchInput
@@ -101,12 +208,35 @@ export function BrowseClient() {
           </Button>
         </div>
 
-        {results.length === 0 ? (
+        {error ? (
           <EmptyState
-            title="No events found"
-            description="Try clearing filters or searching a different keyword."
-            actionLabel="Reset browse"
-            onAction={resetBrowse}
+            title="Could not load events"
+            description={error}
+            actionLabel="Retry"
+            onAction={() => commitFilters({ ...filters })}
+            secondaryActionHref="/demos/event-horizon"
+            secondaryActionLabel="Back home"
+          />
+        ) : loading ? (
+          <EventGridSkeleton count={6} />
+        ) : results.length === 0 ? (
+          <EmptyState
+            title={empty.title}
+            description={empty.description}
+            icon={empty.icon}
+            actionLabel={empty.actionLabel}
+            onAction={handleEmptyPrimary}
+            secondaryActionLabel={empty.secondaryActionLabel}
+            onSecondaryAction={
+              empty.secondaryActionLabel === "Back home"
+                ? undefined
+                : clearFilters
+            }
+            secondaryActionHref={
+              empty.secondaryActionLabel === "Back home"
+                ? "/demos/event-horizon"
+                : undefined
+            }
           />
         ) : (
           <motion.div
@@ -129,12 +259,12 @@ export function BrowseClient() {
       >
         <FilterSidebar
           filters={filters}
-          onChange={setFilters}
-          onReset={resetBrowse}
+          onChange={commitFilters}
+          onReset={clearFilters}
           className="border-0 bg-transparent p-0"
         />
         <Button className="mt-5 w-full" onClick={() => setFiltersOpen(false)}>
-          Show {results.length} event{results.length === 1 ? "" : "s"}
+          Show {total} event{total === 1 ? "" : "s"}
         </Button>
       </Modal>
     </div>

@@ -1,3 +1,14 @@
+import { cn } from "@/lib/demos/taskflow/utils";
+
+export function Skeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn("animate-pulse rounded-lg bg-subtle-strong", className)}
+      aria-hidden
+    />
+  );
+}
+
 export function CardSkeleton() {
   return (
     <div className="rounded-xl border border-border bg-surface p-4" aria-hidden>

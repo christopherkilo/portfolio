@@ -17,6 +17,11 @@ export interface Project {
   featured: boolean;
   /** Internal case-study (or toolkit) route. */
   href?: string;
+  /**
+   * When false, kept for deep links / toolkit modules but omitted from
+   * homepage featured + Projects page grids.
+   */
+  portfolioVisible?: boolean;
 }
 
 export const projects: Project[] = [
@@ -25,8 +30,8 @@ export const projects: Project[] = [
     title: "Event Horizon",
     category: "web",
     description:
-      "Premium event discovery platform with search, filters, favorites, featured carousel, and dynamic event detail pages.",
-    technologies: ["Next.js", "TypeScript", "Tailwind", "Framer Motion"],
+      "Consumer event platform with authentication, reservations, and PostgreSQL-backed persistence.",
+    technologies: ["Next.js", "TypeScript", "PostgreSQL", "Auth.js"],
     image: "/projects/event-horizon-logo.svg",
     github: "https://github.com/christopherkilo/event-horizon",
     liveDemo: "/demos/event-horizon",
@@ -38,12 +43,12 @@ export const projects: Project[] = [
     title: "NovaTech Solutions",
     category: "web",
     description:
-      "Corporate MSP and IT consulting website with services, FAQ accordion, testimonials, and a professional contact experience.",
-    technologies: ["Next.js", "TypeScript", "Tailwind", "Framer Motion"],
+      "Business website integrating HubSpot CRM, automated inquiries, email delivery, and spam protection.",
+    technologies: ["Next.js", "TypeScript", "HubSpot", "Resend"],
     image: "/projects/novatech-logo.svg",
     github: "https://github.com/christopherkilo/novatech-solutions",
     liveDemo: "/demos/novatech-solutions",
-    featured: false,
+    featured: true,
     href: "/projects/novatech-solutions",
   },
   {
@@ -51,13 +56,27 @@ export const projects: Project[] = [
     title: "TaskFlow",
     category: "web",
     description:
-      "Linear-inspired project management app with dashboard analytics, kanban board, calendar, team, and settings.",
-    technologies: ["Next.js", "TypeScript", "Tailwind", "Framer Motion"],
+      "Collaborative SaaS platform featuring realtime updates, Row Level Security, conflict detection, and offline-aware collaboration.",
+    technologies: ["Next.js", "TypeScript", "Supabase", "TanStack Query"],
     image: "/projects/taskflow-logo.svg",
     github: "https://github.com/christopherkilo/taskflow",
     liveDemo: "/demos/taskflow",
-    featured: false,
+    featured: true,
     href: "/projects/taskflow",
+  },
+  {
+    id: "kilo-toolkit",
+    title: "Kilo Toolkit",
+    category: "it",
+    description:
+      "IT diagnostics and troubleshooting toolkit providing practical utilities for hardware, networking, and system analysis.",
+    technologies: ["Next.js", "TypeScript", "Diagnostics", "Networking"],
+    image: "/projects/systemscope.svg",
+    imageAlt: "Kilo Toolkit diagnostics suite cover",
+    github: "https://github.com/christopherkilo/portfolio",
+    liveDemo: "/toolkit",
+    featured: true,
+    href: "/toolkit",
   },
   {
     id: "voltline",
@@ -113,6 +132,7 @@ export const projects: Project[] = [
     featured: false,
     href: "/projects/signal-magazine",
   },
+  // Toolkit module deep-links (not listed as separate portfolio cards)
   {
     id: "systemscope",
     title: "SystemScope",
@@ -124,6 +144,7 @@ export const projects: Project[] = [
     github: "https://github.com/christopherkilo/portfolio",
     featured: false,
     href: "/toolkit/system",
+    portfolioVisible: false,
   },
   {
     id: "memorymedic",
@@ -136,6 +157,7 @@ export const projects: Project[] = [
     github: "https://github.com/christopherkilo/portfolio",
     featured: false,
     href: "/toolkit/memory",
+    portfolioVisible: false,
   },
   {
     id: "netcheck",
@@ -148,36 +170,73 @@ export const projects: Project[] = [
     github: "https://github.com/christopherkilo/portfolio",
     featured: false,
     href: "/toolkit/network",
+    portfolioVisible: false,
   },
 ];
 
 export const categoryLabels: Record<ProjectCategory, string> = {
-  web: "Web Projects",
-  design: "Graphic Design Projects",
-  it: "Kilo Toolkit",
+  web: "Featured Applications",
+  design: "Graphic Design",
+  it: "Professional Toolkit",
+};
+
+/** Shorter labels for case-study badges and metadata (not section titles). */
+export const categoryBadgeLabels: Record<ProjectCategory, string> = {
+  web: "Web Application",
+  design: "Graphic Design",
+  it: "Professional Toolkit",
 };
 
 export const categoryDescriptions: Record<ProjectCategory, string> = {
-  web: "Product interfaces and web apps with polish, performance, and maintainable architecture.",
-  design: "Brand systems, visual narratives, and design artifacts with a quiet premium finish.",
-  it: "One cohesive diagnostics suite for system health, memory analysis, network testing, and guided troubleshooting.",
+  web: "A collection of full-stack applications demonstrating consumer software, business automation, and collaborative systems.",
+  design:
+    "A selection of branding, visual identity, and design projects demonstrating creative problem solving.",
+  it: "Practical utilities built for IT diagnostics, troubleshooting, and everyday technical workflows.",
 };
 
-export function getFeaturedProject(): Project {
-  return projects.find((p) => p.featured) ?? projects[0];
+/** Homepage Featured Applications intro — covers all four software products. */
+export const HOMEPAGE_FEATURED_DESCRIPTION =
+  "Four complete software applications demonstrating consumer platforms, business automation, collaborative systems, and professional IT utilities.";
+
+function isPortfolioVisible(project: Project): boolean {
+  return project.portfolioVisible !== false;
 }
 
-/** One representative project from each discipline for the homepage carousel. */
+/** Projects shown on homepage featured + Projects page grids. */
+export function getPortfolioProjects(): Project[] {
+  return projects.filter(isPortfolioVisible);
+}
+
+export function getFeaturedProject(): Project {
+  return (
+    getPortfolioProjects().find((p) => p.featured) ??
+    getPortfolioProjects()[0] ??
+    projects[0]
+  );
+}
+
+/**
+ * Homepage featured strip — Event Horizon, NovaTech, and TaskFlow.
+ * Kilo Toolkit is presented in its own Professional Toolkit section.
+ */
 export function getHomepageFeaturedProjects(): Project[] {
-  const categories: ProjectCategory[] = ["web", "design", "it"];
-  return categories.map((category) => {
-    const inCategory = projects.filter((project) => project.category === category);
-    return inCategory.find((project) => project.featured) ?? inCategory[0];
-  });
+  return getPortfolioProjectsByCategory("web");
+}
+
+/** Portfolio-visible Kilo Toolkit card for dedicated sections. */
+export function getHomepageToolkitProject(): Project | undefined {
+  return getPortfolioProjects().find((project) => project.id === "kilo-toolkit");
 }
 
 export function getProjectsByCategory(category: ProjectCategory): Project[] {
   return projects.filter((p) => p.category === category);
+}
+
+/** Category filter limited to portfolio-visible cards. */
+export function getPortfolioProjectsByCategory(
+  category: ProjectCategory,
+): Project[] {
+  return getPortfolioProjects().filter((p) => p.category === category);
 }
 
 export function getProjectById(id: string): Project | undefined {
@@ -186,6 +245,17 @@ export function getProjectById(id: string): Project | undefined {
 
 export function getProjectHref(project: Project): string {
   return project.href ?? `/projects/${project.id}`;
+}
+
+export function getProjectCtaLabel(project: Project): string {
+  if (
+    project.id === "kilo-toolkit" ||
+    project.category === "it" ||
+    project.href?.startsWith("/toolkit")
+  ) {
+    return "Open Toolkit";
+  }
+  return "View Case Study";
 }
 
 /** Internal app paths (case studies, demos, toolkit). */

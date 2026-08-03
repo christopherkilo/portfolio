@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Outfit, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE } from "@/lib/constants";
+import { Outfit, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const themeInitializer = `
@@ -40,12 +41,51 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://christopherkilo.dev"),
+  metadataBase: new URL(SITE.url),
   title: {
     default: `${SITE.name} — ${SITE.title}`,
     template: `%s · ${SITE.name}`,
   },
-  description: SITE.tagline,
+  description: SITE.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: SITE.url,
+    title: `${SITE.name} — ${SITE.title}`,
+    description: SITE.description,
+    siteName: SITE.name,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} — ${SITE.title}`,
+    description: SITE.description,
+  },
+  authors: [{ name: SITE.name, url: SITE.url }],
+  creator: SITE.name,
+  keywords: [
+    "Christopher Kilo",
+    "full-stack developer",
+    "Next.js",
+    "TypeScript",
+    "React",
+    "PostgreSQL",
+    "Supabase",
+    "portfolio",
+  ],
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: SITE.name,
+  url: SITE.url,
+  email: SITE.email,
+  jobTitle: SITE.title,
+  description: SITE.description,
+  sameAs: [SITE.github, SITE.linkedin],
 };
 
 export default function RootLayout({
@@ -61,6 +101,7 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitializer }} />
+        <JsonLd data={personJsonLd} />
       </head>
       <body className="flex min-h-full flex-col antialiased">
         <SiteShell>{children}</SiteShell>

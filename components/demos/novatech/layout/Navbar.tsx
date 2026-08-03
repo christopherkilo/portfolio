@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Menu } from "lucide-react";
-import { NAV_LINKS, SITE } from "@/lib/demos/novatech/constants";
+import { CTA, DEMO_BASE, NAV_LINKS } from "@/lib/demos/novatech/constants";
+import { contactHref, isNavActive } from "@/lib/demos/novatech/paths";
 import { cn } from "@/lib/demos/novatech/utils";
 import { Button } from "@/components/demos/novatech/ui/Button";
 import { MobileMenu } from "@/components/demos/novatech/layout/MobileMenu";
@@ -34,18 +35,18 @@ export function Navbar() {
             : "border-transparent bg-surface/70 backdrop-blur-md",
         )}
       >
-        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link
-            href="/demos/novatech-solutions"
-            className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink"
+            href={DEMO_BASE}
+            className="flex min-w-0 items-center gap-2 font-display text-lg font-bold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
           >
             <span
-              className="grid size-8 place-items-center rounded-lg gradient-band text-xs font-bold tracking-tight text-band-ink shadow-sm"
+              className="grid size-8 shrink-0 place-items-center rounded-lg gradient-band text-xs font-bold tracking-tight text-band-ink shadow-sm"
               aria-hidden="true"
             >
               NT
             </span>
-            <span>
+            <span className="truncate">
               <span className="text-primary">Nova</span>Tech
               <span className="ml-1 font-medium text-muted">Solutions</span>
             </span>
@@ -53,17 +54,14 @@ export function Navbar() {
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
             {NAV_LINKS.map((link) => {
-              const active =
-                link.href === "/demos/novatech-solutions"
-                  ? pathname === "/demos/novatech-solutions"
-                  : pathname.startsWith(link.href);
+              const active = isNavActive(pathname, link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "rounded-lg px-3 py-2 text-sm font-medium transition",
+                    "rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                     active
                       ? "bg-primary/10 text-primary"
                       : "text-muted hover:bg-bg hover:text-ink",
@@ -77,21 +75,21 @@ export function Navbar() {
 
           <div className="flex items-center gap-2">
             <div className="hidden sm:block">
-              <Button href="/demos/novatech-solutions/contact" size="sm">
-                Demo inquiry
+              <Button href={contactHref()} size="sm">
+                {CTA.primary}
               </Button>
             </div>
             <ThemeToggle />
             <button
               ref={menuButtonRef}
               type="button"
-              className="inline-flex size-10 items-center justify-center rounded-lg border border-border bg-surface lg:hidden"
+              className="inline-flex size-10 items-center justify-center rounded-lg border border-border bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:hidden"
               aria-label="Open menu"
               aria-expanded={open}
               aria-controls="mobile-navigation"
               onClick={() => setOpen(true)}
             >
-              <Menu className="size-5" />
+              <Menu className="size-5" aria-hidden />
             </button>
           </div>
         </div>
@@ -101,7 +99,6 @@ export function Navbar() {
         onClose={closeMenu}
         returnFocusRef={menuButtonRef}
       />
-      <span className="sr-only">{SITE.name}</span>
     </>
   );
 }

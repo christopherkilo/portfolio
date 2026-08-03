@@ -11,10 +11,12 @@ import {
   Mail,
   Search,
   User,
-  Wrench,
 } from "lucide-react";
 import { NAV_LINKS, SITE } from "@/lib/constants";
-import { getProjectHref, projects } from "@/lib/projectData";
+import {
+  getPortfolioProjects,
+  getProjectHref,
+} from "@/lib/projectData";
 import { durations, easings } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +37,6 @@ type CommandPaletteProps = {
 const iconMap: Record<string, ReactNode> = {
   home: <Home className="size-4" />,
   projects: <FolderKanban className="size-4" />,
-  lab: <Wrench className="size-4" />,
   about: <User className="size-4" />,
   contact: <Mail className="size-4" />,
 };
@@ -66,14 +67,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       keywords: `${link.label} ${link.href}`,
     }));
 
-    const projectItems: CommandItem[] = projects.slice(0, 5).map((p) => ({
-      id: `project-${p.id}`,
-      label: p.title,
-      hint: "Project",
-      icon: <FolderKanban className="size-4" />,
-      action: () => router.push(getProjectHref(p)),
-      keywords: `${p.title} ${p.category} ${p.technologies.join(" ")}`,
-    }));
+    const projectItems: CommandItem[] = getPortfolioProjects()
+      .slice(0, 7)
+      .map((p) => ({
+        id: `project-${p.id}`,
+        label: p.title,
+        hint: "Project",
+        icon: <FolderKanban className="size-4" />,
+        action: () => router.push(getProjectHref(p)),
+        keywords: `${p.title} ${p.category} ${p.technologies.join(" ")}`,
+      }));
 
     const actions: CommandItem[] = [
       {

@@ -1,0 +1,63 @@
+# TaskFlow Integration Setup
+
+Environment and dashboard setup for the TaskFlow Supabase backend (Phase 1).
+
+## Rules
+
+1. Copy `.env.example` → `.env.local` if you do not already have a local file.
+2. Put **real** values **only** in `.env.local`.
+3. Keep `.env.example` as empty placeholders forever.
+4. Never commit secrets. `.env.local` is gitignored.
+
+## Application
+
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_APP_URL` | Base URL (OAuth redirects, absolute links). |
+
+```bash
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+## Supabase (TaskFlow)
+
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL only (e.g. `https://xxxx.supabase.co`). **Do not** append `/rest/v1`. |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser + cookie session client. Safe with RLS. |
+| `SUPABASE_SECRET_KEY` | Server-only admin client. **Never** expose to the browser. |
+
+### Why two keys?
+
+- **Publishable** — user session; RLS applies.
+- **Secret** — server-only; bypasses RLS; reserved for admin/ops, not normal TaskFlow CRUD.
+
+## Database
+
+Apply TaskFlow migrations (or `supabase/APPLY_ALL_TASKFLOW.sql`) in the Supabase SQL editor before signing in. If you previously applied older migrations, also run `supabase/FIX_WORKSPACE_BOOTSTRAP_RLS.sql`.
+
+### Demo seed
+
+Populate a realistic Portfolio Demo Workspace (projects, tasks, comments, notifications, activity, attachment metadata):
+
+```bash
+npm run taskflow:seed
+```
+
+Uses the Supabase **secret** key from `.env.local`. Idempotent (fixed UUIDs + upserts). Optional: `TASKFLOW_SEED_OWNER_EMAIL` to pin Christopher to a specific Auth user. Does not seed presence or offline queue.
+
+## Auth dashboard
+
+1. Enable Google provider.
+2. Add redirect URL: `{NEXT_PUBLIC_APP_URL}/auth/callback`.
+3. Site URL matches `NEXT_PUBLIC_APP_URL`.
+
+## Future integrations (comments only)
+
+`.env.local` / `.env.example` may include commented stubs for realtime, storage, email, and notifications. Do not fill those until later phases.
+
+## Related docs
+
+- [TASKFLOW_BACKEND_ARCHITECTURE.md](./TASKFLOW_BACKEND_ARCHITECTURE.md)
+- [TASKFLOW_DATABASE.md](./TASKFLOW_DATABASE.md)
+- [TASKFLOW_AUTHENTICATION.md](./TASKFLOW_AUTHENTICATION.md)

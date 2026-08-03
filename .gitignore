@@ -19,10 +19,17 @@
 
 # production
 /build
+/dist
+
+# caches
+.turbo
+.cache
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+*.log
 
 # debug
 npm-debug.log*
@@ -30,12 +37,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — keep secrets out of Git; allow committed examples
+.env
+.env.*
+!.env.example
+**/generated/prisma/**
+/generated/
 
 # vercel
 .vercel
 
-# typescript
+# typescript — generated build info must never be committed or packaged
 *.tsbuildinfo
+tsconfig.tsbuildinfo
 next-env.d.ts

@@ -3,46 +3,55 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useId, useRef } from "react";
+import {
+  focusFirstElement,
+  handleFocusTrapTab,
+} from "@/lib/demos/event-horizon/focusTrap";
 
 type ModalProps = {
   open: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   children: React.ReactNode;
+  /** When false, skip autofocus on the close control so a child can take focus. */
+  autoFocusClose?: boolean;
 };
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+  autoFocusClose = true,
+}: ModalProps) {
   const titleId = useId();
+  const descriptionId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key !== "Tab") return;
-      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
+    document.body.style.overflow = "hidden";
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (dialogRef.current) {
+        handleFocusTrapTab(event, dialogRef.current);
       }
     };
+
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
     window.requestAnimationFrame(() => {
-      dialogRef.current
-        ?.querySelector<HTMLElement>("[data-autofocus], button, input, select")
-        ?.focus();
+      if (dialogRef.current) focusFirstElement(dialogRef.current);
     });
+
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
@@ -59,10 +68,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <button
-            type="button"
+          <div
             className="absolute inset-0 bg-overlay backdrop-blur-sm"
-            aria-label="Close dialog"
+            aria-hidden="true"
             onClick={onClose}
           />
           <motion.div
@@ -70,7 +78,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="relative z-10 max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface p-5 shadow-2xl"
+            aria-describedby={description ? descriptionId : undefined}
+            tabIndex={-1}
+            className="relative z-10 max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface p-5 shadow-2xl outline-none focus-visible:ring-2 focus-visible:ring-accent"
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -81,14 +91,19 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
               </h2>
               <button
                 type="button"
-                data-autofocus
+                {...(autoFocusClose ? { "data-autofocus": true } : {})}
                 onClick={onClose}
-                className="inline-flex size-9 items-center justify-center rounded-lg border border-border text-muted hover:text-ink"
-                aria-label="Close"
+                className="inline-flex size-9 items-center justify-center rounded-lg border border-border text-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label="Close dialog"
               >
-                <X className="size-4" />
+                <X className="size-4" aria-hidden />
               </button>
             </div>
+            {description ? (
+              <p id={descriptionId} className="sr-only">
+                {description}
+              </p>
+            ) : null}
             {children}
           </motion.div>
         </motion.div>

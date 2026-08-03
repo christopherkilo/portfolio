@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/shared/Reveal";
-import { cn } from "@/lib/utils";
+import { cn, isSvgImageSrc } from "@/lib/utils";
 import {
   NIGHTSHIFT,
   NIGHTSHIFT_COLORS,
@@ -73,7 +73,7 @@ function Wordmark({ className }: { className?: string }) {
       width={480}
       height={96}
       className={cn("h-8 w-auto", className)}
-      unoptimized
+      unoptimized={isSvgImageSrc("/projects/nightshift/wordmark.svg")}
     />
   );
 }
@@ -445,7 +445,7 @@ export function NightshiftCaseStudy() {
                   width={960}
                   height={640}
                   className="h-auto w-full"
-                  unoptimized
+                  unoptimized={isSvgImageSrc("/projects/nightshift/mockups/street-poster.svg")}
                 />
               </figure>
             </div>
@@ -756,7 +756,7 @@ export function NightshiftCaseStudy() {
                 width={1200}
                 height={675}
                 className="w-full rounded-xl border border-white/10"
-                unoptimized
+                unoptimized={isSvgImageSrc("/projects/nightshift/motion/poster-still.svg")}
               />
               <figcaption className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#34E8FF]">
                 Keyframe still
@@ -812,7 +812,7 @@ export function NightshiftCaseStudy() {
                 width={1400}
                 height={600}
                 className="aspect-[21/9] w-full object-cover"
-                unoptimized
+                unoptimized={isSvgImageSrc("/projects/nightshift/images/treatment-before.svg")}
               />
               <div
                 className="absolute inset-0 overflow-hidden"
@@ -824,7 +824,7 @@ export function NightshiftCaseStudy() {
                   width={1400}
                   height={600}
                   className="h-full w-full object-cover"
-                  unoptimized
+                  unoptimized={isSvgImageSrc("/projects/nightshift/images/treatment-after.svg")}
                 />
               </div>
               <div className="absolute inset-y-0 w-px bg-white shadow-[0_0_12px_#34E8FF]" style={{ left: `${treatment}%` }} />

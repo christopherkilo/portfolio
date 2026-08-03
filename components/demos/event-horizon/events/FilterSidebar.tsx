@@ -16,6 +16,9 @@ type FilterSidebarProps = {
   className?: string;
 };
 
+const fieldClass =
+  "mt-2 h-11 w-full rounded-xl border border-border bg-bg px-3 text-sm font-medium normal-case tracking-normal text-ink outline-none focus-visible:border-accent/50 focus-visible:ring-2 focus-visible:ring-accent/30";
+
 export function FilterSidebar({
   filters,
   onChange,
@@ -34,14 +37,14 @@ export function FilterSidebar({
       )}
       aria-label="Event filters"
     >
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <h2 className="font-display text-base font-semibold">Filters</h2>
         <button
           type="button"
-          className="text-xs font-medium text-accent hover:underline"
+          className="rounded-sm text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           onClick={onReset}
         >
-          Reset
+          Clear Filters
         </button>
       </div>
 
@@ -49,7 +52,7 @@ export function FilterSidebar({
         <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
           Category
         </legend>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Category">
           {(["All", ...CATEGORIES] as const).map((category) => {
             const active = filters.category === category;
             return (
@@ -60,7 +63,7 @@ export function FilterSidebar({
                   update("category", category as EventCategory | "All")
                 }
                 className={cn(
-                  "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition",
+                  "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                   active
                     ? "border-accent/40 bg-accent/15 text-accent"
                     : "border-border text-muted hover:border-accent/30 hover:text-ink",
@@ -74,12 +77,19 @@ export function FilterSidebar({
         </div>
       </fieldset>
 
-      <label className="mt-6 block text-xs font-semibold uppercase tracking-wider text-muted">
-        Location
+      <div className="mt-6">
+        <label
+          htmlFor="eh-filter-city"
+          className="block text-xs font-semibold uppercase tracking-wider text-muted"
+        >
+          Location
+        </label>
         <select
-          className="mt-2 h-11 w-full rounded-xl border border-border bg-bg px-3 text-sm font-medium normal-case tracking-normal text-ink outline-none focus:border-accent/50"
+          id="eh-filter-city"
+          className={fieldClass}
           value={filters.city}
           onChange={(e) => update("city", e.target.value)}
+          aria-describedby="eh-filter-city-hint"
         >
           <option value="All">All cities</option>
           {CITIES.map((city) => (
@@ -88,31 +98,70 @@ export function FilterSidebar({
             </option>
           ))}
         </select>
-      </label>
+        <p id="eh-filter-city-hint" className="mt-1 text-xs text-muted">
+          Filter events by city
+        </p>
+      </div>
 
-      <label className="mt-5 block text-xs font-semibold uppercase tracking-wider text-muted">
-        On or after
+      <div className="mt-5">
+        <label
+          htmlFor="eh-filter-date"
+          className="block text-xs font-semibold uppercase tracking-wider text-muted"
+        >
+          On or after
+        </label>
         <input
+          id="eh-filter-date"
           type="date"
           value={filters.date}
           onChange={(e) => update("date", e.target.value)}
-          className="mt-2 h-11 w-full rounded-xl border border-border bg-bg px-3 text-sm font-medium normal-case tracking-normal text-ink outline-none focus:border-accent/50"
+          className={fieldClass}
+          aria-describedby="eh-filter-date-hint"
         />
-      </label>
+        <p id="eh-filter-date-hint" className="mt-1 text-xs text-muted">
+          Show events starting on this date or later
+        </p>
+      </div>
 
-      <label className="mt-5 block text-xs font-semibold uppercase tracking-wider text-muted">
-        Sort by
+      <div className="mt-5">
+        <label className="flex items-center gap-3 text-sm font-medium text-ink">
+          <input
+            type="checkbox"
+            checked={filters.featured}
+            onChange={(e) => update("featured", e.target.checked)}
+            className="size-4 rounded border-border accent-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-describedby="eh-filter-featured-hint"
+          />
+          Featured only
+        </label>
+        <p id="eh-filter-featured-hint" className="mt-1 text-xs text-muted">
+          Limit results to curated featured events
+        </p>
+      </div>
+
+      <div className="mt-5">
+        <label
+          htmlFor="eh-filter-sort"
+          className="block text-xs font-semibold uppercase tracking-wider text-muted"
+        >
+          Sort by
+        </label>
         <select
-          className="mt-2 h-11 w-full rounded-xl border border-border bg-bg px-3 text-sm font-medium normal-case tracking-normal text-ink outline-none focus:border-accent/50"
+          id="eh-filter-sort"
+          className={fieldClass}
           value={filters.sort}
           onChange={(e) => update("sort", e.target.value as SortOption)}
+          aria-describedby="eh-filter-sort-hint"
         >
           <option value="date-asc">Date (soonest)</option>
           <option value="date-desc">Date (latest)</option>
           <option value="popular">Most popular</option>
           <option value="title">Title A–Z</option>
         </select>
-      </label>
+        <p id="eh-filter-sort-hint" className="mt-1 text-xs text-muted">
+          Change how matching events are ordered
+        </p>
+      </div>
     </aside>
   );
 }

@@ -156,7 +156,7 @@ const studies: Record<string, Omit<CaseStudy, "projectId">> = {
       {
         title: "Restrained corporate visual language",
         explanation:
-          "I chose dark blue, teal, low-contrast borders, controlled gradients, and limited elevation to communicate stability without making an infrastructure company feel cold, generic, or dated.",
+          "I chose deep emerald, bright emerald accents, slate neutrals, and soft white surfaces to communicate growth and trust—closer to modern B2B SaaS than a generic blue IT brochure.",
       },
       {
         title: "Prototype the journey before the lead stack",

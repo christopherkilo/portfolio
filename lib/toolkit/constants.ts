@@ -3,6 +3,7 @@ import {
   BrainCircuit,
   FileText,
   Gauge,
+  LifeBuoy,
   Network,
   Settings,
 } from "lucide-react";
@@ -13,6 +14,7 @@ export const TOOLKIT_NAV = [
   { href: "/toolkit/system", label: "SystemScope", icon: Activity },
   { href: "/toolkit/memory", label: "MemoryMedic", icon: BrainCircuit },
   { href: "/toolkit/network", label: "NetCheck", icon: Network },
+  { href: "/toolkit/troubleshooting", label: "Guided Help", icon: LifeBuoy },
   { href: "/toolkit/reports", label: "Reports", icon: FileText },
   { href: "/toolkit/settings", label: "Settings", icon: Settings },
 ] as const;
@@ -33,7 +35,8 @@ export const DEFAULT_SETTINGS: ToolkitSettings = {
   density: "comfortable",
   notifications: true,
   theme: "dark",
+  autoRefresh: true,
 };
 
 export const DEMO_DISCLOSURE =
-  "Kilo Toolkit is running in Demo Mode with realistic simulated system data. No unrestricted hardware, process, adapter, or local-network information is read from this device.";
+  "Kilo Toolkit runs in Demo Mode with illustrative diagnostic data. This browser build does not read hardware, processes, adapters, or local-network details from your device.";

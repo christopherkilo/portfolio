@@ -1,13 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
-  <rect width="1200" height="750" fill="#0B1F3A"/>
-  <circle cx="1040" cy="-40" r="280" fill="#0D9488" fill-opacity="0.12"/>
-  <circle cx="80" cy="820" r="320" fill="#0F4C81" fill-opacity="0.08"/>
-  <g transform="translate(120 210)">
-    
-    <path d="M90 12 L158 42 V98 C158 138 128 168 90 182 C52 168 22 138 22 98 V42 Z" fill="#0D9488" fill-opacity="0.18" stroke="#0D9488" stroke-width="6"/>
-    <text x="90" y="118" text-anchor="middle" fill="#5EEAD4" font-family="ui-sans-serif,system-ui,sans-serif" font-size="64" font-weight="800">N</text>
-  
+  <rect width="1200" height="750" fill="#0F172A"/>
+  <circle cx="1020" cy="90" r="240" fill="#2563EB" fill-opacity="0.08"/>
+  <circle cx="80" cy="680" r="200" fill="#14B8A6" fill-opacity="0.06"/>
+  <g transform="translate(160 270)">
+    <rect width="96" height="96" rx="24" fill="#2563EB"/>
+    <path d="M30 74 C30 74 30 38 30 30 C30 25 34 22.5 38 25 C43 28 45.5 38 48 46" fill="none" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round"/>
+    <path d="M66 22 C66 22 66 58 66 66 C66 71 62 73.5 58 71 C53 68 50.5 58 48 50" fill="none" stroke="#10B981" stroke-width="7.5" stroke-linecap="round"/>
+    <circle cx="48" cy="48" r="8.5" fill="#14B8A6"/>
+    <circle cx="48" cy="48" r="3.5" fill="#FFFFFF"/>
   </g>
-  <text x="120" y="520" fill="#E8EEF7" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="56" font-weight="700">NovaTech Solutions</text>
-  <text x="120" y="575" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="500">MSP & IT consulting</text>
+  <text x="300" y="325" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="58" font-weight="700">NovaTech Solutions</text>
+  <text x="300" y="375" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="500">Partnership · Precision · Growth</text>
 </svg>

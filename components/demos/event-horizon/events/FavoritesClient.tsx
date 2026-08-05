@@ -37,8 +37,8 @@ export function FavoritesClient() {
       {status === "unauthenticated" ? (
         <div className="mt-10">
           <EmptyState
-            title="Sign in to view favorites"
-            description="Favorites are saved to your account so they follow you across browsers."
+            title="Sign in to keep what pulls you in"
+            description="Favorites stay with your account so the events you save follow you across sessions."
             icon={Heart}
             actionLabel="Sign In"
             onAction={() =>
@@ -58,8 +58,8 @@ export function FavoritesClient() {
       ) : liked.length === 0 ? (
         <div className="mt-10">
           <EmptyState
-            title="No favorites yet"
-            description="Tap the heart on any event card to save it here for quick access later."
+            title="Your orbit is empty"
+            description="Tap the heart on any event and it will gather here—close, saved, ready when you are."
             icon={Heart}
             actionHref="/demos/event-horizon/browse"
             actionLabel="Browse events"

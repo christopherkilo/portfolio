@@ -145,7 +145,7 @@ export function SignInModal() {
           disabled={Boolean(pending)}
           onClick={() => void continueWith("google")}
           className={cn(
-            "inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-accent px-4 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:opacity-60",
+            "inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-accent/45 bg-[#0a0a0a] px-4 text-sm font-semibold text-accent transition hover:border-accent hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:opacity-60",
           )}
           aria-label="Continue with Google"
         >

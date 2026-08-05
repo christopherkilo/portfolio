@@ -31,13 +31,13 @@ export function SectionHeader({
           {eyebrow}
         </p>
       ) : null}
-      <Heading className="font-display text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+      <Heading className="font-display text-3xl font-bold tracking-tight text-ink md:text-[2.5rem] md:leading-[1.15]">
         {title}
       </Heading>
       {description ? (
         <p
           className={cn(
-            "mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg",
+            "mt-5 max-w-2xl text-base leading-relaxed text-muted md:text-lg md:leading-relaxed",
             align === "center" && "mx-auto",
           )}
         >
@@ -51,7 +51,7 @@ export function SectionHeader({
     return (
       <header
         className={cn(
-          "mb-10",
+          "mb-12",
           align === "center" && "mx-auto text-center",
           className,
         )}
@@ -64,7 +64,7 @@ export function SectionHeader({
   return (
     <motion.header
       className={cn(
-        "mb-10",
+        "mb-12",
         align === "center" && "mx-auto text-center",
         className,
       )}

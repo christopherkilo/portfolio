@@ -26,7 +26,7 @@ export function SearchInput({
 
   return (
     <form
-      className={cn("relative", className)}
+      className={cn("eh-search-bloom relative", className)}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit?.();
@@ -37,7 +37,7 @@ export function SearchInput({
         Search events
       </label>
       <Search
-        className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
+        className="eh-search-icon pointer-events-none absolute left-4 top-1/2 z-[1] size-4 -translate-y-1/2 text-muted transition-colors duration-300"
         aria-hidden
       />
       <input
@@ -47,7 +47,7 @@ export function SearchInput({
         placeholder={placeholder}
         aria-describedby={descriptionId}
         autoComplete="off"
-        className="h-12 w-full rounded-2xl border border-border bg-surface pl-11 pr-4 text-sm text-ink outline-none transition placeholder:text-muted focus-visible:border-accent/50 focus-visible:ring-2 focus-visible:ring-accent/30"
+        className="h-12 w-full rounded-2xl border border-border bg-surface/95 pl-11 pr-4 text-sm text-ink outline-none transition placeholder:text-muted focus-visible:border-accent/50"
       />
       <p id={descriptionId} className="sr-only">
         {description}

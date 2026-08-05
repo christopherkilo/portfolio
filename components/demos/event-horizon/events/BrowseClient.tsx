@@ -31,9 +31,8 @@ function getBrowseEmptyState(filters: EventFilters) {
   const query = filters.query.trim();
   if (query) {
     return {
-      title: `No results for “${query}”`,
-      description:
-        "Try a different keyword, clear your search, or browse by city and category.",
+      title: "We couldn’t find anything nearby",
+      description: `Nothing matched “${query}”. Try expanding your search, or explore another category.`,
       icon: Search,
       actionLabel: "Clear search",
       secondaryActionLabel: "Clear all filters",
@@ -41,18 +40,17 @@ function getBrowseEmptyState(filters: EventFilters) {
   }
   if (filters.category !== "All") {
     return {
-      title: `No ${filters.category} events found`,
-      description:
-        "Nothing matches this category with your other filters. Widen the search or pick another category.",
+      title: "We couldn’t find anything nearby",
+      description: `No ${filters.category} events match these filters. Explore another category or widen the criteria.`,
       icon: Tag,
       actionLabel: "Clear category",
       secondaryActionLabel: "Clear all filters",
     };
   }
   return {
-    title: "No events found",
+    title: "We couldn’t find anything nearby",
     description:
-      "Try clearing filters or searching a different keyword to rediscover what’s on.",
+      "Try expanding your search or explore another category — something worth the night is usually close.",
     icon: SlidersHorizontal,
     actionLabel: "Clear Filters",
     secondaryActionLabel: "Back home",
@@ -182,7 +180,7 @@ export function BrowseClient() {
               aria-atomic="true"
             >
               {loading
-                ? "Loading events…"
+                ? "Pulling events into view…"
                 : `${total} event${total === 1 ? "" : "s"} match your filters`}
             </p>
           </div>
@@ -210,8 +208,11 @@ export function BrowseClient() {
 
         {error ? (
           <EmptyState
-            title="Could not load events"
-            description={error}
+            title="Signal lost — events unavailable"
+            description={
+              error ||
+              "We could not pull the catalog into view. Retry in a moment, or return home and try again."
+            }
             actionLabel="Retry"
             onAction={() => commitFilters({ ...filters })}
             secondaryActionHref="/demos/event-horizon"

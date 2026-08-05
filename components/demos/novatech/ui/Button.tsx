@@ -9,13 +9,10 @@ type Variant = "primary" | "secondary" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
-  primary:
-    "bg-primary text-primary-contrast shadow-sm hover:bg-primary-dark",
-  secondary:
-    "bg-accent text-primary-contrast shadow-sm hover:brightness-110",
-  outline:
-    "border border-border bg-surface text-ink hover:border-primary/40 hover:bg-primary/5",
-  ghost: "bg-transparent text-ink hover:bg-ink/5",
+  primary: "nt-btn-primary",
+  secondary: "nt-btn-success",
+  outline: "nt-btn-outline",
+  ghost: "bg-transparent text-muted hover:bg-ink/5 hover:text-ink",
 };
 
 const sizes: Record<Size, string> = {
@@ -51,11 +48,14 @@ export function Button({
 }: ButtonProps) {
   const reducedMotion = useReducedMotion();
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-[color,background-color,border-color,box-shadow,filter] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
     variants[variant],
     sizes[size],
     className,
   );
+
+  const hover = reducedMotion ? undefined : { y: -1 };
+  const tap = reducedMotion ? undefined : { scale: 0.98 };
 
   if (href) {
     if (reducedMotion) {
@@ -69,16 +69,11 @@ export function Button({
     return (
       <motion.div
         className="inline-flex"
-        whileHover={{ y: -1 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={hover}
+        whileTap={tap}
         transition={springHover}
       >
-        <Link
-          href={href}
-          className={classes}
-          aria-label={ariaLabel}
-          onClick={onClick}
-        >
+        <Link href={href} className={classes} aria-label={ariaLabel} onClick={onClick}>
           {children}
         </Link>
       </motion.div>
@@ -104,8 +99,8 @@ export function Button({
     <motion.button
       type={type}
       className={classes}
-      whileHover={{ y: -1 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={hover}
+      whileTap={tap}
       transition={buttonTransition}
       onClick={onClick}
       disabled={disabled}

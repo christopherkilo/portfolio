@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { NAV_LINKS, SITE } from "@/lib/demos/novatech/constants";
+import { NovaTechMark } from "@/components/demos/novatech/brand/NovaTechMark";
 
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-border bg-footer text-footer-ink">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.2fr_1fr_1fr] lg:px-8">
         <div>
-          <p className="font-display text-xl font-bold">
-            <span className="text-footer-accent">Nova</span>Tech Solutions
+          <p className="flex items-center gap-2.5 font-display text-xl font-bold">
+            <NovaTechMark decorative size="sm" className="brightness-110" />
+            <span>
+              <span className="text-footer-accent">Nova</span>Tech Solutions
+            </span>
           </p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-footer-ink/70">
             {SITE.description}

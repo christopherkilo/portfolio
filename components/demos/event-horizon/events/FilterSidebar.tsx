@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import {
   CATEGORIES,
   CITIES,
@@ -7,6 +8,7 @@ import {
   type EventFilters,
   type SortOption,
 } from "@/lib/demos/event-horizon/eventData";
+import { getCategoryAccent } from "@/lib/demos/event-horizon/categoryStyles";
 import { cn } from "@/lib/demos/event-horizon/utils";
 
 type FilterSidebarProps = {
@@ -32,7 +34,7 @@ export function FilterSidebar({
   return (
     <aside
       className={cn(
-        "h-fit rounded-2xl border border-border bg-surface p-5",
+        "eh-card h-fit rounded-2xl border bg-surface/90 p-5 backdrop-blur-sm",
         className,
       )}
       aria-label="Event filters"
@@ -55,6 +57,8 @@ export function FilterSidebar({
         <div className="flex flex-wrap gap-2" role="group" aria-label="Category">
           {(["All", ...CATEGORIES] as const).map((category) => {
             const active = filters.category === category;
+            const accent =
+              category === "All" ? null : getCategoryAccent(category);
             return (
               <button
                 key={category}
@@ -63,11 +67,29 @@ export function FilterSidebar({
                   update("category", category as EventCategory | "All")
                 }
                 className={cn(
-                  "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                  active
+                  "eh-cat-chip rounded-lg border px-2.5 py-1.5 text-xs font-semibold tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                  active && !accent
                     ? "border-accent/40 bg-accent/15 text-accent"
-                    : "border-border text-muted hover:border-accent/30 hover:text-ink",
+                    : !accent
+                      ? "border-border text-muted hover:border-accent/30 hover:text-ink"
+                      : active
+                        ? undefined
+                        : "border-border text-muted",
                 )}
+                style={
+                  accent
+                    ? ({
+                        ["--eh-cat" as string]: accent.color,
+                        ...(active
+                          ? {
+                              borderColor: accent.border,
+                              backgroundColor: accent.wash,
+                              color: accent.color,
+                            }
+                          : undefined),
+                      } as CSSProperties)
+                    : undefined
+                }
                 aria-pressed={active}
               >
                 {category}

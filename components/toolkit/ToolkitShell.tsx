@@ -24,12 +24,19 @@ import { DEMO_DISCLOSURE, SCAN_STAGES, TOOLKIT_NAV } from "@/lib/toolkit/constan
 import { exportReport, saveReport } from "@/lib/toolkit/report-storage";
 import type { DiagnosticReport } from "@/lib/toolkit/types";
 import { ToolkitProvider, useToolkit } from "@/components/toolkit/ToolkitContext";
-import { DemoModeBadge } from "@/components/toolkit/ToolkitUI";
+import {
+  GuidedTroubleshootingProvider,
+  useOptionalGuidedTroubleshooting,
+} from "@/components/toolkit/GuidedTroubleshootingProvider";
+import { DemoModeBadge, DiagnosticScanOverlay, StartupOverlay } from "@/components/toolkit/ToolkitUI";
+import { pickRecommendations, statusFromScore } from "@/lib/toolkit/simulation";
 
 export function ToolkitShell({ children }: { children: React.ReactNode }) {
   return (
     <ToolkitProvider>
-      <ToolkitShellInner>{children}</ToolkitShellInner>
+      <GuidedTroubleshootingProvider>
+        <ToolkitShellInner>{children}</ToolkitShellInner>
+      </GuidedTroubleshootingProvider>
     </ToolkitProvider>
   );
 }
@@ -42,15 +49,25 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
     system,
     memory,
     network,
+    healthScore,
+    recommendations,
+    profileLabel,
     sessionLabel,
     settings,
     reports,
     providerError,
     reportStorageStatus,
+    scanning,
+    scanStageLabel,
+    scanProgress,
+    startupOpen,
+    startupLabel,
     refreshReports,
     refreshAll,
+    refreshDiagnostics,
     updateSettings,
   } = useToolkit();
+  const guide = useOptionalGuidedTroubleshooting();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
@@ -65,8 +82,38 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
       hint: item.href,
       action: () => router.push(item.href),
     })),
+    {
+      label: "Start Guided Troubleshooting",
+      hint: "Guide",
+      action: () => router.push("/toolkit/troubleshooting"),
+    },
+    {
+      label: "Troubleshoot Slow Computer",
+      hint: "Guide",
+      action: () => router.push("/toolkit/troubleshooting?start=slow-computer"),
+    },
+    {
+      label: "Troubleshoot Network",
+      hint: "Guide",
+      action: () => router.push("/toolkit/troubleshooting?start=slow-internet"),
+    },
+    {
+      label: "Troubleshoot Low Storage",
+      hint: "Guide",
+      action: () => router.push("/toolkit/troubleshooting?start=storage-full"),
+    },
+    ...(guide?.hasProgress
+      ? [
+          {
+            label: "Resume Current Guide",
+            hint: "Guide",
+            action: () => router.push("/toolkit/troubleshooting?resume=1"),
+          },
+        ]
+      : []),
     { label: "Run full diagnostic scan", hint: "Action", action: startScan },
-    ...(reports[0] ? [{ label: "Export latest report", hint: "JSON", action: () => exportReport(reports[0]) }] : []),
+    { label: "Refresh diagnostics", hint: "Action", action: () => void refreshDiagnostics() },
+    ...(reports[0] ? [{ label: "Export latest report", hint: "JSON", action: () => exportReport(reports[0], "json") }] : []),
     { label: "Open portfolio", hint: "Navigation", action: () => router.push("/") },
   ];
 
@@ -91,14 +138,17 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
             id: crypto.randomUUID(),
             name: `Full Diagnostic · ${new Date().toLocaleDateString()}`,
             createdAt: new Date().toISOString(),
-            overallStatus: system.health >= 85 ? "healthy" : "attention",
+            overallStatus: statusFromScore(healthScore || system.health),
+            healthScore: healthScore || system.health,
+            activeProfile: profileLabel,
+            systemSummary: `${profileLabel} · ${system.deviceName} · ${system.operatingSystem} · CPU ${system.metrics.cpu}% · Memory ${memory.usagePercent}% · Latency ${network.quality.latency} ms`,
             systemFindings: system.findings,
             memoryFindings: memory.findings,
             networkFindings: network.findings,
-            recommendations: [
-              { id: "storage", title: "Recover primary-drive headroom", description: "Review large files before utilization reaches 85%.", priority: "medium", module: "system" },
-              { id: "browser", title: "Review browser workload", description: "Close inactive tabs before considering a memory upgrade.", priority: "low", module: "memory" },
-            ],
+            recommendations:
+              recommendations.length > 0
+                ? recommendations
+                : pickRecommendations(Date.now(), 3),
             demoMode: true,
           };
           saveReport(report);
@@ -109,7 +159,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
     }
     const timer = window.setTimeout(() => setStage((value) => value + 1), reducedMotion || !settings.animations ? 120 : 520);
     return () => window.clearTimeout(timer);
-  }, [scanState, stage, system, memory, network, refreshReports, reducedMotion, settings.animations]);
+  }, [scanState, stage, system, memory, network, healthScore, recommendations, profileLabel, refreshReports, reducedMotion, settings.animations]);
 
   function startScan() {
     setStage(0);
@@ -148,7 +198,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-white/7 p-3">
-          {!collapsed ? <div className="mb-3 rounded-xl bg-white/[0.03] p-3"><DemoModeBadge compact /><p className="mt-2 text-[11px] leading-relaxed text-muted">No system data is read from this device.</p></div> : null}
+          {!collapsed ? <div className="mb-3 rounded-xl bg-white/[0.03] p-3"><DemoModeBadge compact /><p className="mt-2 text-[11px] leading-relaxed text-muted">Illustrative diagnostics for portfolio demonstration.</p></div> : null}
           <Link href="/" title={collapsed ? "Back to portfolio" : undefined} className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-text">
             <ChevronLeft className="size-4 shrink-0" />
             {!collapsed ? <span>Back to portfolio</span> : <span className="sr-only">Back to portfolio</span>}
@@ -184,13 +234,19 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
           <button type="button" disabled={!settings.notifications} onClick={() => setNotificationsOpen((value) => !value)} className="relative rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text disabled:cursor-not-allowed disabled:opacity-40" aria-label={settings.notifications ? "Open notifications" : "Notifications disabled in settings"}>
             <Bell className="size-4" />{settings.notifications ? <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary" /> : null}
           </button>
-          <button type="button" disabled={!reports[0]} onClick={() => reports[0] && exportReport(reports[0])} className="hidden rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text disabled:cursor-not-allowed disabled:opacity-35 sm:block" aria-label={reports[0] ? `Export latest report: ${reports[0].name}` : "No report available to export"} title="Export latest report">
+          <button type="button" disabled={!reports[0]} onClick={() => reports[0] && exportReport(reports[0], "json")} className="hidden rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text disabled:cursor-not-allowed disabled:opacity-35 sm:block" aria-label={reports[0] ? `Export latest report: ${reports[0].name}` : "No report available to export"} title="Export latest report">
             <Download className="size-4" />
+          </button>
+          <button type="button" onClick={() => void refreshDiagnostics()} disabled={scanning} className="hidden items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm text-muted transition hover:border-white/20 hover:text-text disabled:opacity-50 xl:flex" aria-label="Refresh diagnostics">
+            <RotateCcw className={`size-4 ${scanning ? "animate-spin" : ""}`} />Refresh
           </button>
           <button type="button" onClick={startScan} className="hidden items-center gap-2 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-black transition hover:bg-primary sm:flex">
             <Play className="size-4" />Run Full Scan
           </button>
         </header>
+
+        <DiagnosticScanOverlay open={scanning} stageLabel={scanStageLabel} progress={scanProgress} />
+        <StartupOverlay open={startupOpen} stageLabel={startupLabel} />
 
         {providerError ? (
           <div role="alert" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-400/20 bg-rose-400/[0.06] px-4 py-3 text-sm text-rose-100 sm:mx-6 lg:mx-8">
@@ -207,7 +263,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
         {notificationsOpen && settings.notifications ? (
           <aside className="fixed right-4 top-20 z-50 w-[min(360px,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0b0b0b]/95 p-4 shadow-2xl backdrop-blur-2xl" aria-label="Notifications">
             <div className="flex items-center justify-between"><h2 className="font-display font-semibold">Notifications</h2><button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X className="size-4" /></button></div>
-            <div className="mt-4 space-y-3 text-sm"><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Storage check</span>Primary-drive utilization is above 70%.</p><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Demo provider ready</span>All three simulated diagnostic providers are available.</p></div>
+            <div className="mt-4 space-y-3 text-sm"><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Storage check</span>Primary-drive utilization is above 70%.</p><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Providers ready</span>SystemScope, MemoryMedic, and NetCheck are available.</p></div>
           </aside>
         ) : null}
 
@@ -370,6 +426,6 @@ function ScanDialog({ open, onClose, state, stage, onStart, onCancel }: { open: 
   const progress = Math.min(100, Math.round((stage / SCAN_STAGES.length) * 100));
   const panelRef = useDialogFocus(open, onClose);
   return (
-    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[95] grid place-items-center bg-black/75 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-labelledby="diagnostic-scan-title"><motion.div ref={panelRef} className="w-full max-w-xl rounded-3xl border border-white/10 bg-[#0b0b0b] p-6 shadow-2xl" initial={{ scale: .97, y: 10 }} animate={{ scale: 1, y: 0 }}><div className="flex items-start justify-between"><div><DemoModeBadge compact /><h2 id="diagnostic-scan-title" className="mt-3 font-display text-2xl font-semibold">Full diagnostic scan</h2><p className="mt-2 text-sm text-muted">{state === "complete" ? "Scan complete. A simulated report was saved." : state === "cancelled" ? "Scan cancelled. No report was created." : "Reviewing all simulated diagnostic providers."}</p></div><button type="button" onClick={onClose} aria-label="Close scan"><X className="size-5 text-muted" /></button></div><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]" role="progressbar" aria-label="Diagnostic scan progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={state === "complete" ? 100 : progress}><motion.div className="h-full bg-primary" animate={{ width: `${state === "complete" ? 100 : progress}%` }} /></div><p className="mt-2 text-right font-mono text-xs text-muted" aria-live="polite">{state === "complete" ? 100 : progress}%</p><ol className="mt-5 space-y-2">{SCAN_STAGES.map((item, index) => <li key={item.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", index === stage && state === "running" ? "bg-white/[0.05] text-text" : index < stage || state === "complete" ? "text-secondary" : "text-muted")}><span className={cn("size-2 rounded-full border border-white/20", (index < stage || state === "complete") && "border-primary bg-primary")} />{item.label}</li>)}</ol><p className="mt-5 rounded-xl border border-white/7 bg-white/[0.025] p-3 text-xs leading-relaxed text-muted">{DEMO_DISCLOSURE}</p><div className="mt-5 flex justify-end gap-3">{state === "running" ? <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-muted hover:text-text">Cancel scan</button> : <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-primary"><RotateCcw className="size-4" />{state === "idle" ? "Start scan" : "Run again"}</button>}{state === "complete" ? <Link href="/toolkit/reports" onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm"><Download className="size-4" />View report</Link> : null}</div></motion.div></motion.div> : null}</AnimatePresence>
+    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[95] grid place-items-center bg-black/75 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-labelledby="diagnostic-scan-title"><motion.div ref={panelRef} className="w-full max-w-xl rounded-3xl border border-white/10 bg-[#0b0b0b] p-6 shadow-2xl" initial={{ scale: .97, y: 10 }} animate={{ scale: 1, y: 0 }}><div className="flex items-start justify-between"><div><DemoModeBadge compact /><h2 id="diagnostic-scan-title" className="mt-3 font-display text-2xl font-semibold">Full diagnostic scan</h2><p className="mt-2 text-sm text-muted">{state === "complete" ? "Scan complete. A report was saved locally." : state === "cancelled" ? "Scan cancelled. No report was created." : "Reviewing SystemScope, MemoryMedic, and NetCheck."}</p></div><button type="button" onClick={onClose} aria-label="Close scan"><X className="size-5 text-muted" /></button></div><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]" role="progressbar" aria-label="Diagnostic scan progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={state === "complete" ? 100 : progress}><motion.div className="h-full bg-primary" animate={{ width: `${state === "complete" ? 100 : progress}%` }} /></div><p className="mt-2 text-right font-mono text-xs text-muted" aria-live="polite">{state === "complete" ? 100 : progress}%</p><ol className="mt-5 space-y-2">{SCAN_STAGES.map((item, index) => <li key={item.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", index === stage && state === "running" ? "bg-white/[0.05] text-text" : index < stage || state === "complete" ? "text-secondary" : "text-muted")}><span className={cn("size-2 rounded-full border border-white/20", (index < stage || state === "complete") && "border-primary bg-primary")} />{item.label}</li>)}</ol><p className="mt-5 rounded-xl border border-white/7 bg-white/[0.025] p-3 text-xs leading-relaxed text-muted">{DEMO_DISCLOSURE}</p><div className="mt-5 flex justify-end gap-3">{state === "running" ? <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-muted hover:text-text">Cancel scan</button> : <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-primary"><RotateCcw className="size-4" />{state === "idle" ? "Start scan" : "Run again"}</button>}{state === "complete" ? <Link href="/toolkit/reports" onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm"><Download className="size-4" />View report</Link> : null}</div></motion.div></motion.div> : null}</AnimatePresence>
   );
 }

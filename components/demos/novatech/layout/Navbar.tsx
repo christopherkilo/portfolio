@@ -7,6 +7,7 @@ import { Menu } from "lucide-react";
 import { CTA, DEMO_BASE, NAV_LINKS } from "@/lib/demos/novatech/constants";
 import { contactHref, isNavActive } from "@/lib/demos/novatech/paths";
 import { cn } from "@/lib/demos/novatech/utils";
+import { NovaTechMark } from "@/components/demos/novatech/brand/NovaTechMark";
 import { Button } from "@/components/demos/novatech/ui/Button";
 import { MobileMenu } from "@/components/demos/novatech/layout/MobileMenu";
 import { ThemeToggle } from "@/components/demos/novatech/layout/ThemeToggle";
@@ -38,14 +39,9 @@ export function Navbar() {
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link
             href={DEMO_BASE}
-            className="flex min-w-0 items-center gap-2 font-display text-lg font-bold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+            className="flex min-w-0 items-center gap-2.5 font-display text-lg font-bold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
           >
-            <span
-              className="grid size-8 shrink-0 place-items-center rounded-lg gradient-band text-xs font-bold tracking-tight text-band-ink shadow-sm"
-              aria-hidden="true"
-            >
-              NT
-            </span>
+            <NovaTechMark decorative size="sm" />
             <span className="truncate">
               <span className="text-primary">Nova</span>Tech
               <span className="ml-1 font-medium text-muted">Solutions</span>

@@ -33,6 +33,8 @@ export const projects: Project[] = [
       "Consumer event platform with authentication, reservations, and PostgreSQL-backed persistence.",
     technologies: ["Next.js", "TypeScript", "PostgreSQL", "Auth.js"],
     image: "/projects/event-horizon-logo.svg",
+    imageAlt:
+      "Event Horizon portfolio cover with a supporting black-hole mark above a fully readable title",
     github: "https://github.com/christopherkilo/event-horizon",
     liveDemo: "/demos/event-horizon",
     featured: true,
@@ -46,6 +48,8 @@ export const projects: Project[] = [
       "Business website integrating HubSpot CRM, automated inquiries, email delivery, and spam protection.",
     technologies: ["Next.js", "TypeScript", "HubSpot", "Resend"],
     image: "/projects/novatech-logo.svg",
+    imageAlt:
+      "NovaTech Solutions portfolio cover with emerald growth mark and enterprise wordmark",
     github: "https://github.com/christopherkilo/novatech-solutions",
     liveDemo: "/demos/novatech-solutions",
     featured: true,

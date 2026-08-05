@@ -588,13 +588,13 @@ export type PortfolioItem = {
 export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
   {
     id: "clinic-network",
-    title: "Multi-Site Clinic Network",
+    title: "Healthcare Clinic Infrastructure",
     category: "Networking",
     serviceId: "networking",
     summary:
-      "A fictional modernization concept for a growing outpatient provider.",
+      "A fictional modernization concept for a growing outpatient provider across four sites.",
     challenge:
-      "Inconsistent wireless coverage and flat networks made support and access control difficult across four sites.",
+      "Inconsistent wireless coverage and flat networks made support and access control difficult across locations.",
     scope:
       "Segmented network architecture, secure staff and guest Wi-Fi, rollout sequencing, and centralized monitoring design.",
     outcome:
@@ -602,25 +602,25 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
   },
   {
     id: "retail-msp",
-    title: "Retail MSP Rollout",
+    title: "Retail POS Deployment",
     category: "Managed IT",
     serviceId: "managed-it",
     summary:
-      "An illustrative managed-services rollout for a 60-seat retail team.",
+      "An illustrative managed-services and POS endpoint program for a multi-store retail team.",
     challenge:
       "Store teams relied on inconsistent devices and informal support paths that obscured recurring issues.",
     scope:
-      "Endpoint standards, intake workflows, escalation paths, asset inventory, and sample service reporting.",
+      "Endpoint standards, POS device imaging, intake workflows, escalation paths, and sample service reporting.",
     outcome:
       "Illustrative result: a support model designed for consistent onboarding and more visible operational trends.",
   },
   {
     id: "cloud-migration",
-    title: "Microsoft 365 Migration",
+    title: "Hybrid Office Migration",
     category: "Cloud Solutions",
     serviceId: "cloud-solutions",
     summary:
-      "A fictional Microsoft 365 transition planned around business continuity.",
+      "A fictional Microsoft 365 and hybrid-access transition planned around business continuity.",
     challenge:
       "Legacy mail and scattered file storage limited collaboration while raising migration and access concerns.",
     scope:
@@ -630,11 +630,11 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
   },
   {
     id: "security-baseline",
-    title: "SMB Security Baseline",
+    title: "Professional Services Support",
     category: "Cybersecurity",
     serviceId: "cybersecurity",
     summary:
-      "An illustrative security-foundation program for a professional-services firm.",
+      "An illustrative security-foundation and support program for a growing professional-services firm.",
     challenge:
       "Rapid growth had outpaced consistent identity, endpoint, and employee-awareness practices.",
     scope:
@@ -644,11 +644,11 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
   },
   {
     id: "corporate-site",
-    title: "Corporate Website Rebuild",
+    title: "Managed Office Network Refresh",
     category: "Website Development",
     serviceId: "website-development",
     summary:
-      "A fictional accessible website refresh for a specialist consultancy.",
+      "A fictional accessible website and inquiry-path refresh for a specialist consultancy.",
     challenge:
       "An outdated site made services difficult to understand and offered no clear inquiry path on mobile.",
     scope:
@@ -673,8 +673,8 @@ export const PORTFOLIO_ITEMS: readonly PortfolioItem[] = [
 ] as const;
 
 export const ABOUT_STATS = [
-  { label: "Systems and decisions", value: "Documented" },
-  { label: "Security foundations", value: "Layered" },
-  { label: "Communication style", value: "Clear" },
-  { label: "Engagement planning", value: "Phased" },
+  { label: "Average uptime across managed clients", value: "99.8%" },
+  { label: "Tickets closed last quarter", value: "1,284" },
+  { label: "Median first response", value: "18 min" },
+  { label: "Client satisfaction", value: "4.8/5" },
 ] as const;

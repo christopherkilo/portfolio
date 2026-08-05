@@ -19,6 +19,8 @@ export type Recommendation = {
   id: string;
   title: string;
   description: string;
+  reason?: string;
+  benefit?: string;
   priority: "low" | "medium" | "high";
   module: "system" | "memory" | "network";
 };
@@ -68,6 +70,7 @@ export type ProcessRecord = {
   category: "Browser" | "Development" | "Communication" | "System" | "Utility";
   memoryMb: number;
   percentage: number;
+  cpu: number;
   status: HealthStatus;
   recommendation?: string;
 };
@@ -141,6 +144,9 @@ export type DiagnosticReport = {
   name: string;
   createdAt: string;
   overallStatus: HealthStatus;
+  healthScore?: number;
+  systemSummary?: string;
+  activeProfile?: string;
   systemFindings: Finding[];
   memoryFindings: Finding[];
   networkFindings: Finding[];
@@ -175,5 +181,6 @@ export type ToolkitSettings = {
   density: "comfortable" | "compact";
   notifications: boolean;
   theme: "light" | "dark";
+  autoRefresh: boolean;
 };
 

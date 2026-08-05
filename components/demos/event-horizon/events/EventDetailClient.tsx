@@ -12,6 +12,10 @@ import {
   type TicketType,
 } from "@/lib/demos/event-horizon/eventData";
 import {
+  getCategoryAccent,
+  getPremiumBadges,
+} from "@/lib/demos/event-horizon/categoryStyles";
+import {
   calculateReservationTotals,
   validateReservation,
 } from "@/lib/demos/event-horizon/reservation";
@@ -24,6 +28,10 @@ import {
 import { ImageGallery } from "@/components/demos/event-horizon/events/ImageGallery";
 import { Button } from "@/components/demos/event-horizon/ui/Button";
 import { Modal } from "@/components/demos/event-horizon/ui/Modal";
+import {
+  CategoryBadge,
+  PremiumBadgePill,
+} from "@/components/demos/event-horizon/ui/PremiumBadge";
 import { useFavorites } from "@/contexts/demos/event-horizon/FavoritesContext";
 import { useReservations } from "@/contexts/demos/event-horizon/ReservationsContext";
 import { useToast } from "@/contexts/demos/event-horizon/ToastContext";
@@ -239,13 +247,29 @@ export function EventDetailClient({ event }: { event: EventItem }) {
         <ImageGallery images={event.gallery} alt={event.title} />
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            {event.category}
-          </p>
-          <h1 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
-            {event.title}
-          </h1>
-          <p className="mt-4 text-muted">{event.description}</p>
+          {(() => {
+            const accent = getCategoryAccent(event.category);
+            const badges = getPremiumBadges(event).slice(0, 3);
+            return (
+              <>
+                <div className="flex flex-wrap items-center gap-2">
+                  {badges.map((badge) => (
+                    <PremiumBadgePill key={badge.kind} badge={badge} />
+                  ))}
+                  <CategoryBadge
+                    category={event.category}
+                    color={accent.color}
+                    wash={accent.wash}
+                    border={accent.border}
+                  />
+                </div>
+                <h1 className="mt-4 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                  {event.title}
+                </h1>
+                <p className="mt-4 leading-relaxed text-muted">{event.description}</p>
+              </>
+            );
+          })()}
 
           <dl className="mt-6 space-y-3 rounded-2xl border border-border bg-surface p-5 text-sm">
             <div className="flex justify-between gap-4">
@@ -592,7 +616,7 @@ export function EventDetailClient({ event }: { event: EventItem }) {
 
             <div
               id={errorId}
-              className="mt-3 min-h-[1.25rem] text-sm text-warm"
+              className="mt-3 min-h-[1.25rem] text-sm font-medium text-[color:var(--highlight)]"
               role="alert"
               aria-live="assertive"
             >

@@ -46,7 +46,7 @@ function ReservationCard({
   onCancel: () => void;
 }) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--card-shadow)]">
+    <article className="eh-card overflow-hidden rounded-2xl border bg-surface/90 shadow-[var(--card-shadow)] backdrop-blur-sm">
       <div className="grid gap-0 sm:grid-cols-[140px_1fr]">
         <div className="relative aspect-[16/10] bg-surface-elevated sm:aspect-auto sm:min-h-[160px]">
           <Image
@@ -144,9 +144,9 @@ function getEmptyCopy(
 } {
   if (!hasAny) {
     return {
-      title: "No tickets yet",
+      title: "No tickets in your gravity well",
       description:
-        "Reserve seats from any event page. Confirmed tickets sync to your account.",
+        "Reserve seats from any event page. Confirmed tickets sync quietly to your account.",
       icon: Ticket,
       actionLabel: "Browse events",
       actionHref: "/demos/event-horizon/browse",
@@ -157,9 +157,9 @@ function getEmptyCopy(
 
   if (filter === "Cancelled") {
     return {
-      title: "No cancelled reservations",
+      title: "Nothing cancelled in this field",
       description:
-        "Cancelled tickets remain in your history. Nothing is cancelled right now.",
+        "Cancelled tickets remain in your history. The slate is clear for now.",
       icon: Ban,
       actionLabel: "View all tickets",
       resetToAll: true,
@@ -170,9 +170,9 @@ function getEmptyCopy(
 
   if (filter === "Completed") {
     return {
-      title: "No completed events yet",
+      title: "No completed nights yet",
       description:
-        "After an event date passes, those reservations move here so you can keep a record.",
+        "When an event date passes, those reservations settle here as a quiet record.",
       icon: CalendarDays,
       actionLabel: "View all tickets",
       resetToAll: true,
@@ -183,9 +183,9 @@ function getEmptyCopy(
 
   if (filter === "Upcoming") {
     return {
-      title: "No upcoming reservations",
+      title: "No upcoming pull on the calendar",
       description:
-        "You do not have active tickets on the calendar. Discover something new to reserve.",
+        "You do not have active tickets ahead. Discover something worth crossing town for.",
       icon: Ticket,
       actionLabel: "Browse events",
       actionHref: "/demos/event-horizon/browse",
@@ -194,8 +194,8 @@ function getEmptyCopy(
   }
 
   return {
-    title: "No reservations to show",
-    description: "Try another filter or explore the catalog.",
+    title: "No reservations in view",
+    description: "Try another filter, or wander the catalog until something catches.",
     icon: Search,
     actionLabel: "Browse events",
     actionHref: "/demos/event-horizon/browse",
@@ -237,8 +237,8 @@ export function TicketsClient() {
         </h1>
         <div className="mt-10">
           <EmptyState
-            title="Sign in to view tickets"
-            description="Reservations are stored on your account. Sign in to review, cancel, or revisit confirmations."
+            title="Sign in to hold your tickets"
+            description="Reservations stay bound to your account—ready whenever you cross back into Event Horizon."
             icon={Ticket}
             actionLabel="Sign In"
             onAction={() =>

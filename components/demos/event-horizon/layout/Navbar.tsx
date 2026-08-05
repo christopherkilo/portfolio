@@ -12,6 +12,7 @@ import {
   handleFocusTrapTab,
 } from "@/lib/demos/event-horizon/focusTrap";
 import { cn } from "@/lib/demos/event-horizon/utils";
+import { EventHorizonLockup } from "@/components/demos/event-horizon/brand/EventHorizonLockup";
 import { Button } from "@/components/demos/event-horizon/ui/Button";
 import { ThemeToggle } from "@/components/demos/event-horizon/ui/ThemeToggle";
 import { ProfileMenu } from "@/components/demos/event-horizon/auth/ProfileMenu";
@@ -101,16 +102,16 @@ function NavbarInner() {
         className={cn(
           "sticky top-0 z-50 h-[var(--nav-height)] border-b transition-colors",
           scrolled
-            ? "border-border bg-bg/85 backdrop-blur-xl"
+            ? "eh-glass border-[color:var(--glass-border)]"
             : "border-transparent bg-transparent",
         )}
       >
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             href="/demos/event-horizon"
-            className="rounded-sm font-display text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+            className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
           >
-            <span className="text-accent">Event</span> Horizon
+            <EventHorizonLockup size="sm" />
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
@@ -128,7 +129,7 @@ function NavbarInner() {
                   className={cn(
                     "rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                     active
-                      ? "bg-accent/15 text-accent"
+                      ? "bg-accent/22 text-accent shadow-[inset_0_0_0_1px_rgba(255,140,43,0.35)]"
                       : "text-muted hover:bg-surface-elevated hover:text-ink",
                   )}
                 >

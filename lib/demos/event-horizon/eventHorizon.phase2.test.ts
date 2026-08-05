@@ -169,7 +169,8 @@ describe("loading states", () => {
     );
     expect(markup).toContain(EVENT_GRID_LOADING_LABEL);
     expect(markup).toContain('aria-busy="true"');
-    expect(EVENT_DETAIL_LOADING_LABEL).toBe("Loading event");
+    expect(EVENT_DETAIL_LOADING_LABEL).toBe("Approaching event details");
+    expect(EVENT_GRID_LOADING_LABEL).toBe("Pulling events into view");
   });
 });
 

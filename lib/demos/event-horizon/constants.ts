@@ -1,8 +1,8 @@
 export const SITE = {
   name: "Event Horizon",
-  tagline: "Discover what's next in your city",
+  tagline: "Where nights out gather gravity",
   description:
-    "Event Horizon is a modern discovery platform for concerts, conferences, markets, and nights out—curated with clarity and speed.",
+    "Event Horizon is a cinematic discovery platform for concerts, conferences, markets, and nights out—curated with clarity, warmth, and pull.",
   copyright: `© ${new Date().getFullYear()} Event Horizon. All rights reserved.`,
 } as const;
 

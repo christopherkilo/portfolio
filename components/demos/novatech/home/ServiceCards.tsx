@@ -73,9 +73,9 @@ export function ServiceCards({
             >
               <Link
                 href={serviceHref(service.id)}
-                className="group flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition hover:border-accent/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+                className="group flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-[var(--card-shadow)] transition hover:border-accent/35 hover:shadow-[var(--card-shadow-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
               >
-                <div className="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-accent-soft text-accent transition group-hover:bg-accent group-hover:text-primary-contrast">
+                <div className="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-accent-soft text-highlight transition group-hover:bg-primary group-hover:text-primary-contrast">
                   <Icon className="size-5" aria-hidden />
                 </div>
                 <h3 className="font-display text-lg font-semibold text-ink">

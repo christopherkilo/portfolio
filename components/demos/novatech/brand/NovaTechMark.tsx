@@ -3,9 +3,8 @@
 import { useId } from "react";
 
 /**
- * NovaTech mark — two strengths converging into one outcome.
- * Twin ribbons meet at center; negative space suggests an “N” without drawing the letter.
- * Minimal, favicon-safe, memorable without the wordmark.
+ * NovaTech mark — geometric convergence into partnership.
+ * Indigo field with lighter indigo supporting tones only.
  */
 export function NovaTechMark({
   className,
@@ -37,8 +36,9 @@ export function NovaTechMark({
       {!decorative ? <title>{title}</title> : null}
       <defs>
         <linearGradient id={fieldId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#2563EB" />
-          <stop offset="100%" stopColor="#1D4ED8" />
+          <stop offset="0%" stopColor="#6366F1" />
+          <stop offset="70%" stopColor="#4F46E5" />
+          <stop offset="100%" stopColor="#4338CA" />
         </linearGradient>
       </defs>
 
@@ -66,13 +66,13 @@ export function NovaTechMark({
       <path
         d="M22 7.5 C22 7.5 22 19.5 22 22.5 C22 24.2 20.6 25 19.2 24.2 C17.6 23.3 16.8 19.8 16 16.8"
         fill="none"
-        stroke="#10B981"
+        stroke="#A5B4FC"
         strokeWidth="2.85"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
 
-      <circle cx="16" cy="16" r="2.85" fill="#14B8A6" />
+      <circle cx="16" cy="16" r="2.85" fill="#A5B4FC" />
       <circle cx="16" cy="16" r="1.2" fill="#FFFFFF" />
     </svg>
   );

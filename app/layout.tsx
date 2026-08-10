@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE } from "@/lib/constants";
@@ -74,6 +74,16 @@ export const metadata: Metadata = {
     "PostgreSQL",
     "Supabase",
     "portfolio",
+  ],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#050505" },
+    { media: "(prefers-color-scheme: light)", color: "#eef0f3" },
   ],
 };
 

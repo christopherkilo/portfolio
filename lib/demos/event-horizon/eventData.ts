@@ -1,3 +1,8 @@
+import {
+  resolveEventCoverImage,
+  resolveEventGallery,
+} from "@/lib/demos/event-horizon/placeholders";
+
 /**
  * Event Horizon catalog module.
  *
@@ -82,7 +87,7 @@ function tickets(
   return items;
 }
 
-export const events: EventItem[] = [
+const CATALOG_EVENTS: EventItem[] = [
   {
     id: "aurora-synth-night",
     slug: "aurora-synth-night",
@@ -768,6 +773,18 @@ export const events: EventItem[] = [
     ),
   },
 ];
+
+/** Apply premium artwork to every catalog event (generated → category fallback). */
+function withCategoryPlaceholders(event: EventItem): EventItem {
+  return {
+    ...event,
+    image: resolveEventCoverImage(event),
+    gallery: resolveEventGallery(event),
+  };
+}
+
+export const events: EventItem[] = CATALOG_EVENTS.map(withCategoryPlaceholders);
+
 
 export function getEventById(id: string) {
   return events.find((event) => event.id === id || event.slug === id);

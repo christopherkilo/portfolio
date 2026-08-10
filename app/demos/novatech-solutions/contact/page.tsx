@@ -4,7 +4,7 @@ import { SITE } from "@/lib/demos/novatech/constants";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Request a consultation in the fictional ${SITE.name} demo. Entries are validated locally and are not sent or stored.`,
+  description: `Request a consultation in the fictional ${SITE.name} demo. Validated inquiries can flow to HubSpot and Resend when the demo environment is configured.`,
   robots: { index: false, follow: false },
 };
 

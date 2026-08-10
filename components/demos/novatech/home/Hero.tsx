@@ -90,35 +90,35 @@ function HeroDepth() {
         <path
           className="nt-path-flow"
           d="M60 560 C180 520 260 420 380 390 C520 350 600 300 740 270 C880 240 980 170 1140 140"
-          stroke="rgba(37,99,235,0.09)"
+          stroke="rgba(99,102,241,0.1)"
           strokeWidth="1.4"
           strokeDasharray="4 10"
         />
         <path
           className="nt-path-flow nt-path-flow-delay"
           d="M40 200 C200 240 300 300 420 340 C560 390 680 430 820 470 C960 510 1060 560 1180 600"
-          stroke="rgba(20,184,166,0.08)"
+          stroke="rgba(165,180,252,0.09)"
           strokeWidth="1.25"
           strokeDasharray="3 12"
         />
         <path
           d="M200 80 C280 160 320 240 360 320 C400 400 460 480 560 540"
-          stroke="rgba(16,185,129,0.07)"
+          stroke="rgba(99,102,241,0.07)"
           strokeWidth="1.1"
         />
         <path
           d="M900 40 C860 140 820 220 780 300 C740 380 660 460 580 520"
-          stroke="rgba(37,99,235,0.06)"
+          stroke="rgba(99,102,241,0.06)"
           strokeWidth="1.1"
         />
 
         {/* Intersection nodes */}
-        <circle cx="380" cy="390" r="3.2" fill="rgba(37,99,235,0.14)" />
-        <circle cx="740" cy="270" r="2.8" fill="rgba(20,184,166,0.14)" />
-        <circle cx="420" cy="340" r="2.4" fill="rgba(16,185,129,0.12)" />
-        <circle cx="820" cy="470" r="2.6" fill="rgba(37,99,235,0.1)" />
-        <circle className="nt-data-pulse" cx="560" cy="540" r="2.2" fill="rgba(20,184,166,0.16)" />
-        <circle className="nt-data-pulse nt-data-pulse-delay" cx="780" cy="300" r="2" fill="rgba(37,99,235,0.14)" />
+        <circle cx="380" cy="390" r="3.2" fill="rgba(99,102,241,0.14)" />
+        <circle cx="740" cy="270" r="2.8" fill="rgba(165,180,252,0.14)" />
+        <circle cx="420" cy="340" r="2.4" fill="rgba(99,102,241,0.12)" />
+        <circle cx="820" cy="470" r="2.6" fill="rgba(99,102,241,0.1)" />
+        <circle className="nt-data-pulse" cx="560" cy="540" r="2.2" fill="rgba(165,180,252,0.16)" />
+        <circle className="nt-data-pulse nt-data-pulse-delay" cx="780" cy="300" r="2" fill="rgba(99,102,241,0.14)" />
 
         {/* Quiet blueprint frames */}
         <rect
@@ -127,7 +127,7 @@ function HeroDepth() {
           width="220"
           height="140"
           rx="8"
-          stroke="rgba(37,99,235,0.05)"
+          stroke="rgba(99,102,241,0.05)"
           strokeWidth="1"
         />
         <rect
@@ -136,7 +136,7 @@ function HeroDepth() {
           width="200"
           height="120"
           rx="8"
-          stroke="rgba(20,184,166,0.05)"
+          stroke="rgba(165,180,252,0.05)"
           strokeWidth="1"
         />
       </svg>

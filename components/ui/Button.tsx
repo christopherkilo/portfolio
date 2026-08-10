@@ -20,9 +20,9 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-sm",
-  md: "h-11 px-5 text-sm",
-  lg: "h-12 px-6 text-base",
+  sm: "min-h-11 h-11 px-3.5 text-sm",
+  md: "min-h-11 h-11 px-5 text-sm",
+  lg: "min-h-12 h-12 px-6 text-base",
 };
 
 type ButtonProps = {
@@ -32,6 +32,8 @@ type ButtonProps = {
   children: React.ReactNode;
   href?: string;
   external?: boolean;
+  /** Native HTML download attribute for same-origin file links. */
+  download?: string | boolean;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   disabled?: boolean;
@@ -46,6 +48,7 @@ function ButtonShell({
   children,
   href,
   external,
+  download,
   type,
   onClick,
   disabled,
@@ -56,6 +59,7 @@ function ButtonShell({
   children: React.ReactNode;
   href?: string;
   external?: boolean;
+  download?: string | boolean;
   type: "button" | "submit" | "reset";
   onClick?: () => void;
   disabled?: boolean;
@@ -67,13 +71,24 @@ function ButtonShell({
     </span>
   );
 
+  const downloadAttr =
+    download === undefined || download === false
+      ? undefined
+      : download === true
+        ? true
+        : download;
+
   const inner = href ? (
-    external || href.startsWith("mailto:") || href.startsWith("tel:") ? (
+    external ||
+    downloadAttr !== undefined ||
+    href.startsWith("mailto:") ||
+    href.startsWith("tel:") ? (
       <a
         href={href}
-        {...(external
+        {...(external && downloadAttr === undefined
           ? { target: "_blank", rel: "noopener noreferrer" }
           : {})}
+        {...(downloadAttr !== undefined ? { download: downloadAttr } : {})}
         className={cn(classes, "group/btn")}
         aria-label={ariaLabel}
       >
@@ -110,6 +125,7 @@ export function Button({
   children,
   href,
   external,
+  download,
   type = "button",
   onClick,
   disabled,
@@ -138,6 +154,7 @@ export function Button({
         ariaLabel={ariaLabel}
         href={href}
         external={external}
+        download={download}
         type={type}
         onClick={onClick}
         disabled={disabled}

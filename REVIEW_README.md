@@ -1,5 +1,7 @@
 # Christopher Kilo Portfolio — Review Package
 
+> **Final quality status:** see [`REVIEW_SUMMARY.md`](./REVIEW_SUMMARY.md) (authoritative). Do not use obsolete status snapshots.
+
 ## 1. Project name
 Christopher Kilo Portfolio (`portfolio`)
 

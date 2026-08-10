@@ -1,13 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
   <rect width="1200" height="750" fill="#09090B"/>
-  <circle cx="1040" cy="-40" r="280" fill="#60A5FA" fill-opacity="0.12"/>
-  <circle cx="80" cy="820" r="320" fill="#3B82F6" fill-opacity="0.08"/>
-  <g transform="translate(120 210)">
-    
-    <rect x="12" y="12" width="156" height="156" rx="36" fill="#60A5FA"/>
-    <path d="M52 92 L78 118 L128 62" stroke="#09090B" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  
+  <circle cx="1040" cy="-20" r="280" fill="#10B981" fill-opacity="0.12"/>
+  <circle cx="60" cy="780" r="300" fill="#6EE7B7" fill-opacity="0.07"/>
+
+  <g transform="translate(140 248)">
+    <defs>
+      <linearGradient id="tf-mark-field-b" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#059669"/>
+        <stop offset="55%" stop-color="#10B981"/>
+        <stop offset="100%" stop-color="#34D399"/>
+      </linearGradient>
+      <radialGradient id="tf-mark-glow-b" cx="70%" cy="30%" r="50%">
+        <stop offset="0%" stop-color="#6EE7B7" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#6EE7B7" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="96" height="96" rx="24" fill="url(#tf-mark-field-b)"/>
+    <rect width="96" height="96" rx="24" fill="url(#tf-mark-glow-b)"/>
+    <rect x="3.5" y="3.5" width="89" height="89" rx="20.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="2"/>
+    <path d="M19.5 64.5 C33 64.5 36.5 47.5 48 47.5 C59.5 47.5 63 30.5 76.5 30.5" fill="none" stroke="#6EE7B7" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+    <path d="M19.5 70.5 C34.5 70.5 36 48 48 48 C60 48 61.5 25.5 76.5 25.5" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="19.5" cy="70.5" r="6.5" fill="#A7F3D0"/>
+    <circle cx="48" cy="48" r="8.5" fill="#FFFFFF"/>
+    <circle cx="48" cy="48" r="3.5" fill="#10B981"/>
+    <circle cx="76.5" cy="25.5" r="6.5" fill="#ECFDF5"/>
   </g>
-  <text x="120" y="520" fill="#E8EEF7" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="56" font-weight="700">TaskFlow</text>
-  <text x="120" y="575" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="500">Project management</text>
+
+  <text x="140" y="420" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="56" font-weight="700">TaskFlow</text>
+  <text x="140" y="470" fill="#86EFAC" fill-opacity="0.85" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="500">Collaborative project management</text>
 </svg>

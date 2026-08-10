@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s · NovaTech Solutions Demo",
   },
   description:
-    "Fictional managed IT marketing demo for NovaTech Solutions — illustrative services, portfolio concepts, and a frontend consultation inquiry.",
+    "Fictional managed IT marketing demo for NovaTech Solutions — illustrative services plus a real inquiry pipeline (Turnstile, HubSpot, Resend) when configured.",
   robots: { index: false, follow: false },
 };
 
@@ -24,7 +24,7 @@ export default function NovaTechDemoLayout({
       caseStudyHref="/projects/novatech-solutions"
       notice="Fictional company website demo — illustrative content only."
     >
-      <div data-demo="novatech" className="flex min-h-full flex-col">
+      <div data-demo="novatech" data-theme="dark" className="flex min-h-full flex-col">
         <SiteShell>{children}</SiteShell>
       </div>
     </DemoShell>

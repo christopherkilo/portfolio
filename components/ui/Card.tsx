@@ -21,6 +21,10 @@ import { durations, springHover } from "@/lib/animation";
 import { Badge } from "@/components/ui/Badge";
 import { GithubIcon } from "@/components/ui/BrandIcons";
 import { Shimmer } from "@/components/ui/Shimmer";
+import { EventHorizonCardCover } from "@/components/ui/EventHorizonCardCover";
+import { KiloToolkitCardCover } from "@/components/ui/KiloToolkitCardCover";
+import { NovaTechCardCover } from "@/components/ui/NovaTechCardCover";
+import { TaskflowCardCover } from "@/components/ui/TaskflowCardCover";
 import { cn, isSvgImageSrc } from "@/lib/utils";
 
 export type ProjectCardVariant = "carousel" | "grid";
@@ -32,6 +36,13 @@ type ProjectCardProps = {
   variant?: ProjectCardVariant;
 };
 
+const ANIMATED_COVER_IDS = new Set([
+  "taskflow",
+  "event-horizon",
+  "novatech-solutions",
+  "kilo-toolkit",
+]);
+
 function ProjectCardComponent({
   project,
   className,
@@ -40,9 +51,11 @@ function ProjectCardComponent({
   const ref = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
   const [hovered, setHovered] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const href = getProjectHref(project);
   const hasImage = Boolean(project.image);
+  const hasAnimatedCover = ANIMATED_COVER_IDS.has(project.id);
+  const coverActive = hovered && !reducedMotion;
+  const [imageLoaded, setImageLoaded] = useState(hasAnimatedCover);
   const ctaLabel = getProjectCtaLabel(project);
   const isGrid = variant === "grid";
 
@@ -94,6 +107,12 @@ function ProjectCardComponent({
       onMouseMove={handleMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleLeave}
+      onFocusCapture={() => setHovered(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          handleLeave();
+        }
+      }}
       whileHover={reducedMotion ? undefined : { y: -8, scale: 1.015 }}
       whileTap={reducedMotion ? undefined : { scale: 0.99 }}
       transition={springHover}
@@ -110,7 +129,7 @@ function ProjectCardComponent({
         "gradient-border glass-panel group relative flex h-full flex-col overflow-hidden rounded-[var(--radius)]",
         isGrid
           ? "w-full min-w-0"
-          : "w-[min(100%,300px)] shrink-0 sm:w-[340px]",
+          : "w-[min(100%,calc(100vw-2.5rem))] max-w-[300px] shrink-0 sm:w-[340px] sm:max-w-none",
         hovered &&
           "brightness-[1.05] shadow-[0_28px_60px_-28px_rgba(0,0,0,0.45),0_0_40px_-20px_var(--glow-yellow)]",
         className,
@@ -135,10 +154,11 @@ function ProjectCardComponent({
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
+              data-no-drag
               onClick={(event) => event.stopPropagation()}
               onPointerDown={(event) => event.stopPropagation()}
               aria-label={`${project.title} on GitHub`}
-              className="relative z-[4] inline-flex size-9 items-center justify-center rounded-full border border-white/12 bg-black/55 text-text backdrop-blur-md transition duration-[var(--duration-fast)] hover:border-primary/45 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="relative z-[4] inline-flex size-11 items-center justify-center rounded-full border border-white/12 bg-black/55 text-text backdrop-blur-md transition duration-[var(--duration-fast)] hover:border-primary/45 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <GithubIcon className="size-4" />
             </a>
@@ -157,7 +177,39 @@ function ProjectCardComponent({
           <div className="absolute inset-0 animate-pulse bg-white/[0.03]" />
         </div>
 
-        {hasImage ? (
+        {hasAnimatedCover ? (
+          <motion.div
+            className="absolute inset-0"
+            style={reducedMotion ? undefined : { x: imageX, y: imageY }}
+            initial={false}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            {project.id === "taskflow" ? (
+              <TaskflowCardCover
+                reducedMotion={reducedMotion}
+                active={coverActive}
+              />
+            ) : null}
+            {project.id === "event-horizon" ? (
+              <EventHorizonCardCover
+                reducedMotion={reducedMotion}
+                active={coverActive}
+              />
+            ) : null}
+            {project.id === "novatech-solutions" ? (
+              <NovaTechCardCover
+                reducedMotion={reducedMotion}
+                active={coverActive}
+              />
+            ) : null}
+            {project.id === "kilo-toolkit" ? (
+              <KiloToolkitCardCover
+                reducedMotion={reducedMotion}
+                active={coverActive}
+              />
+            ) : null}
+          </motion.div>
+        ) : hasImage ? (
           <motion.div
             className="absolute inset-[-8%]"
             style={reducedMotion ? undefined : { x: imageX, y: imageY }}
@@ -209,7 +261,7 @@ function ProjectCardComponent({
           <h3 className="font-display text-lg font-semibold text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary">
             {project.title}
           </h3>
-          <p className="mt-2 line-clamp-3 max-w-prose text-sm leading-relaxed text-muted">
+          <p className="mt-2 line-clamp-3 max-w-prose text-sm leading-relaxed text-secondary">
             {project.description}
           </p>
         </div>

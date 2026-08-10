@@ -1,9 +1,49 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" fill="none">
-  <rect width="1200" height="750" fill="#0B0B0F"/>
-  <rect x="48" y="48" width="1104" height="654" rx="32" fill="none" stroke="#60A5FA" stroke-opacity="0.18" stroke-width="2"/>
-  
-      <rect x="470" y="190" width="260" height="260" rx="56" fill="#60A5FA"/>
-      <path d="M545 325 L600 380 L695 255" fill="none" stroke="#0B0B0F" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="600" y="620" text-anchor="middle" fill="#F8FAFC" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif" font-size="52" font-weight="700">TaskFlow</text>
+  <rect width="1200" height="750" fill="#09090B"/>
+  <circle cx="1020" cy="40" r="280" fill="#10B981" fill-opacity="0.14"/>
+  <circle cx="80" cy="700" r="300" fill="#6EE7B7" fill-opacity="0.07"/>
+  <radialGradient id="tf-cover-glow" cx="30%" cy="35%" r="55%">
+    <stop offset="0%" stop-color="#10B981" stop-opacity="0.16"/>
+    <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1200" height="750" fill="url(#tf-cover-glow)"/>
+
+  <!-- Soft workflow constellation -->
+  <g opacity="0.45">
+    <path d="M90 560 C280 560 330 420 510 420 C690 420 760 280 1110 280" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-dasharray="8 14" stroke-opacity="0.55"/>
+    <path d="M120 620 C310 620 360 480 540 480 C720 480 800 350 1080 350" fill="none" stroke="#6EE7B7" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 16" stroke-opacity="0.35"/>
+    <circle cx="160" cy="560" r="6" fill="#10B981" fill-opacity="0.55"/>
+    <circle cx="340" cy="500" r="5" fill="#6EE7B7" fill-opacity="0.45"/>
+    <circle cx="510" cy="420" r="7" fill="#10B981" fill-opacity="0.6"/>
+    <circle cx="690" cy="380" r="5" fill="#6EE7B7" fill-opacity="0.4"/>
+    <circle cx="870" cy="320" r="6" fill="#10B981" fill-opacity="0.5"/>
+    <circle cx="1040" cy="280" r="5" fill="#6EE7B7" fill-opacity="0.45"/>
+  </g>
+
+  <!-- Mark — reduced size, breathing room -->
+  <g transform="translate(140 248)">
+    <defs>
+      <linearGradient id="tf-mark-field" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#059669"/>
+        <stop offset="55%" stop-color="#10B981"/>
+        <stop offset="100%" stop-color="#34D399"/>
+      </linearGradient>
+      <radialGradient id="tf-mark-glow" cx="70%" cy="30%" r="50%">
+        <stop offset="0%" stop-color="#6EE7B7" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#6EE7B7" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="96" height="96" rx="24" fill="url(#tf-mark-field)"/>
+    <rect width="96" height="96" rx="24" fill="url(#tf-mark-glow)"/>
+    <rect x="3.5" y="3.5" width="89" height="89" rx="20.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="2"/>
+    <path d="M19.5 64.5 C33 64.5 36.5 47.5 48 47.5 C59.5 47.5 63 30.5 76.5 30.5" fill="none" stroke="#6EE7B7" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+    <path d="M19.5 70.5 C34.5 70.5 36 48 48 48 C60 48 61.5 25.5 76.5 25.5" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="19.5" cy="70.5" r="6.5" fill="#A7F3D0"/>
+    <circle cx="48" cy="48" r="8.5" fill="#FFFFFF"/>
+    <circle cx="48" cy="48" r="3.5" fill="#10B981"/>
+    <circle cx="76.5" cy="25.5" r="6.5" fill="#ECFDF5"/>
+  </g>
+
+  <text x="140" y="420" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="56" font-weight="700">TaskFlow</text>
+  <text x="140" y="470" fill="#86EFAC" fill-opacity="0.85" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="500">Collaborative project management</text>
 </svg>

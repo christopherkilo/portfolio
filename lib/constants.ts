@@ -6,10 +6,14 @@ export const SITE = {
   description:
     "Christopher Kilo is a full-stack developer specializing in modern web applications, business automation, collaborative software, and IT tools built with React, Next.js, TypeScript, PostgreSQL, and Supabase.",
   email: "christopherkilo.pro@gmail.com",
-  linkedin: "https://linkedin.com/in/christopherkilo",
+  linkedin: "https://www.linkedin.com/in/christopher-kilo-312467425/",
   github: "https://github.com/christopherkilo",
-  resume: "/resume.pdf",
-  url: "https://christopherkilo.dev",
+  /** Public resume PDF path (served from /public). */
+  resume: "/Christopher_Kilo_Resume.pdf",
+  /** Suggested download filename for the resume PDF. */
+  resumeFileName: "Christopher_Kilo_Resume.pdf",
+  resumeUpdatedLabel: "Updated August 2026",
+  url: "https://christopherkilo.com",
   copyright: `© ${new Date().getFullYear()} Christopher Kilo. All rights reserved.`,
 } as const;
 
@@ -17,6 +21,7 @@ export const NAV_LINKS = [
   { href: "/", label: "Home", id: "home" },
   { href: "/projects", label: "Projects", id: "projects" },
   { href: "/about", label: "About", id: "about" },
+  { href: "/resume", label: "Resume", id: "resume" },
   { href: "/contact", label: "Contact", id: "contact" },
 ] as const;
 

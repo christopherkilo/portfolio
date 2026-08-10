@@ -1,3 +1,23 @@
+[data-demo="event-horizon"] .eh-artwork-shimmer {
+  animation: eh-artwork-shimmer 1.4s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes eh-artwork-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-demo="event-horizon"] .eh-artwork-shimmer {
+    animation: none;
+  }
+}
+
 /* Scoped live-demo themes. Tokens inherit into Tailwind color utilities. */
 
 [data-demo="event-horizon"] {
@@ -5,10 +25,10 @@
   --bg: #0b0b0b;
   --surface: #171717;
   --surface-elevated: #232323;
-  --ink: #ffffff;
-  --text: #ffffff;
-  --secondary: #d1d5db;
-  --muted: #9ca3af;
+  --ink: #f5f5f5;
+  --text: #f5f5f5;
+  --secondary: #d4d4d4;
+  --muted: #a3a3a3;
   --border: rgba(255, 255, 255, 0.08);
   --accent: #ff8c2b;
   --accent-strong: #ff7a00;
@@ -340,7 +360,57 @@ html[data-theme="light"] [data-demo="event-horizon"] .eh-card,
 }
 
 [data-demo="novatech"] {
-  /* Partnership identity — blue trust · teal collaboration · emerald growth */
+  /* Final brand — indigo enterprise SaaS (dark-first). Emerald = success only. */
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-elevated: #334155;
+  --ink: #f5f5f5;
+  --text: #f5f5f5;
+  --secondary: #d4d4d4;
+  --muted: #b8c0cc;
+  --border: rgba(148, 163, 184, 0.16);
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-pressed: #4338ca;
+  --primary-glow: #a5b4fc;
+  --primary-contrast: #ffffff;
+  --accent: #6366f1;
+  --accent-soft: rgba(99, 102, 241, 0.16);
+  --teal: #6366f1;
+  --teal-soft: rgba(99, 102, 241, 0.16);
+  --highlight: #a5b4fc;
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.16);
+  --info: #60a5fa;
+  --info-soft: rgba(96, 165, 250, 0.14);
+  --error: #ff9188;
+  --overlay: rgba(2, 6, 23, 0.72);
+  --footer-bg: #020617;
+  --footer-ink: #f8fafc;
+  --footer-accent: #a5b4fc;
+  --map-bg: #1e293b;
+  --map-grid: #475569;
+  --hero-glow-accent: rgba(99, 102, 241, 0.16);
+  --hero-glow-primary: rgba(165, 180, 252, 0.1);
+  --hero-glow-growth: rgba(99, 102, 241, 0.07);
+  --hero-start: #0f172a;
+  --hero-mid: #0f172a;
+  --hero-end: #0b1220;
+  --band-mid: #4f46e5;
+  --band-ink: #ffffff;
+  --band-action: #ffffff;
+  --band-action-ink: #312e81;
+  --slate: #94a3b8;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 28px -16px rgba(0, 0, 0, 0.45);
+  --card-shadow-hover: 0 1px 2px rgba(0, 0, 0, 0.25), 0 14px 28px -14px rgba(99, 102, 241, 0.2);
+  --nav-height: 4.25rem;
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100%;
+}
+
+[data-demo="novatech"][data-theme="light"] {
   --bg: #f8fafc;
   --surface: #ffffff;
   --surface-elevated: #f1f5f9;
@@ -349,79 +419,86 @@ html[data-theme="light"] [data-demo="event-horizon"] .eh-card,
   --secondary: #475569;
   --muted: #64748b;
   --border: rgba(15, 23, 42, 0.1);
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-pressed: #4338ca;
+  --primary-glow: #a5b4fc;
   --primary-contrast: #ffffff;
-  --accent: #10b981;
-  --accent-soft: rgba(16, 185, 129, 0.12);
-  --teal: #14b8a6;
-  --teal-soft: rgba(20, 184, 166, 0.12);
-  --highlight: #14b8a6;
+  --accent: #6366f1;
+  --accent-soft: rgba(99, 102, 241, 0.12);
+  --teal: #6366f1;
+  --teal-soft: rgba(99, 102, 241, 0.12);
+  --highlight: #4f46e5;
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.12);
+  --info: #2563eb;
+  --info-soft: rgba(37, 99, 235, 0.1);
   --error: #b42318;
   --overlay: rgba(15, 23, 42, 0.45);
   --footer-bg: #0f172a;
   --footer-ink: #f8fafc;
-  --footer-accent: #14b8a6;
+  --footer-accent: #a5b4fc;
   --map-bg: #eef2ff;
   --map-grid: #94a3b8;
-  --hero-glow-accent: rgba(37, 99, 235, 0.1);
-  --hero-glow-primary: rgba(20, 184, 166, 0.08);
-  --hero-glow-growth: rgba(16, 185, 129, 0.07);
+  --hero-glow-accent: rgba(99, 102, 241, 0.1);
+  --hero-glow-primary: rgba(165, 180, 252, 0.08);
+  --hero-glow-growth: rgba(99, 102, 241, 0.05);
   --hero-start: #f1f5f9;
   --hero-mid: #f8fafc;
   --hero-end: #ffffff;
-  --band-mid: #14b8a6;
+  --band-mid: #4f46e5;
   --band-ink: #ffffff;
   --band-action: #ffffff;
-  --band-action-ink: #1e3a8a;
+  --band-action-ink: #312e81;
   --slate: #475569;
   --card-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.1);
-  --card-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.05), 0 16px 32px -14px rgba(37, 99, 235, 0.16);
-  --nav-height: 4.25rem;
+  --card-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.05), 0 14px 28px -14px rgba(99, 102, 241, 0.16);
   color-scheme: light;
-  background: var(--bg);
-  color: var(--ink);
-  min-height: 100%;
 }
 
-html[data-theme="dark"] [data-demo="novatech"],
 [data-demo="novatech"][data-theme="dark"] {
   --bg: #0f172a;
   --surface: #1e293b;
   --surface-elevated: #334155;
-  --ink: #ffffff;
-  --text: #ffffff;
-  --secondary: #cbd5e1;
-  --muted: #94a3b8;
+  --ink: #f5f5f5;
+  --text: #f5f5f5;
+  --secondary: #d4d4d4;
+  --muted: #b8c0cc;
   --border: rgba(148, 163, 184, 0.16);
-  --primary: #3b82f6;
-  --primary-dark: #2563eb;
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-pressed: #4338ca;
+  --primary-glow: #a5b4fc;
   --primary-contrast: #ffffff;
-  --accent: #10b981;
-  --accent-soft: rgba(16, 185, 129, 0.16);
-  --teal: #14b8a6;
-  --teal-soft: rgba(20, 184, 166, 0.16);
-  --highlight: #2dd4bf;
+  --accent: #6366f1;
+  --accent-soft: rgba(99, 102, 241, 0.16);
+  --teal: #6366f1;
+  --teal-soft: rgba(99, 102, 241, 0.16);
+  --highlight: #a5b4fc;
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.16);
+  --info: #60a5fa;
+  --info-soft: rgba(96, 165, 250, 0.14);
   --error: #ff9188;
   --overlay: rgba(2, 6, 23, 0.72);
   --footer-bg: #020617;
   --footer-ink: #f8fafc;
-  --footer-accent: #14b8a6;
+  --footer-accent: #a5b4fc;
   --map-bg: #1e293b;
   --map-grid: #475569;
-  --hero-glow-accent: rgba(37, 99, 235, 0.14);
-  --hero-glow-primary: rgba(20, 184, 166, 0.1);
-  --hero-glow-growth: rgba(16, 185, 129, 0.08);
+  --hero-glow-accent: rgba(99, 102, 241, 0.16);
+  --hero-glow-primary: rgba(165, 180, 252, 0.1);
+  --hero-glow-growth: rgba(99, 102, 241, 0.07);
   --hero-start: #0f172a;
   --hero-mid: #0f172a;
   --hero-end: #0b1220;
-  --band-mid: #14b8a6;
+  --band-mid: #4f46e5;
   --band-ink: #ffffff;
   --band-action: #ffffff;
-  --band-action-ink: #1e3a8a;
+  --band-action-ink: #312e81;
   --slate: #94a3b8;
   --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 28px -16px rgba(0, 0, 0, 0.45);
-  --card-shadow-hover: 0 1px 2px rgba(0, 0, 0, 0.25), 0 18px 36px -14px rgba(37, 99, 235, 0.22);
+  --card-shadow-hover: 0 1px 2px rgba(0, 0, 0, 0.25), 0 14px 28px -14px rgba(99, 102, 241, 0.2);
   color-scheme: dark;
 }
 
@@ -440,10 +517,16 @@ html[data-theme="dark"] [data-demo="novatech"],
   inset: 0;
   opacity: 0.4;
   background-image:
-    linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, black 20%, transparent 75%);
+}
+
+[data-demo="novatech"][data-theme="light"] .nt-hero-depth {
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.035) 1px, transparent 1px);
 }
 
 [data-demo="novatech"] .nt-hero-nodes {
@@ -459,10 +542,10 @@ html[data-theme="dark"] [data-demo="novatech"],
   inset: 0;
   opacity: 0.085;
   background-image:
-    linear-gradient(rgba(37, 99, 235, 0.55) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.45) 1px, transparent 1px),
-    radial-gradient(circle at 30% 40%, rgba(20, 184, 166, 0.35), transparent 42%),
-    radial-gradient(circle at 72% 58%, rgba(16, 185, 129, 0.28), transparent 40%);
+    linear-gradient(rgba(99, 102, 241, 0.55) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.45) 1px, transparent 1px),
+    radial-gradient(circle at 30% 40%, rgba(165, 180, 252, 0.4), transparent 42%),
+    radial-gradient(circle at 72% 58%, rgba(99, 102, 241, 0.3), transparent 40%);
   background-size:
     48px 48px,
     48px 48px,
@@ -513,15 +596,8 @@ html[data-theme="dark"] [data-demo="novatech"],
     0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
-html[data-theme="dark"] [data-demo="novatech"] .nt-hero-depth,
-[data-demo="novatech"][data-theme="dark"] .nt-hero-depth {
-  background-image:
-    linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
-}
-
 [data-demo="novatech"] .gradient-band {
-  background: linear-gradient(135deg, #2563eb 0%, #14b8a6 52%, #10b981 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #4338ca 100%);
   color: var(--band-ink);
 }
 
@@ -587,39 +663,47 @@ html[data-theme="dark"] [data-demo="novatech"] .nt-hero-depth,
 }
 
 [data-demo="novatech"] .nt-btn-primary {
-  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  background: #6366f1;
   color: #ffffff;
   border-radius: 0.75rem;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 1px 2px rgba(15, 23, 42, 0.06),
-    0 8px 18px -8px rgba(37, 99, 235, 0.45);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 1px 2px rgba(15, 23, 42, 0.12),
+    0 6px 14px -8px rgba(15, 23, 42, 0.35);
   transition:
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 [data-demo="novatech"] .nt-btn-primary:hover {
-  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  background: #4f46e5;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 2px 4px rgba(15, 23, 42, 0.08),
-    0 14px 28px -10px rgba(37, 99, 235, 0.5);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(15, 23, 42, 0.14),
+    0 8px 16px -8px rgba(15, 23, 42, 0.4);
+}
+
+[data-demo="novatech"] .nt-btn-primary:active {
+  background: #4338ca;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.28),
+    0 1px 2px rgba(15, 23, 42, 0.1);
+  transform: translateY(0.5px);
 }
 
 [data-demo="novatech"] .nt-btn-primary:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #a5b4fc;
   outline-offset: 3px;
 }
 
 [data-demo="novatech"] .nt-btn-success {
-  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(180deg, var(--success) 0%, #059669 100%);
   color: #042f24;
   border-radius: 0.75rem;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 8px 18px -8px rgba(16, 185, 129, 0.38);
+    0 8px 18px -8px color-mix(in srgb, var(--success) 38%, transparent);
   transition:
     background 0.25s ease,
     box-shadow 0.25s ease,
@@ -644,8 +728,8 @@ html[data-theme="dark"] [data-demo="novatech"] .nt-hero-depth,
 
 [data-demo="novatech"] .nt-btn-outline:hover {
   border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
-  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
-  box-shadow: 0 6px 16px -10px rgba(37, 99, 235, 0.2);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+  box-shadow: 0 4px 12px -8px rgba(15, 23, 42, 0.35);
 }
 
 [data-demo="novatech"] .nt-trust-chip {
@@ -656,13 +740,34 @@ html[data-theme="dark"] [data-demo="novatech"] .nt-hero-depth,
 }
 
 [data-demo="novatech"] .nt-ops-status-ok {
-  color: var(--accent);
-  background: var(--accent-soft);
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+[data-demo="novatech"] .nt-ops-status-info {
+  color: var(--info);
+  background: var(--info-soft);
 }
 
 [data-demo="novatech"] .nt-ops-status-warn {
   color: #b45309;
   background: rgba(245, 158, 11, 0.12);
+}
+
+[data-demo="novatech"] .theme-icon-dark {
+  display: none;
+}
+
+[data-demo="novatech"] .theme-icon-light {
+  display: block;
+}
+
+[data-demo="novatech"][data-theme="light"] .theme-icon-light {
+  display: none;
+}
+
+[data-demo="novatech"][data-theme="light"] .theme-icon-dark {
+  display: block;
 }
 
 /* NovaTech — keyboard focus + reduced-motion comfort */
@@ -690,12 +795,14 @@ html[data-theme="dark"] [data-demo="novatech"] .nt-hero-depth,
   --bg: #09090b;
   --surface: #111113;
   --elevated: #18181b;
-  --ink: #fafafa;
-  --text: #fafafa;
-  --muted: #a1a1aa;
+  --ink: #f5f5f5;
+  --text: #f5f5f5;
+  --secondary: #d4d4d4;
+  --muted: #a3a3a3;
   --border: rgba(255, 255, 255, 0.08);
-  --accent: #60a5fa;
-  --accent-strong: #3b82f6;
+  --accent: #10b981;
+  --accent-strong: #059669;
+  --accent-highlight: #6ee7b7;
   --success: #34d399;
   --warning: #fbbf24;
   --danger: #f87171;
@@ -723,10 +830,12 @@ html[data-theme="light"] [data-demo="taskflow"],
   --elevated: #eef1f6;
   --ink: #18181b;
   --text: #18181b;
+  --secondary: #4b5563;
   --muted: #5f6470;
   --border: rgba(24, 24, 27, 0.12);
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
+  --accent: #059669;
+  --accent-strong: #047857;
+  --accent-highlight: #10b981;
   --success: #047857;
   --warning: #b45309;
   --danger: #dc2626;

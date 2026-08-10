@@ -84,11 +84,11 @@ export default function NetCheckPage() {
         description="Connection health, latency trends, DNS comparison, adapters, and guided troubleshooting."
       />
 
-      <section className="rounded-3xl border border-white/8 bg-white/[0.03] p-5 sm:p-6">
+      <section className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="flex items-center gap-2 font-display text-xl font-semibold">
-              <span className="size-2 rounded-full bg-emerald-400" />
+              <span className="size-2 rounded-full bg-success" />
               Connected via {network.connectionType}
             </p>
             <p className="mt-2 text-sm text-muted">Demo Mode network profile for this session.</p>
@@ -128,7 +128,7 @@ export default function NetCheckPage() {
             type="button"
             disabled={testing}
             onClick={runTest}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-primary disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="inline-flex items-center gap-2 tk-btn-primary px-4 py-2 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             <Play className="size-4" />
             {testing ? "Testing…" : "Run Connection Test"}
@@ -173,14 +173,14 @@ export default function NetCheckPage() {
           />
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <article className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+          <article className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-4">
             <p className="text-xs uppercase tracking-wider text-muted">Connection quality trend</p>
             <p className="mt-2 font-display text-2xl font-semibold tabular-nums">{quality.score}</p>
             <div className="mt-3">
               <Sparkline values={history.quality} />
             </div>
           </article>
-          <article className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+          <article className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-4">
             <p className="text-xs uppercase tracking-wider text-muted">DNS response trend</p>
             <p className="mt-2 font-display text-2xl font-semibold tabular-nums">
               {network.dnsResults[1]?.responseMs ?? 17} ms
@@ -198,7 +198,7 @@ export default function NetCheckPage() {
           {network.adapters.map((adapter) => (
             <article
               key={adapter.id}
-              className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 transition hover:border-white/14"
+              className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 transition hover:border-primary/25"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export default function NetCheckPage() {
       <section>
         <h2 className="font-display text-xl font-semibold">Device map</h2>
         <p className="mt-1 text-sm text-muted">Visualization of a typical private network profile.</p>
-        <div className="relative mt-4 overflow-hidden rounded-3xl border border-white/8 bg-white/[0.025] p-6">
+        <div className="relative mt-4 overflow-hidden rounded-3xl border border-white/8 bg-surface/80 p-6">
           <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(circle,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:22px_22px]" />
           <div className="relative grid grid-cols-2 gap-5 sm:grid-cols-4 lg:grid-cols-7">
             {network.devices.map((device) => {
@@ -244,7 +244,7 @@ export default function NetCheckPage() {
               return (
                 <div key={device.id} className="relative flex flex-col items-center text-center">
                   <span className="absolute left-1/2 top-6 hidden h-px w-full bg-white/10 lg:block" />
-                  <span className="relative z-10 grid size-12 place-items-center rounded-2xl border border-white/10 bg-[#0b0b0b] transition hover:border-primary/30">
+                  <span className="relative z-10 grid size-12 place-items-center rounded-2xl border border-white/10 bg-surface transition hover:border-primary/30">
                     <Icon
                       className={`size-5 ${device.type === "router" ? "text-primary" : "text-secondary"}`}
                     />
@@ -264,7 +264,7 @@ export default function NetCheckPage() {
           {network.dnsResults.map((dns) => (
             <article
               key={dns.provider}
-              className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 transition hover:border-white/14"
+              className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-4 transition hover:border-primary/25"
             >
               <div className="flex items-start justify-between">
                 <h3 className="font-medium">{dns.provider}</h3>
@@ -286,7 +286,7 @@ export default function NetCheckPage() {
 
       <section
         id="troubleshooting"
-        className="scroll-mt-[var(--scroll-mt)] rounded-3xl border border-white/8 bg-white/[0.03] p-5 sm:p-6"
+        className="scroll-mt-[var(--scroll-mt)] rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 sm:p-6"
       >
         <h2 className="font-display text-2xl font-semibold">Troubleshooting wizard</h2>
         <p className="mt-2 text-sm text-muted">
@@ -362,7 +362,7 @@ function WizardNode({
               <strong className="text-secondary">Escalation:</strong> {node.result.escalation}
             </p>
             {node.result.safetyNote ? (
-              <p className="mt-2 text-amber-100/80">
+              <p className="mt-2 text-warning/80">
                 <strong>Safety:</strong> {node.result.safetyNote}
               </p>
             ) : null}

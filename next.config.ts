@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
         destination: "/projects",
         permanent: true,
       },
+      {
+        source: "/resume.pdf",
+        destination: "/Christopher_Kilo_Resume.pdf",
+        permanent: true,
+      },
     ];
   },
   images: {

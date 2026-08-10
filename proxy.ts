@@ -5,7 +5,11 @@ function normalizeUrl(raw: string) {
   return raw.replace(/\/$/, "").replace(/\/rest\/v1$/i, "");
 }
 
-export async function middleware(request: NextRequest) {
+/**
+ * Network proxy for TaskFlow session refresh and page-level auth redirects.
+ * Preserves the former middleware.ts behavior under the Next.js 16 proxy convention.
+ */
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
   });

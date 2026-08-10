@@ -36,7 +36,7 @@ NovaTech upcoming / live integrations (values only in `.env.local`):
 
 See `NOVATECH_INTEGRATION_SETUP.md` and `NOVATECH_BACKEND_ARCHITECTURE.md`.
 
-TaskFlow upcoming Supabase placeholders (empty until backend phase; values only in `.env.local`):
+TaskFlow Supabase env (values only in `.env.local`):
 
 | Variable | Purpose |
 |----------|---------|
@@ -44,7 +44,13 @@ TaskFlow upcoming Supabase placeholders (empty until backend phase; values only 
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser publishable key (RLS-protected) |
 | `SUPABASE_SECRET_KEY` | Server-only secret (never commit) |
 
-See `TASKFLOW_INTEGRATION_SETUP.md`.
+See `TASKFLOW_INTEGRATION_SETUP.md` and `TASKFLOW_AUTHENTICATION.md`.
+
+Local OAuth callback used by the app:
+
+`http://localhost:3000/auth/callback`
+
+(or `{NEXT_PUBLIC_APP_URL}/auth/callback`). Production must allowlist the deployed origin’s `/auth/callback` in Supabase — never only localhost.
 
 ## Customize
 
@@ -55,7 +61,7 @@ See `TASKFLOW_INTEGRATION_SETUP.md`.
 | Motion tokens | `lib/animation.ts` |
 | Theme colors | `app/globals.css` |
 | Project images | `public/projects/` |
-| Resume PDF | `public/resume.pdf` |
+| Resume PDF | `public/Christopher_Kilo_Resume.pdf` (regenerate: `python3 scripts/generate-resume-pdf.py`) |
 
 ## Pages
 

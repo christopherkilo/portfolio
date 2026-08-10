@@ -48,9 +48,24 @@ Uses the Supabase **secret** key from `.env.local`. Idempotent (fixed UUIDs + up
 
 ## Auth dashboard
 
-1. Enable Google provider.
-2. Add redirect URL: `{NEXT_PUBLIC_APP_URL}/auth/callback`.
-3. Site URL matches `NEXT_PUBLIC_APP_URL`.
+### Local development
+
+1. Enable Google provider in Supabase Authentication.
+2. Site URL: `http://localhost:3000` (or your local `NEXT_PUBLIC_APP_URL`).
+3. Redirect URL allowlist must include the **actual** app callback:
+
+   `{NEXT_PUBLIC_APP_URL}/auth/callback`
+
+   Example for default local: `http://localhost:3000/auth/callback`
+
+### Production
+
+1. Site URL: your deployed origin.
+2. Redirect URL allowlist must include:
+
+   `{deployed-origin}/auth/callback`
+
+Do not ship with only localhost redirects configured if the app is deployed.
 
 ## Future integrations (comments only)
 

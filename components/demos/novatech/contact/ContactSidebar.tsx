@@ -38,7 +38,7 @@ export function ContactSidebar() {
             </li>
           </ul>
           <div className="mt-5 flex items-start gap-3 rounded-xl bg-bg px-4 py-3">
-            <Clock3 className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
+            <Clock3 className="mt-0.5 size-4 shrink-0 text-info" aria-hidden />
             <div>
               <p className="text-sm font-semibold text-ink">Operating hours</p>
               <p className="mt-1 text-sm text-muted">{SITE.hours}</p>
@@ -56,15 +56,15 @@ export function ContactSidebar() {
           <ol className="mt-4 space-y-3">
             {PROCESS.map((step, index) => (
               <li key={step} className="flex gap-3 text-sm leading-relaxed text-muted">
-                <span className="font-mono text-xs text-accent">
+                <span className="font-mono text-xs text-info">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span>{step}</span>
               </li>
             ))}
           </ol>
-          <div className="mt-5 flex items-start gap-3 rounded-xl border border-accent/20 bg-accent-soft px-4 py-3">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
+          <div className="mt-5 flex items-start gap-3 rounded-xl border border-info/20 bg-info-soft px-4 py-3">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-info" aria-hidden />
             <p className="text-sm leading-relaxed text-ink">
               Inquiries are validated server-side, checked with Cloudflare
               Turnstile, stored in HubSpot, and acknowledged by email when
@@ -80,7 +80,7 @@ export function ContactSidebar() {
         >
           <div className="map-grid absolute inset-0 opacity-50" />
           <div className="relative z-10 mx-4 max-w-xs rounded-xl border border-border bg-surface px-4 py-3 text-center shadow-md">
-            <MapPin className="mx-auto size-5 text-accent" aria-hidden />
+            <MapPin className="mx-auto size-5 text-info" aria-hidden />
             <p className="mt-2 text-sm font-semibold text-ink">
               Illustrative service area
             </p>

@@ -48,7 +48,7 @@ export function BusinessInsights() {
                   decimals={stat.decimals}
                 />
               </p>
-              <p className="mt-2 text-sm font-medium text-accent">{stat.delta}</p>
+              <p className="mt-2 text-sm font-medium text-success">{stat.delta}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -70,7 +70,7 @@ export function BusinessInsights() {
                   Resolved tickets · 8 weeks
                 </h3>
               </div>
-              <p className="text-sm font-semibold text-accent">+18% QoQ</p>
+              <p className="text-sm font-semibold text-success">+18% QoQ</p>
             </div>
             <div
               className="mt-8 flex h-44 items-end gap-2 sm:gap-3"
@@ -86,7 +86,7 @@ export function BusinessInsights() {
                   >
                     <div className="flex w-full flex-1 items-end justify-center">
                       <motion.div
-                        className="w-full max-w-[2.75rem] rounded-t-md bg-gradient-to-t from-primary to-accent"
+                        className="w-full max-w-[2.75rem] rounded-t-md bg-gradient-to-t from-primary-dark to-highlight"
                         initial={reduced ? false : { height: 0 }}
                         whileInView={
                           reduced ? undefined : { height: `${heightPct}%` }
@@ -131,7 +131,7 @@ export function BusinessInsights() {
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-bg">
                     <motion.div
-                      className="h-full rounded-full bg-accent"
+                      className="h-full rounded-full bg-primary"
                       initial={reduced ? false : { width: 0 }}
                       whileInView={
                         reduced ? undefined : { width: `${stage.percent}%` }
@@ -171,7 +171,7 @@ export function BusinessInsights() {
                   className="flex gap-3 border-b border-border/70 pb-4 last:border-0 last:pb-0"
                 >
                   <span
-                    className="mt-1.5 size-2 shrink-0 rounded-full bg-accent"
+                    className="mt-1.5 size-2 shrink-0 rounded-full bg-primary"
                     aria-hidden
                   />
                   <div>
@@ -216,7 +216,7 @@ export function BusinessInsights() {
                 <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
                   Win rate
                 </dt>
-                <dd className="mt-2 font-display text-2xl font-bold text-accent">
+                <dd className="mt-2 font-display text-2xl font-bold text-success">
                   <CountUp value={34} suffix="%" />
                 </dd>
               </div>

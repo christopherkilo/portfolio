@@ -34,11 +34,12 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
             ? "border-border bg-[var(--nav-scrolled)] backdrop-blur-2xl"
             : "border-transparent bg-transparent",
         )}
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="group font-display text-lg font-semibold tracking-tight text-text transition hover:opacity-90"
+            className="group inline-flex min-h-11 min-w-0 max-w-[calc(100%-4.5rem)] items-center truncate font-display text-base font-semibold tracking-tight text-text transition hover:opacity-90 sm:max-w-none sm:text-lg"
             aria-label="Christopher Kilo"
           >
             CHRISTOPHER KILO
@@ -68,7 +69,7 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
             <button
               type="button"
               onClick={onOpenCommand}
-              className="group hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-muted backdrop-blur-xl transition hover:border-white/20 hover:text-text md:inline-flex"
+              className="group hidden min-h-11 items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-secondary backdrop-blur-xl transition hover:border-white/20 hover:text-text md:inline-flex"
               aria-label="Open command palette"
             >
               <Command className="icon-interactive size-3.5" aria-hidden />
@@ -82,7 +83,7 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
 
             <button
               type="button"
-              className="inline-flex size-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl md:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl md:hidden"
               aria-label="Open menu"
               aria-expanded={open}
               onClick={openMenu}
@@ -116,8 +117,8 @@ function NavItem({
         setOrigin(e.clientX < rect.left + rect.width / 2 ? "left" : "right");
       }}
       className={cn(
-        "group relative block rounded-lg px-3 py-2 text-sm font-medium transition",
-        active ? "text-text" : "text-muted hover:text-text",
+        "group relative inline-flex min-h-11 items-center rounded-lg px-2.5 py-2 text-sm font-medium transition lg:px-3",
+        active ? "text-text" : "text-secondary hover:text-text",
       )}
     >
       {label}

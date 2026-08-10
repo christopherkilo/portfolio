@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, MapPin, Ticket, Users } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -13,6 +12,7 @@ import {
   getCategoryAccent,
   getPremiumBadges,
 } from "@/lib/demos/event-horizon/categoryStyles";
+import { EventArtwork } from "@/components/demos/event-horizon/events/EventArtwork";
 import {
   getBookedPercent,
   getSocialProof,
@@ -83,16 +83,14 @@ export function EventCard({
         aria-label={`${event.title}. ${priceLabel}. ${remainingLabel}.`}
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-surface-elevated">
-          <Image
-            src={event.image}
-            alt=""
-            fill
+          <EventArtwork
+            event={event}
             sizes={
               variant === "rail"
                 ? "300px"
                 : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             }
-            className="object-cover transition duration-500 group-hover:scale-[1.04]"
+            imageClassName="transition duration-500 group-hover:scale-[1.04]"
           />
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-70 transition-opacity duration-500 group-hover:opacity-95"

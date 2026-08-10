@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "generatedAt": "2026-08-09T01:21:02.636Z",
+  "entries": {
+    "aurora-synth-night": {
+      "slug": "aurora-synth-night",
+      "fingerprint": "eh_faa3a56e",
+      "path": "/placeholders/events/generated/aurora-synth-night.webp",
+      "seed": "aurora-synth-night"
+    },
+    "frontier-dev-summit": {
+      "slug": "frontier-dev-summit",
+      "fingerprint": "eh_94f98e0d",
+      "path": "/placeholders/events/generated/frontier-dev-summit.webp",
+      "seed": "frontier-dev-summit"
+    },
+    "canvas-after-dark": {
+      "slug": "canvas-after-dark",
+      "fingerprint": "eh_53fbed4e",
+      "path": "/placeholders/events/generated/canvas-after-dark.webp",
+      "seed": "canvas-after-dark"
+    },
+    "taste-of-the-grid": {
+      "slug": "taste-of-the-grid",
+      "fingerprint": "eh_05d32fdc",
+      "path": "/placeholders/events/generated/taste-of-the-grid.webp",
+      "seed": "taste-of-the-grid"
+    },
+    "harbor-run-classic": {
+      "slug": "harbor-run-classic",
+      "fingerprint": "eh_12bee2f1",
+      "path": "/placeholders/events/generated/harbor-run-classic.webp",
+      "seed": "harbor-run-classic"
+    },
+    "velvet-room-sessions": {
+      "slug": "velvet-room-sessions",
+      "fingerprint": "eh_f03d11fd",
+      "path": "/placeholders/events/generated/velvet-room-sessions.webp",
+      "seed": "velvet-room-sessions"
+    },
+    "circuit-makers-lab": {
+      "slug": "circuit-makers-lab",
+      "fingerprint": "eh_dd68f837",
+      "path": "/placeholders/events/generated/circuit-makers-lab.webp",
+      "seed": "circuit-makers-lab"
+    },
+    "pulse-film-garden": {
+      "slug": "pulse-film-garden",
+      "fingerprint": "eh_59f73fc1",
+      "path": "/placeholders/events/generated/pulse-film-garden.webp",
+      "seed": "pulse-film-garden"
+    },
+    "orbit-community-cup": {
+      "slug": "orbit-community-cup",
+      "fingerprint": "eh_2fb07a59",
+      "path": "/placeholders/events/generated/orbit-community-cup.webp",
+      "seed": "orbit-community-cup"
+    },
+    "neon-lane-sessions": {
+      "slug": "neon-lane-sessions",
+      "fingerprint": "eh_8992672c",
+      "path": "/placeholders/events/generated/neon-lane-sessions.webp",
+      "seed": "neon-lane-sessions"
+    },
+    "foundry-after-hours": {
+      "slug": "foundry-after-hours",
+      "fingerprint": "eh_9d0eeba0",
+      "path": "/placeholders/events/generated/foundry-after-hours.webp",
+      "seed": "foundry-after-hours"
+    },
+    "amber-room-comedy": {
+      "slug": "amber-room-comedy",
+      "fingerprint": "eh_4432fc18",
+      "path": "/placeholders/events/generated/amber-room-comedy.webp",
+      "seed": "amber-room-comedy"
+    },
+    "skyline-rooftop-market": {
+      "slug": "skyline-rooftop-market",
+      "fingerprint": "eh_f253f48d",
+      "path": "/placeholders/events/generated/skyline-rooftop-market.webp",
+      "seed": "skyline-rooftop-market"
+    },
+    "cedar-chamber-night": {
+      "slug": "cedar-chamber-night",
+      "fingerprint": "eh_1f520881",
+      "path": "/placeholders/events/generated/cedar-chamber-night.webp",
+      "seed": "cedar-chamber-night"
+    },
+    "lumen-yoga-dawn": {
+      "slug": "lumen-yoga-dawn",
+      "fingerprint": "eh_8442e060",
+      "path": "/placeholders/events/generated/lumen-yoga-dawn.webp",
+      "seed": "lumen-yoga-dawn"
+    },
+    "harbor-lights-festival": {
+      "slug": "harbor-lights-festival",
+      "fingerprint": "eh_e1997298",
+      "path": "/placeholders/events/generated/harbor-lights-festival.webp",
+      "seed": "harbor-lights-festival"
+    }
+  }
+}

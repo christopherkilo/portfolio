@@ -31,7 +31,7 @@ export const projects: Project[] = [
     category: "web",
     description:
       "Consumer event platform with authentication, reservations, and PostgreSQL-backed persistence.",
-    technologies: ["Next.js", "TypeScript", "PostgreSQL", "Auth.js"],
+    technologies: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Auth.js"],
     image: "/projects/event-horizon-logo.svg",
     imageAlt:
       "Event Horizon portfolio cover with a supporting black-hole mark above a fully readable title",
@@ -49,7 +49,7 @@ export const projects: Project[] = [
     technologies: ["Next.js", "TypeScript", "HubSpot", "Resend"],
     image: "/projects/novatech-logo.svg",
     imageAlt:
-      "NovaTech Solutions portfolio cover with emerald growth mark and enterprise wordmark",
+      "NovaTech Solutions portfolio cover with indigo enterprise mark and wordmark",
     github: "https://github.com/christopherkilo/novatech-solutions",
     liveDemo: "/demos/novatech-solutions",
     featured: true,
@@ -63,6 +63,8 @@ export const projects: Project[] = [
       "Collaborative SaaS platform featuring realtime updates, Row Level Security, conflict detection, and offline-aware collaboration.",
     technologies: ["Next.js", "TypeScript", "Supabase", "TanStack Query"],
     image: "/projects/taskflow-logo.svg",
+    imageAlt:
+      "TaskFlow portfolio cover with green workflow mark and collaborative project management lockup",
     github: "https://github.com/christopherkilo/taskflow",
     liveDemo: "/demos/taskflow",
     featured: true,
@@ -75,7 +77,7 @@ export const projects: Project[] = [
     description:
       "IT diagnostics and troubleshooting toolkit providing practical utilities for hardware, networking, and system analysis.",
     technologies: ["Next.js", "TypeScript", "Diagnostics", "Networking"],
-    image: "/projects/systemscope.svg",
+    image: "/projects/kilo-toolkit.svg",
     imageAlt: "Kilo Toolkit diagnostics suite cover",
     github: "https://github.com/christopherkilo/portfolio",
     liveDemo: "/toolkit",
@@ -220,11 +222,12 @@ export function getFeaturedProject(): Project {
 }
 
 /**
- * Homepage featured strip — Event Horizon, NovaTech, and TaskFlow.
- * Kilo Toolkit is presented in its own Professional Toolkit section.
+ * Homepage featured strip — Event Horizon, NovaTech, TaskFlow, and Kilo Toolkit.
  */
 export function getHomepageFeaturedProjects(): Project[] {
-  return getPortfolioProjectsByCategory("web");
+  const web = getPortfolioProjectsByCategory("web");
+  const toolkit = getHomepageToolkitProject();
+  return toolkit ? [...web, toolkit] : web;
 }
 
 /** Portfolio-visible Kilo Toolkit card for dedicated sections. */

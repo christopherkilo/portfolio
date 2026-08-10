@@ -7,7 +7,7 @@ type BadgeProps = {
 };
 
 const tones = {
-  default: "border-white/10 bg-white/[0.04] text-muted",
+  default: "border-white/12 bg-white/[0.05] text-secondary",
   primary: "border-primary/30 bg-primary/[0.08] text-primary",
   secondary: "border-white/12 bg-white/[0.06] text-secondary",
   highlight: "border-white/12 bg-white/[0.05] text-secondary",

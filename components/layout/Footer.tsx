@@ -3,25 +3,25 @@ import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-white/[0.06] bg-black/40 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 lg:px-8">
+    <footer className="mt-auto border-t border-white/[0.06] bg-black/40 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="flex flex-col justify-between gap-8 md:flex-row md:items-start">
           <div className="max-w-sm">
             <p className="font-display text-lg font-semibold text-text">
               {SITE.name}
               <span className="text-muted">.</span>
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
+            <p className="mt-2 text-sm leading-relaxed text-secondary">
               {SITE.title}
             </p>
           </div>
           <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <ul className="flex flex-wrap gap-x-2 gap-y-1">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted transition hover:text-text"
+                    className="inline-flex min-h-11 items-center px-2.5 text-sm text-secondary transition hover:text-text"
                   >
                     {link.label}
                   </Link>
@@ -36,7 +36,7 @@ export function Footer() {
           <div className="flex flex-col gap-2 sm:items-end">
             <a
               href={`mailto:${SITE.email}`}
-              className="text-muted transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="inline-flex min-h-11 max-w-full items-center break-all text-secondary transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               {SITE.email}
             </a>

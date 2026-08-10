@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import type { EventItem } from "@/lib/demos/event-horizon/eventData";
 import {
   getCategoryAccent,
   getPremiumBadges,
 } from "@/lib/demos/event-horizon/categoryStyles";
+import { EventArtwork } from "@/components/demos/event-horizon/events/EventArtwork";
 import { formatEventDate } from "@/lib/demos/event-horizon/utils";
 import {
   CategoryBadge,
@@ -61,12 +61,9 @@ export function FeaturedCarousel({ events }: FeaturedCarouselProps) {
           className="grid md:grid-cols-2"
         >
           <div className="relative aspect-[16/11] md:aspect-auto md:min-h-[320px]">
-            <Image
-              src={current.image}
-              alt=""
-              fill
+            <EventArtwork
+              event={current}
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
               priority
             />
             <div

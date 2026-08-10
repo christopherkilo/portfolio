@@ -30,89 +30,89 @@ type FloatingLabel = {
 const floatingLabels: FloatingLabel[] = [
   {
     text: "Next.js",
-    // NW gutter — above terminal panel
-    slot: "top-0 left-0",
-    rotate: -6,
+    // NW — crowns the terminal
+    slot: "top-0 left-1 sm:left-2",
+    rotate: -5,
     motion: { x: 3, y: -3 },
     delay: 0,
   },
   {
     text: "TypeScript",
-    // NE gutter — above editor panel
-    slot: "top-0 right-0",
-    rotate: 5,
+    // NE — above the editor crown
+    slot: "top-0 right-2 sm:right-3",
+    rotate: 4,
     motion: { x: -3, y: -2 },
     delay: 0.15,
   },
   {
     text: "Tailwind",
-    // West mid gap — left of editor, below terminal
-    slot: "top-[44%] left-0 -translate-y-1/2",
-    rotate: -4,
+    // West — beside the diagonal seam
+    slot: "top-[40%] left-0 -translate-y-1/2",
+    rotate: -3,
     motion: { x: 2, y: 3 },
     delay: 0.3,
   },
   {
     text: "JavaScript",
-    // East mid — right edge below editor body
-    slot: "top-[60%] right-0 -translate-y-1/2 hidden sm:block",
-    rotate: 4,
+    // East — right of the editor body
+    slot: "top-[58%] right-0 -translate-y-1/2 hidden sm:block",
+    rotate: 3,
     motion: { x: -2, y: 3 },
     delay: 0.45,
   },
   {
     text: "CompTIA A+",
-    // SW gutter — clear of diagnostics content
-    slot: "bottom-0 left-0",
-    rotate: 5,
+    // SW — above diagnostics; hide on the tightest phones to avoid collisions
+    slot: "bottom-1 left-0 hidden sm:block",
+    rotate: 4,
     motion: { x: 2, y: -2 },
     delay: 0.2,
   },
   {
     text: "Networking",
-    // SE gutter — above status chip
-    slot: "bottom-[20%] right-0 hidden md:block",
-    rotate: -5,
+    // SE — frames status / editor lower edge
+    slot: "bottom-[18%] right-0 hidden md:block",
+    rotate: -4,
     motion: { x: -3, y: 2 },
     delay: 0.35,
   },
   {
     text: "Graphic Design",
-    // North-center strip — above both panel crowns
-    slot: "top-0 left-1/2 -translate-x-1/2 hidden lg:block",
-    rotate: 3,
+    // North-center — over the pair’s crown
+    slot: "top-0 left-[42%] -translate-x-1/2 hidden lg:block",
+    rotate: 2,
     motion: { x: 2, y: -3 },
     delay: 0.5,
   },
   {
     text: "HTML",
-    // West gap twin — below Tailwind slot, still left of editor
-    slot: "top-[52%] left-0 hidden sm:block",
-    rotate: -7,
+    // West mid — under Tailwind, beside terminal/editor seam
+    slot: "top-[49%] left-0 hidden sm:block",
+    rotate: -5,
     motion: { x: 3, y: 2 },
     delay: 0.25,
   },
   {
     text: "CSS",
-    // East upper strip — right edge above editor body
-    slot: "top-[12%] right-0 hidden md:block",
-    rotate: 6,
+    // East upper — right of terminal / above editor
+    slot: "top-[14%] right-0 hidden md:block",
+    rotate: 5,
     motion: { x: -2, y: 2 },
     delay: 0.4,
   },
   {
     text: "Git",
-    // Lower-east gap — between diagnostics right edge and status
-    slot: "bottom-[12%] right-[28%] hidden lg:block",
-    rotate: -3,
+    // Lower seam — between editor and diagnostics
+    slot: "bottom-[14%] right-[30%] hidden lg:block",
+    rotate: -2,
     motion: { x: 2, y: -2 },
     delay: 0.55,
   },
   {
     text: "Framer Motion",
-    // Lower-west gap — above diagnostics, left of editor
-    slot: "top-[66%] left-0 hidden lg:block",
-    rotate: 4,
+    // Lower-west — beside diagnostics, below the pair
+    slot: "top-[64%] left-0 hidden lg:block",
+    rotate: 3,
     motion: { x: 3, y: -2 },
     delay: 0.6,
   },
@@ -126,28 +126,53 @@ const heroEntrance = {
   delay: 0.3,
 };
 
+/** Shared idle float for hero panels — gentle and continuous; hover does not lift. */
+function panelIdleMotion(reducedMotion: boolean | null, delay: number) {
+  if (reducedMotion) {
+    return {
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0 },
+    };
+  }
+  return {
+    animate: { opacity: 1, y: [0, -6, 0] },
+    transition: {
+      opacity: { duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] as const },
+      y: {
+        duration: 7.5,
+        repeat: Infinity,
+        ease: "easeInOut" as const,
+        delay,
+      },
+    },
+  };
+}
+
 export function Hero() {
   const reducedMotion = useReducedMotion();
+  const terminalMotion = panelIdleMotion(reducedMotion, 0.12);
+  const editorMotion = panelIdleMotion(reducedMotion, 0.22);
+  const diagnosticsMotion = panelIdleMotion(reducedMotion, 0.32);
 
   return (
-    <section className="relative flex min-h-[100svh] items-center overflow-x-clip pb-16 pt-[calc(var(--nav-height)+1rem)]">
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8">
+    <section className="relative flex min-h-[100svh] items-center overflow-x-clip pb-12 pt-[calc(var(--nav-height)+0.75rem)] sm:pb-16 sm:pt-[calc(var(--nav-height)+1rem)]">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8">
         <motion.div
           className="relative z-10"
-          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reducedMotion ? { duration: 0 } : heroEntrance}
         >
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-muted">
             Portfolio
           </p>
-          <h1 className="font-display text-5xl font-semibold tracking-[0.06em] text-text sm:text-6xl lg:text-7xl">
+          <h1 className="font-display text-[2.125rem] font-semibold leading-tight tracking-[0.06em] text-text min-[380px]:text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
             <SignatureName name={SITE.name} />
           </h1>
           <p className="mt-4 text-lg font-medium text-secondary sm:text-xl">
             {SITE.title}
           </p>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-secondary sm:text-lg">
             {SITE.tagline}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -160,7 +185,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        <div className="relative mx-auto h-[420px] w-full max-w-lg sm:h-[480px] lg:h-[520px]">
+        <div className="hero-illustration relative mx-auto h-[400px] w-full max-w-lg overflow-hidden sm:h-[420px] sm:overflow-visible md:h-[480px] lg:h-[520px]">
           {/* Labels stay in gutters; z below panels so glass never reveals them through content */}
           {floatingLabels.map((label, i) => (
             <motion.div
@@ -181,7 +206,7 @@ export function Hero() {
                   ? undefined
                   : {
                       // Shared phase family so floats feel synced, not random
-                      duration: 8.5,
+                      duration: 7.5,
                       repeat: Infinity,
                       ease: "easeInOut",
                       delay: label.delay * 0.65,
@@ -190,26 +215,26 @@ export function Hero() {
             >
               <Badge
                 tone={i % 2 === 0 ? "secondary" : "default"}
-                className="glass shadow-lg"
+                className="hero-tech-tag glass shadow-lg"
               >
                 {label.text}
               </Badge>
             </motion.div>
           ))}
 
+          {/*
+            Diagonal pair — midpoint between heavy overlap and disconnected stack.
+            Edges may kiss (~10–20px); text regions stay clear. Terminal stacks above.
+          */}
           <motion.div
-            className="code-panel glass absolute left-2 top-8 z-10 w-[min(78%,20rem)] -rotate-3 overflow-hidden rounded-[var(--radius-md)] p-4 shadow-2xl sm:left-4 sm:w-[78%]"
-            initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={
-              reducedMotion
-                ? { duration: 0 }
-                : { duration: 0.45, delay: 0.12, ease: [0.22, 1, 0.36, 1] }
-            }
+            className="code-panel glass absolute left-2 top-5 z-20 w-[min(82%,19.5rem)] -rotate-1 overflow-hidden rounded-[var(--radius-md)] p-3 shadow-2xl sm:left-3 sm:top-6 sm:w-[min(76%,19rem)] sm:-rotate-2 sm:p-4 md:left-4 md:top-7 lg:w-[min(74%,19rem)]"
+            initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+            animate={terminalMotion.animate}
+            transition={terminalMotion.transition}
           >
             <div className="mb-3 flex items-center gap-2">
-              <Terminal className="size-4 text-secondary" />
-              <span className="font-mono text-xs text-muted">zsh — ~/build</span>
+              <Terminal className="hero-panel-icon size-4" />
+              <span className="hero-panel-muted font-mono text-xs">zsh — ~/build</span>
             </div>
             <pre className="font-mono text-[11px] leading-relaxed sm:text-xs">
               <span className="tok tok-prompt">$</span>{" "}
@@ -230,18 +255,14 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            className="code-panel glass absolute right-0 top-28 z-[11] w-[min(72%,18rem)] rotate-2 overflow-hidden rounded-[var(--radius-md)] border border-white/10 p-4 shadow-2xl sm:w-[72%]"
-            initial={reducedMotion ? false : { opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={
-              reducedMotion
-                ? { duration: 0 }
-                : { duration: 0.45, delay: 0.22, ease: [0.22, 1, 0.36, 1] }
-            }
+            className="code-panel glass absolute right-2 top-[6.75rem] z-10 w-[min(78%,18rem)] rotate-1 overflow-hidden rounded-[var(--radius-md)] border border-white/10 p-3 shadow-2xl sm:right-3 sm:top-[8rem] sm:w-[min(72%,18rem)] sm:rotate-1 sm:p-4 md:right-4 md:top-[8.75rem] lg:top-[9.25rem] lg:w-[min(70%,17.5rem)]"
+            initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+            animate={editorMotion.animate}
+            transition={editorMotion.transition}
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="font-mono text-xs text-muted">editor.tsx</span>
-              <span className="size-2 rounded-full bg-secondary/80" />
+              <span className="hero-panel-muted font-mono text-xs">editor.tsx</span>
+              <span className="size-2 rounded-full bg-[color:var(--hero-panel-text-secondary)] opacity-80" />
             </div>
             <pre className="font-mono text-[11px] leading-relaxed sm:text-xs">
               <span className="tok tok-kw">const</span>{" "}
@@ -271,40 +292,36 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            className="glass absolute bottom-10 left-6 z-[12] w-[min(70%,18rem)] -rotate-2 rounded-[var(--radius-md)] p-4 shadow-2xl sm:w-[70%]"
-            initial={reducedMotion ? false : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={
-              reducedMotion
-                ? { duration: 0 }
-                : { duration: 0.45, delay: 0.32, ease: [0.22, 1, 0.36, 1] }
-            }
+            className="glass absolute bottom-14 left-2 z-[15] w-[min(58%,13rem)] -rotate-1 rounded-[var(--radius-md)] p-2.5 shadow-2xl sm:bottom-8 sm:left-3 sm:w-[min(62%,15.5rem)] sm:p-4 md:bottom-10 md:left-4"
+            initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+            animate={diagnosticsMotion.animate}
+            transition={diagnosticsMotion.transition}
           >
-            <div className="mb-3 flex items-center gap-2">
-              <Activity className="size-4 text-secondary" />
-              <span className="text-xs font-medium text-text">Diagnostics</span>
+            <div className="mb-2 flex items-center gap-2 sm:mb-3">
+              <Activity className="hero-panel-icon size-4" />
+              <span className="hero-panel-text text-xs font-medium">Diagnostics</span>
             </div>
-            <ul className="space-y-2 text-xs text-muted">
+            <ul className="hero-panel-secondary space-y-1.5 text-[11px] sm:space-y-2 sm:text-xs">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-secondary" />
+                <CheckCircle2 className="hero-panel-icon size-3.5 shrink-0" />
                 Build pipeline healthy
               </li>
               <li className="flex items-center gap-2">
-                <Wifi className="size-3.5 text-secondary" />
+                <Wifi className="hero-panel-icon size-3.5 shrink-0" />
                 Network latency 12ms
               </li>
-              <li className="flex items-center gap-2">
-                <Cpu className="size-3.5 text-muted" />
+              <li className="hidden items-center gap-2 sm:flex">
+                <Cpu className="hero-panel-icon size-3.5 opacity-70" />
                 Thermals nominal
               </li>
             </ul>
           </motion.div>
 
           <motion.div
-            className="glass absolute bottom-2 right-4 z-[13] flex items-center gap-3 rounded-xl px-3 py-2 -rotate-1"
-            animate={reducedMotion ? undefined : { y: [0, -3, 0] }}
+            className="glass absolute bottom-2 right-2 z-[16] flex max-w-[min(90%,14rem)] items-center gap-2.5 rounded-xl px-2.5 py-2 -rotate-1 sm:bottom-3 sm:right-3 sm:max-w-none sm:gap-3 sm:px-3 md:right-4"
+            animate={reducedMotion ? undefined : { y: [0, -6, 0] }}
             transition={{
-              duration: 8.5,
+              duration: 7.5,
               repeat: Infinity,
               ease: "easeInOut",
               delay: 0.4,
@@ -312,15 +329,15 @@ export function Hero() {
           >
             <span className="relative flex size-2.5">
               {!reducedMotion ? (
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-secondary/40 opacity-60" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-[color:var(--hero-panel-text-secondary)] opacity-40" />
               ) : null}
-              <span className="relative inline-flex size-2.5 rounded-full bg-secondary/70" />
+              <span className="relative inline-flex size-2.5 rounded-full bg-[color:var(--hero-panel-text-secondary)] opacity-70" />
             </span>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted">
+              <p className="hero-panel-muted text-[10px] uppercase tracking-wider">
                 System
               </p>
-              <p className="text-xs font-medium text-text">All services online</p>
+              <p className="hero-panel-text text-xs font-medium">All services online</p>
             </div>
           </motion.div>
         </div>

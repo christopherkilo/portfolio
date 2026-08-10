@@ -67,10 +67,10 @@ export function CaseStudyDesktopNav({
             key={section.id}
             href={`#${section.id}`}
             className={cn(
-              "block rounded-lg px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+              "block min-h-9 rounded-lg px-2.5 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
               activeSection === section.id
                 ? "bg-white/10"
-                : "text-muted hover:text-text",
+                : "text-secondary hover:text-text",
             )}
             style={
               activeSection === section.id
@@ -96,7 +96,7 @@ export function CaseStudyMobileToc({
   accent: string;
 }) {
   return (
-    <div className="sticky top-16 z-30 -mx-4 border-b border-white/8 bg-bg/90 px-4 py-2 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 xl:hidden">
+    <div className="sticky top-[var(--nav-height)] z-30 -mx-4 border-b border-white/8 bg-bg/90 px-4 py-2 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 xl:hidden">
       <label className="sr-only" htmlFor="case-study-mobile-toc">
         Jump to section
       </label>
@@ -106,10 +106,10 @@ export function CaseStudyMobileToc({
             key={section.id}
             href={`#${section.id}`}
             className={cn(
-              "shrink-0 rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+              "inline-flex min-h-11 shrink-0 items-center rounded-full border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
               activeSection === section.id
                 ? "border-transparent text-bg"
-                : "border-white/10 text-muted hover:text-text",
+                : "border-white/10 text-secondary hover:text-text",
             )}
             style={
               activeSection === section.id
@@ -246,7 +246,7 @@ export function CaseStudyLightbox({
                 ref={closeRef}
                 type="button"
                 onClick={onClose}
-                className="rounded-full border border-white/15 p-2 transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 p-2 transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{ outlineColor: accent }}
                 aria-label="Close preview"
               >

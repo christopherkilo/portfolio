@@ -41,13 +41,13 @@ export function getNovatechAppUrl(): string {
 
 export function getTurnstileRuntimeConfig() {
   const nodeEnv = process.env.NODE_ENV ?? "development";
+  const allowDevBypassExplicit =
+    read("NOVATECH_ALLOW_TURNSTILE_DEV_BYPASS") === "true";
   return {
     secret: read("TURNSTILE_SECRET_KEY"),
     siteKey: read("NEXT_PUBLIC_TURNSTILE_SITE_KEY"),
     nodeEnv,
-    allowDevBypass:
-      nodeEnv !== "production" &&
-      read("NOVATECH_ALLOW_TURNSTILE_DEV_BYPASS") === "true",
+    allowDevBypass: nodeEnv !== "production" && allowDevBypassExplicit,
   };
 }
 
@@ -56,14 +56,25 @@ export function getTurnstileRuntimeConfig() {
  */
 export function getNovatechServerEnv(): NovatechServerEnv {
   const turnstile = getTurnstileRuntimeConfig();
+  const isProd = turnstile.nodeEnv === "production";
+
+  // Soft local defaults — HubSpot "default" pipeline stage IDs work for most portals.
+  // Production still requires explicit email configuration.
+  const fromEmail =
+    read("NOVATECH_FROM_EMAIL") ||
+    (isProd ? "" : "onboarding@resend.dev");
+  const staffEmail =
+    read("NOVATECH_STAFF_EMAIL") ||
+    (isProd ? "" : fromEmail || "onboarding@resend.dev");
 
   const values = {
     hubspotAccessToken: read("HUBSPOT_ACCESS_TOKEN"),
-    hubspotPipelineId: read("HUBSPOT_PIPELINE_ID"),
-    hubspotDealStageId: read("HUBSPOT_DEAL_STAGE_ID"),
+    hubspotPipelineId: read("HUBSPOT_PIPELINE_ID") || "default",
+    hubspotDealStageId:
+      read("HUBSPOT_DEAL_STAGE_ID") || "appointmentscheduled",
     resendApiKey: read("RESEND_API_KEY"),
-    fromEmail: read("NOVATECH_FROM_EMAIL"),
-    staffEmail: read("NOVATECH_STAFF_EMAIL"),
+    fromEmail,
+    staffEmail,
     turnstileSecretKey: turnstile.secret,
     appUrl: getNovatechAppUrl(),
     nodeEnv: turnstile.nodeEnv,
@@ -72,8 +83,6 @@ export function getNovatechServerEnv(): NovatechServerEnv {
 
   const required: Array<{ key: keyof typeof values; env: string }> = [
     { key: "hubspotAccessToken", env: "HUBSPOT_ACCESS_TOKEN" },
-    { key: "hubspotPipelineId", env: "HUBSPOT_PIPELINE_ID" },
-    { key: "hubspotDealStageId", env: "HUBSPOT_DEAL_STAGE_ID" },
     { key: "resendApiKey", env: "RESEND_API_KEY" },
     { key: "fromEmail", env: "NOVATECH_FROM_EMAIL" },
     { key: "staffEmail", env: "NOVATECH_STAFF_EMAIL" },

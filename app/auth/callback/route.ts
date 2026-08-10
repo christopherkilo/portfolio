@@ -14,8 +14,8 @@ function safeNextPath(raw: string | null) {
 
 /**
  * Supabase OAuth PKCE callback.
- * Session cookies must be written onto the redirect response or middleware
- * will bounce the user straight back to sign-in.
+ * Session cookies must be written onto the redirect response or the TaskFlow
+ * proxy will bounce the user straight back to sign-in.
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   if (!code) {
     return NextResponse.redirect(
       `${origin}/demos/taskflow/signin?error=${encodeURIComponent(
-        "Missing auth code. Check Supabase redirect URLs include /auth/callback.",
+        "Sign-in could not complete. Please try again.",
       )}`,
     );
   }
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
   if (!url || !key) {
     return NextResponse.redirect(
       `${origin}/demos/taskflow/signin?error=${encodeURIComponent(
-        "Supabase env vars are missing on the server.",
+        "Authentication is temporarily unavailable.",
       )}`,
     );
   }

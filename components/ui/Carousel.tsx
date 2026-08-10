@@ -45,6 +45,16 @@ export function Carousel({
   const lastTime = useRef(0);
   const didDrag = useRef(false);
   const activePointer = useRef<number | null>(null);
+  const resumeTimer = useRef<number | null>(null);
+
+  const clearResumeTimer = useCallback(() => {
+    if (resumeTimer.current != null) {
+      window.clearTimeout(resumeTimer.current);
+      resumeTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => () => clearResumeTimer(), [clearResumeTimer]);
 
   const count = children.length;
   const gap = 24;
@@ -109,16 +119,22 @@ export function Carousel({
   ]);
 
   function onPointerDown(e: React.PointerEvent) {
-    // Ignore non-primary buttons; let links receive clean clicks
+    // Ignore non-primary buttons; let dedicated controls receive clean clicks
     if (e.button !== 0) return;
-    // Don't steal gestures that start on interactive controls (GitHub, etc.)
     const target = e.target as HTMLElement | null;
-    if (target?.closest("a, button, input, textarea, select, [role='button']")) {
+    // Card overlay links must still allow swipe; exclude only real controls.
+    if (
+      target?.closest(
+        "button, input, textarea, select, [data-no-drag], [role='button']",
+      )
+    ) {
       return;
     }
     activePointer.current = e.pointerId;
     didDrag.current = false;
+    clearResumeTimer();
     setIsDragging(true);
+    setPaused(true);
     dragStartX.current = e.clientX;
     scrollStart.current = x.get();
     lastX.current = e.clientX;
@@ -161,6 +177,13 @@ export function Carousel({
       const rawIndex = Math.round(-projected / itemWidth);
       scrollToIndex(rawIndex, true);
     }
+
+    // Resume autoplay after a short idle so touch browsing isn't fighty
+    clearResumeTimer();
+    resumeTimer.current = window.setTimeout(() => {
+      setPaused(false);
+      resumeTimer.current = null;
+    }, autoPlayMs);
   }
 
   function onClickCapture(e: React.MouseEvent) {
@@ -177,7 +200,10 @@ export function Carousel({
   return (
     <div
       className={cn("relative", className)}
-      onMouseEnter={() => setPaused(true)}
+      onMouseEnter={() => {
+        clearResumeTimer();
+        setPaused(true);
+      }}
       onMouseLeave={() => setPaused(false)}
       role="region"
       aria-roledescription="carousel"
@@ -199,7 +225,7 @@ export function Carousel({
             type="button"
             aria-label={`Previous ${label}`}
             onClick={() => scrollToIndex(index - 1)}
-            className="inline-flex size-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -207,7 +233,7 @@ export function Carousel({
             type="button"
             aria-label={`Next ${label}`}
             onClick={() => scrollToIndex(index + 1)}
-            className="inline-flex size-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -224,6 +250,10 @@ export function Carousel({
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           onClickCapture={onClickCapture}
+          onPointerEnter={() => setPaused(true)}
+          onPointerLeave={() => {
+            if (!isDragging) setPaused(false);
+          }}
         >
           {children.map((child, i) => (
             <div

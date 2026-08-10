@@ -40,14 +40,14 @@ export default function SettingsPage() {
       {message ? (
         <div
           role="status"
-          className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.05] p-3 text-sm text-emerald-200"
+          className="rounded-xl border border-success/20 bg-success/[0.05] p-3 text-sm text-success"
         >
           {message}
         </div>
       ) : null}
 
       <section className="grid gap-5 xl:grid-cols-2">
-        <article className="rounded-3xl border border-white/8 bg-white/[0.03] p-5">
+        <article className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5">
           <div className="flex items-center gap-3">
             <MonitorCog className="size-5 text-secondary" />
             <h2 className="font-display text-xl font-semibold">Experience</h2>
@@ -60,7 +60,7 @@ export default function SettingsPage() {
                 onChange={(event) =>
                   updateSettings({ theme: event.target.value as "light" | "dark" })
                 }
-                className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"
+                className="mt-2 w-full rounded-xl border border-white/8 bg-bg p-3 text-text"
               >
                 <option value="dark">Dark mode</option>
                 <option value="light">Light mode</option>
@@ -75,7 +75,7 @@ export default function SettingsPage() {
                     refreshSpeed: Number(event.target.value) as 1000 | 2000 | 4000,
                   })
                 }
-                className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"
+                className="mt-2 w-full rounded-xl border border-white/8 bg-bg p-3 text-text"
               >
                 <option value={1000}>Fast · every second</option>
                 <option value={2000}>Balanced · every 2 seconds</option>
@@ -91,7 +91,7 @@ export default function SettingsPage() {
                     density: event.target.value as "comfortable" | "compact",
                   })
                 }
-                className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"
+                className="mt-2 w-full rounded-xl border border-white/8 bg-bg p-3 text-text"
               >
                 <option value="comfortable">Comfortable</option>
                 <option value="compact">Compact</option>
@@ -118,7 +118,7 @@ export default function SettingsPage() {
           </div>
         </article>
 
-        <article className="rounded-3xl border border-white/8 bg-white/[0.03] p-5">
+        <article className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5">
           <div className="flex items-center gap-3">
             <Database className="size-5 text-secondary" />
             <h2 className="font-display text-xl font-semibold">Demo data</h2>
@@ -128,7 +128,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={() => void refreshDiagnostics()}
-              className="flex w-full items-center gap-3 rounded-xl border border-white/8 p-3 text-left text-sm text-muted transition hover:bg-white/[0.04] hover:text-text"
+              className="flex w-full items-center gap-3 rounded-xl border border-white/8 p-3 text-left text-sm text-muted transition hover:bg-surface-elevated/60 hover:text-text"
             >
               <RotateCcw className="size-4" />
               <span>
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                 restoreHealthySystem();
                 setMessage("Restored Healthy System profile.");
               }}
-              className="flex w-full items-center gap-3 rounded-xl border border-white/8 p-3 text-left text-sm text-muted transition hover:bg-white/[0.04] hover:text-text"
+              className="flex w-full items-center gap-3 rounded-xl border border-white/8 p-3 text-left text-sm text-muted transition hover:bg-surface-elevated/60 hover:text-text"
             >
               <RotateCcw className="size-4" />
               <span>
@@ -153,7 +153,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={() => void resetDemo()}
-              className="flex w-full items-center gap-3 rounded-xl border border-white/8 p-3 text-left text-sm text-muted transition hover:bg-white/[0.04] hover:text-text"
+              className="flex w-full items-center gap-3 rounded-xl border border-white/8 p-3 text-left text-sm text-muted transition hover:bg-surface-elevated/60 hover:text-text"
             >
               <RotateCcw className="size-4" />
               <span>
@@ -164,7 +164,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={removeReports}
-              className="flex w-full items-center gap-3 rounded-xl border border-rose-400/15 p-3 text-left text-sm text-rose-200/80 transition hover:bg-rose-400/[0.04]"
+              className="flex w-full items-center gap-3 rounded-xl border border-danger/20 p-3 text-left text-sm text-danger/80 transition hover:bg-danger/10"
             >
               <Trash2 className="size-4" />
               <span>
@@ -176,9 +176,9 @@ export default function SettingsPage() {
         </article>
       </section>
 
-      <section className="rounded-3xl border border-dashed border-white/12 bg-white/[0.02] p-6">
+      <section className="rounded-3xl border border-dashed border-white/12 bg-surface/60 p-6">
         <div className="flex items-start gap-4">
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/[0.05]">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-surface-elevated/70">
             <MonitorCog className="size-5 text-muted" />
           </span>
           <div>
@@ -221,7 +221,7 @@ function Toggle({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-5 rounded-xl border border-white/8 p-3 transition hover:border-white/14">
+    <label className="flex items-center justify-between gap-5 rounded-xl border border-white/8 p-3 transition hover:border-primary/25">
       <span className="text-sm text-muted">
         <strong className="block font-medium text-text">{label}</strong>
         {detail}

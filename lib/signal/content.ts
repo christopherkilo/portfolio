@@ -1,3 +1,5 @@
+import { SIGNAL_PALETTE } from "@/lib/signal/palette";
+
 export const SIGNAL = {
   name: "Signal",
   issue: "Issue 01",
@@ -21,33 +23,33 @@ export const SIGNAL = {
 export const SIGNAL_COLORS = [
   {
     name: "Paper White",
-    hex: "#F7F4EF",
+    hex: SIGNAL_PALETTE.paper,
     use: "Primary page ground and digital reading surfaces.",
   },
   {
     name: "Rich Black",
-    hex: "#121212",
+    hex: SIGNAL_PALETTE.ink,
     use: "Display type, body text, and high-contrast photography.",
   },
   {
-    name: "Warm Gray",
-    hex: "#8A847A",
+    name: "Caption Stone",
+    hex: SIGNAL_PALETTE.caption,
     use: "Captions, folios, metadata, and secondary hierarchy.",
   },
   {
-    name: "Muted Cobalt",
-    hex: "#2F4F8A",
-    use: "Section markers, links, and quiet editorial accents.",
+    name: "Editorial Cobalt",
+    hex: SIGNAL_PALETTE.cobalt,
+    use: "Section markers, links, and confident editorial accents.",
   },
   {
     name: "Signal Orange",
-    hex: "#E85D04",
+    hex: SIGNAL_PALETTE.orange,
     use: "Issue-specific accent—cover signal, pull-quote marks, data highlights.",
   },
   {
     name: "Ink Soft",
-    hex: "#2A2926",
-    use: "Long-form body on paper to reduce optical harshness.",
+    hex: SIGNAL_PALETTE.body,
+    use: "Long-form body on paper with clear contrast against paper white.",
   },
 ] as const;
 

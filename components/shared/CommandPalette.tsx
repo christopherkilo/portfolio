@@ -38,6 +38,7 @@ const iconMap: Record<string, ReactNode> = {
   home: <Home className="size-4" />,
   projects: <FolderKanban className="size-4" />,
   about: <User className="size-4" />,
+  resume: <FileText className="size-4" />,
   contact: <Mail className="size-4" />,
 };
 
@@ -91,13 +92,21 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       },
       {
         id: "resume",
-        label: "Download resume",
+        label: "View resume",
+        hint: "/resume",
+        icon: <FileText className="size-4" />,
+        action: () => router.push("/resume"),
+        keywords: "resume cv download pdf",
+      },
+      {
+        id: "resume-pdf",
+        label: "Download resume PDF",
         hint: "PDF",
         icon: <FileText className="size-4" />,
         action: () => {
-          window.open(SITE.resume, "_blank");
+          window.open(SITE.resume, "_blank", "noopener,noreferrer");
         },
-        keywords: "resume cv download",
+        keywords: "resume cv download pdf file",
       },
     ];
 
@@ -180,7 +189,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   setActive(0);
                 }}
                 placeholder="Search pages, projects, actions…"
-                className="w-full bg-transparent text-sm text-text outline-none placeholder:text-muted"
+                className="min-h-11 w-full bg-transparent text-base text-text outline-none placeholder:text-tertiary"
                 aria-label="Command search"
               />
             </div>
@@ -195,10 +204,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     <button
                       type="button"
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition duration-[var(--duration-fast)]",
+                        "flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm transition duration-[var(--duration-fast)]",
                         i === cappedActive
                           ? "bg-white/[0.08] text-text ring-1 ring-primary/40"
-                          : "text-muted hover:bg-white/5 hover:text-text",
+                          : "text-secondary hover:bg-white/5 hover:text-text",
                       )}
                       onMouseEnter={() => setActive(i)}
                       onClick={() => {

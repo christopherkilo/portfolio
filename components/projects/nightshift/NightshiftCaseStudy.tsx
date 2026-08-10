@@ -57,7 +57,7 @@ function SectionHeading({
         {title}
       </h2>
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
+        <p className="mt-3 text-sm leading-relaxed text-secondary sm:text-base">
           {description}
         </p>
       ) : null}
@@ -132,7 +132,7 @@ function PosterArt({
           <span className="h-1 w-10 rounded-full" style={{ backgroundColor: poster.accent }} />
         </div>
         {!compact ? (
-          <p className="pt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#6F758A]">
+          <p className="pt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
             {NIGHTSHIFT.website} · sponsors
           </p>
         ) : null}
@@ -192,7 +192,7 @@ export function NightshiftCaseStudy() {
           <div>
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 text-sm text-muted transition hover:text-text"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-text"
             >
               <ArrowLeft className="size-4" />
               Back to Projects
@@ -200,13 +200,13 @@ export function NightshiftCaseStudy() {
             <p className="mt-8 font-mono text-xs uppercase tracking-[0.28em] text-[#34E8FF]">
               {NIGHTSHIFT.category} · {NIGHTSHIFT.year}
             </p>
-            <h1 className="mt-4 font-display text-5xl font-extrabold tracking-tight text-text sm:text-6xl lg:text-7xl">
+            <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-text sm:text-5xl md:text-6xl lg:text-7xl">
               NIGHTSHIFT
             </h1>
             <p className="mt-4 font-display text-2xl text-[#34E8FF]">
               {NIGHTSHIFT.tagline}
             </p>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-secondary sm:text-lg">
               An integrated campaign for a nighttime festival combining digital
               art, electronic music, creative technology, and immersive media—
               one concept adapted across posters, social, environment, merch, and motion.
@@ -261,7 +261,7 @@ export function NightshiftCaseStudy() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl space-y-28 px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-6 sm:py-16 md:space-y-28 lg:px-8">
         <CaseStudyMobileToc
           sections={NIGHTSHIFT_SECTIONS}
           activeSection={activeSection}
@@ -288,7 +288,7 @@ export function NightshiftCaseStudy() {
           <div className="grid gap-4 lg:grid-cols-2">
             <NightFrame>
               <h3 className="font-display text-xl font-semibold">Constraints</h3>
-              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted">
+              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-secondary">
                 <li>Create night-energy without generic club aesthetics.</li>
                 <li>Keep dates and venue readable at poster distance.</li>
                 <li>Adapt for artists and activities without redesigning from scratch.</li>
@@ -297,7 +297,7 @@ export function NightshiftCaseStudy() {
             </NightFrame>
             <NightFrame accent="#6B4DFF">
               <h3 className="font-display text-xl font-semibold">Opportunity</h3>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
+              <p className="mt-4 text-sm leading-relaxed text-secondary">
                 Cropped letterforms, layered grids, and luminous directional lines
                 can feel experimental while still protecting hierarchy. The system
                 treats darkness as negative space—not as a place to dump effects.
@@ -373,7 +373,7 @@ export function NightshiftCaseStudy() {
                   SHIFT
                 </p>
               </div>
-              <p className="text-sm leading-relaxed text-muted">
+              <p className="text-sm leading-relaxed text-secondary">
                 Display type carries impact through scale and crop. Source Sans
                 handles body clarity. JetBrains Mono protects schedules, badges,
                 and technical labels.
@@ -811,7 +811,7 @@ export function NightshiftCaseStudy() {
                 alt="Untreated NightShift campaign image"
                 width={1400}
                 height={600}
-                className="aspect-[21/9] w-full object-cover"
+                className="aspect-[16/10] w-full object-cover sm:aspect-[21/9]"
                 unoptimized={isSvgImageSrc("/projects/nightshift/images/treatment-before.svg")}
               />
               <div
@@ -858,7 +858,7 @@ export function NightshiftCaseStudy() {
           <div className="grid gap-4 lg:grid-cols-2">
             <NightFrame>
               <h3 className="font-display text-xl font-semibold">Consistency across formats</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 I kept the grid, date lockup, and accent logic stable, then varied
                 crop, category color, and information density. That let every
                 adaptation feel related without becoming a lazy crop of the hero poster.
@@ -866,7 +866,7 @@ export function NightshiftCaseStudy() {
             </NightFrame>
             <NightFrame accent="#6B4DFF">
               <h3 className="font-display text-xl font-semibold">Experimentation vs readability</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 Oversized type and layered grids create energy, but dates, venue,
                 and access information always needed a protected reading path—
                 especially on environmental graphics.
@@ -874,7 +874,7 @@ export function NightshiftCaseStudy() {
             </NightFrame>
             <NightFrame accent="#F5D547">
               <h3 className="font-display text-xl font-semibold">Hardest adaptation</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 Leaderboard and email formats. With almost no vertical space, the
                 system had to communicate identity through lockup, accent, and
                 compressed hierarchy rather than atmospheric composition.
@@ -882,7 +882,7 @@ export function NightshiftCaseStudy() {
             </NightFrame>
             <NightFrame>
               <h3 className="font-display text-xl font-semibold">Future improvement</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 I would replace composed mockups with photographed environments,
                 finalize After Effects exports for the motion poster, and build a
                 stricter component library for social production speed.

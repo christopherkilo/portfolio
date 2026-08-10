@@ -47,7 +47,7 @@ export function AboutPreview() {
               <h3 className="font-display text-lg font-semibold text-text">
                 {role.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
+              <p className="mt-2 text-sm leading-relaxed text-secondary">
                 {role.description}
               </p>
             </motion.div>

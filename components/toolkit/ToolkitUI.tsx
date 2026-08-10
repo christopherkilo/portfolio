@@ -38,17 +38,17 @@ export function DemoModeBadge({ compact = false }: { compact?: boolean }) {
 }
 
 const statusStyles: Record<HealthStatus, string> = {
-  healthy: "border-emerald-400/20 bg-emerald-400/8 text-emerald-300",
-  attention: "border-amber-300/20 bg-amber-300/8 text-amber-200",
-  critical: "border-rose-400/20 bg-rose-400/8 text-rose-300",
+  healthy: "border-success/25 bg-success/10 text-success",
+  attention: "border-warning/25 bg-warning/10 text-warning",
+  critical: "border-danger/25 bg-danger/10 text-danger",
 };
 
 const moduleStatusStyles: Record<string, string> = {
-  Healthy: "border-emerald-400/20 bg-emerald-400/8 text-emerald-300",
-  Optimized: "border-emerald-400/20 bg-emerald-400/8 text-emerald-300",
-  Monitoring: "border-sky-300/20 bg-sky-300/8 text-sky-200",
-  Attention: "border-amber-300/20 bg-amber-300/8 text-amber-200",
-  "Minor Warning": "border-amber-300/20 bg-amber-300/8 text-amber-200",
+  Healthy: "border-success/25 bg-success/10 text-success",
+  Optimized: "border-success/25 bg-success/10 text-success",
+  Monitoring: "border-primary/25 bg-primary/10 text-primary",
+  Attention: "border-warning/25 bg-warning/10 text-warning",
+  "Minor Warning": "border-warning/25 bg-warning/10 text-warning",
 };
 
 export function StatusBadge({ status }: { status: HealthStatus }) {
@@ -62,9 +62,9 @@ export function StatusBadge({ status }: { status: HealthStatus }) {
       <span
         className={cn(
           "size-1.5 rounded-full",
-          status === "healthy" && "bg-emerald-300",
-          status === "attention" && "bg-amber-200",
-          status === "critical" && "bg-rose-300",
+          status === "healthy" && "bg-success",
+          status === "attention" && "bg-warning",
+          status === "critical" && "bg-danger",
         )}
         aria-hidden
       />
@@ -167,11 +167,11 @@ export const MetricCard = memo(function MetricCard({
       animate={{ opacity: 1, y: 0 }}
       whileHover={reduced ? undefined : { y: -2 }}
       transition={{ duration: 0.28 }}
-      className="rounded-2xl border border-white/8 bg-white/[0.035] p-4 backdrop-blur-xl transition hover:border-white/14"
+      className="rounded-2xl border border-white/8 bg-surface/90 p-4 shadow-[var(--card-shadow)] transition hover:border-primary/25"
     >
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted">{label}</p>
-        {icon ? <span className="text-secondary">{icon}</span> : null}
+        {icon ? <span className="text-primary/80">{icon}</span> : null}
       </div>
       <p className="mt-3 font-display text-2xl font-semibold text-text">
         {typeof numericValue === "number" ? (
@@ -260,7 +260,7 @@ export function CapacityBar({
   const reserved = Math.min(8, Math.max(0, 100 - usedPercent) * 0.15);
   const free = Math.max(0, 100 - usedPercent - reserved);
   const tone =
-    usedPercent >= 85 ? "bg-rose-400" : usedPercent >= 70 ? "bg-amber-300" : "bg-secondary";
+    usedPercent >= 85 ? "bg-danger" : usedPercent >= 70 ? "bg-warning" : "bg-success";
 
   return (
     <div>
@@ -339,10 +339,10 @@ export function Sparkline({
 export function RecommendationCard({ recommendation }: { recommendation: Recommendation }) {
   const priorityTone =
     recommendation.priority === "high"
-      ? "text-rose-200"
+      ? "text-danger"
       : recommendation.priority === "medium"
-        ? "text-amber-200"
-        : "text-sky-200";
+        ? "text-warning"
+        : "text-primary";
 
   return (
     <article className="rounded-xl bg-black/20 p-3 transition hover:bg-black/30">
@@ -374,7 +374,7 @@ const findingIcons: Record<Severity, React.ReactNode> = {
 export function FindingCard({ finding }: { finding: Finding }) {
   const [open, setOpen] = useState(false);
   return (
-    <article className="rounded-2xl border border-white/8 bg-black/20 p-4 transition hover:border-white/14">
+    <article className="rounded-2xl border border-white/8 bg-surface/70 p-4 transition hover:border-primary/25">
       <button
         type="button"
         className="flex w-full items-start gap-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -385,10 +385,10 @@ export function FindingCard({ finding }: { finding: Finding }) {
           className={cn(
             "mt-0.5",
             finding.severity === "warning"
-              ? "text-amber-200"
+              ? "text-warning"
               : finding.severity === "critical"
-                ? "text-rose-300"
-                : "text-secondary",
+                ? "text-danger"
+                : "text-primary",
           )}
         >
           {findingIcons[finding.severity]}
@@ -455,7 +455,7 @@ export function ChartPanel({
 }) {
   const gradientId = `toolkit-${title.replaceAll(/[^a-zA-Z0-9]+/g, "-")}`;
   return (
-    <section className="rounded-[var(--radius)] border border-white/8 bg-white/[0.03] p-5">
+    <section className="rounded-[var(--radius)] border border-white/8 bg-surface/90 p-5 shadow-[var(--card-shadow)]">
       <div className="mb-5">
         <h3 className="font-display text-base font-semibold text-text">{title}</h3>
         <p className="sr-only">{summary}</p>
@@ -473,16 +473,17 @@ export function ChartPanel({
             <XAxis dataKey="time" hide />
             <YAxis
               width={30}
-              tick={{ fill: "#777", fontSize: 10 }}
+              tick={{ fill: "var(--muted)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
               unit={unit}
             />
             <Tooltip
               contentStyle={{
-                background: "#0c0c0c",
-                border: "1px solid rgba(255,255,255,.1)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 borderRadius: 12,
+                color: "var(--text)",
               }}
             />
             <Area
@@ -503,7 +504,7 @@ export function ChartPanel({
 
 export function LoadingPanel({ label = "Loading diagnostics…" }: { label?: string }) {
   return (
-    <div className="grid min-h-56 place-items-center rounded-2xl border border-white/8 bg-white/[0.025]">
+    <div className="grid min-h-56 place-items-center rounded-2xl border border-white/8 bg-surface/70">
       <div className="text-center">
         <span className="mx-auto block size-8 animate-spin rounded-full border-2 border-white/10 border-t-primary" />
         <p className="mt-3 text-sm text-muted">{label}</p>
@@ -548,9 +549,9 @@ export function StartupOverlay({
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-[#050505]" role="status" aria-live="polite">
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-bg" role="status" aria-live="polite">
       <div className="text-center">
-        <span className="mx-auto grid size-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.05] font-display text-lg font-bold">
+        <span className="mx-auto grid size-12 place-items-center rounded-2xl border border-white/10 bg-surface font-display text-lg font-bold text-primary">
           K
         </span>
         <p className="mt-5 font-display text-xl font-semibold">Kilo Toolkit</p>
@@ -580,7 +581,7 @@ export function ScenarioProfilePanel({
 
   return (
     <section
-      className="rounded-3xl border border-white/8 bg-white/[0.035] p-5 backdrop-blur-xl"
+      className="rounded-3xl border border-white/8 bg-surface/90 p-5 shadow-[var(--card-shadow)]"
       aria-labelledby="simulation-profile-heading"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -601,7 +602,7 @@ export function ScenarioProfilePanel({
             <select
               value={activeProfileId}
               onChange={(event) => onProfileChange(event.target.value as SimulationProfileId)}
-              className="mt-1 w-full rounded-xl border border-white/8 bg-[#0a0a0a] px-3 py-2.5 text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="mt-1 w-full rounded-xl border border-white/8 bg-bg px-3 py-2.5 text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               aria-describedby="simulation-profile-help"
             >
               {SCENARIO_OPTIONS.map((option) => (

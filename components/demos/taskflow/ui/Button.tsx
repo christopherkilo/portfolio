@@ -9,7 +9,7 @@ type Variant = "primary" | "secondary" | "ghost" | "outline" | "danger";
 type Size = "sm" | "md" | "lg" | "icon";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-accent text-bg hover:bg-accent-strong",
+  primary: "bg-accent text-white hover:bg-accent-strong",
   secondary: "bg-elevated text-ink hover:bg-subtle-strong",
   ghost: "bg-transparent text-muted hover:bg-subtle hover:text-ink",
   outline:

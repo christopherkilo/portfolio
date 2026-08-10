@@ -67,6 +67,7 @@ import {
   MetaLabel,
   PaperFrame,
 } from "@/components/projects/signal/SignalPrimitives";
+import { SIGNAL_PALETTE } from "@/lib/signal/palette";
 
 const signalSerif = Source_Serif_4({
   subsets: ["latin"],
@@ -74,13 +75,19 @@ const signalSerif = Source_Serif_4({
   display: "swap",
 });
 
-const CHART_COLORS = ["#E85D04", "#2F4F8A", "#121212", "#8A847A", "#C45C26"];
-const SIGNAL_ACCENT = "#E85D04";
+const CHART_COLORS = [
+  SIGNAL_PALETTE.orange,
+  SIGNAL_PALETTE.cobalt,
+  SIGNAL_PALETTE.ink,
+  SIGNAL_PALETTE.caption,
+  SIGNAL_PALETTE.flame,
+];
+const SIGNAL_ACCENT = SIGNAL_PALETTE.orange;
 const TOOLTIP_STYLE = {
-  backgroundColor: "#121212",
+  backgroundColor: SIGNAL_PALETTE.ink,
   border: `1px solid ${SIGNAL_ACCENT}`,
   borderRadius: "10px",
-  color: "#F7F4EF",
+  color: SIGNAL_PALETTE.onInk,
 };
 
 function SectionHeading({
@@ -99,7 +106,7 @@ function SectionHeading({
         {title}
       </h2>
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
+        <p className="mt-3 text-sm leading-relaxed text-secondary sm:text-base">
           {description}
         </p>
       ) : null}
@@ -121,7 +128,7 @@ function CoverArt({
   return (
     <div
       className={cn(
-        "relative h-full overflow-hidden bg-[#F7F4EF] text-[#121212]",
+        "relative h-full overflow-hidden bg-[#FAF7F2] text-[#111111]",
         mono && "grayscale",
         compact ? "p-4" : "p-5 sm:p-6",
       )}
@@ -129,7 +136,7 @@ function CoverArt({
       <GridOverlay visible={showGrid} />
       {concept === "primary" ? (
         <>
-          <div className="absolute inset-y-0 left-0 w-[38%] bg-[#121212]" />
+          <div className="absolute inset-y-0 left-0 w-[38%] bg-[#111111]" />
           <div className="relative z-10 flex h-full flex-col justify-between">
             <div className="max-w-[34%]">
               <Image
@@ -139,28 +146,28 @@ function CoverArt({
                 height={42}
                 className="h-auto w-full brightness-0 invert"
               />
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#E85D04]">
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#FF4F00]">
                 {SIGNAL.issue}
               </p>
-              <p className="mt-10 font-display text-xl font-semibold leading-tight text-[#F7F4EF] sm:text-2xl">
+              <p className="mt-10 font-display text-xl font-semibold leading-tight text-[#FAF7F2] sm:text-2xl">
                 HUMAN
                 <br />
-                <span className="text-[#E85D04]">/ MACHINE</span>
+                <span className="text-[#FF4F00]">/ MACHINE</span>
               </p>
             </div>
             <div className="ml-[42%] space-y-3 pb-8">
               <div
                 aria-hidden
-                className="aspect-[4/3] rounded-sm bg-gradient-to-br from-[#2F4F8A]/30 via-[#E85D04]/20 to-[#121212]/10"
+                className="aspect-[4/3] rounded-sm bg-gradient-to-br from-[#2160D4]/55 via-[#FF4F00]/40 to-[#111111]/20"
               />
               <p className="font-display text-lg font-semibold leading-tight sm:text-xl">
                 The New Creative Machine
               </p>
-              <p className="text-xs text-[#8A847A]">
+              <p className="text-xs text-[#6F6960]">
                 Hardware · Interfaces · Connection
               </p>
               <div className="flex items-end justify-between gap-3 pt-2">
-                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#8A847A]">
+                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#6F6960]">
                   {SIGNAL.date} · {SIGNAL.price}
                 </p>
                 <BarcodePlaceholder className="w-24" />
@@ -173,15 +180,15 @@ function CoverArt({
         <div className="relative z-10 flex h-full flex-col justify-between">
           <div className="flex items-start justify-between">
             <p className="font-display text-xl font-bold tracking-[0.14em]">SIGNAL</p>
-            <MetaLabel className="text-[#E85D04]">{SIGNAL.issue}</MetaLabel>
+            <MetaLabel className="text-[#FF4F00]">{SIGNAL.issue}</MetaLabel>
           </div>
           <p className="font-display text-5xl font-semibold leading-[0.9] tracking-tight sm:text-6xl">
             HUMAN
             <br />
             MACHINE
           </p>
-          <div className="flex items-end justify-between border-t border-[#121212]/15 pt-4">
-            <p className="max-w-[18ch] text-sm text-[#2A2926]">
+          <div className="flex items-end justify-between border-t border-[#111111]/15 pt-4">
+            <p className="max-w-[18ch] text-sm text-[#1F1E1B]">
               The New Creative Machine and other essays on authorship after automation.
             </p>
             <BarcodePlaceholder className="w-20" />
@@ -196,10 +203,10 @@ function CoverArt({
           </div>
           <div
             aria-hidden
-            className="mt-4 flex-1 rounded-sm bg-gradient-to-b from-[#121212] via-[#2F4F8A] to-[#E85D04]/70"
+            className="mt-4 flex-1 rounded-sm bg-gradient-to-b from-[#111111] via-[#2160D4] to-[#FF4F00]"
           />
           <p className="mt-4 font-display text-2xl font-semibold">Human / Machine</p>
-          <p className="mt-1 text-xs text-[#8A847A]">
+          <p className="mt-1 text-xs text-[#6F6960]">
             Feature: The New Creative Machine · {SIGNAL.date}
           </p>
         </div>
@@ -220,22 +227,22 @@ function SpreadCanvas({
 
   return (
     <PaperFrame className="aspect-[11/8.5] w-full">
-      <div className="relative h-full bg-[#F7F4EF] p-[4%]">
+      <div className="relative h-full bg-[#FAF7F2] p-[4%]">
         <GridOverlay visible={showGrid} />
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#8A847A]">
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#6F6960]">
           Signal · Feature · {spread.folio}
         </p>
 
         {spreadId === "open" ? (
           <div className="mt-4 grid h-[85%] grid-cols-12 gap-3">
-            <div className="col-span-7 rounded-sm bg-gradient-to-br from-[#121212] via-[#2F4F8A] to-[#E85D04]/50" />
+            <div className="col-span-7 rounded-sm bg-gradient-to-br from-[#111111] via-[#2160D4] to-[#FF4F00]/80" />
             <div className="col-span-5 flex flex-col justify-end pb-6">
               <MetaLabel>Feature</MetaLabel>
               <h3 className="mt-3 font-display text-3xl font-semibold leading-tight sm:text-4xl">
                 The New Creative Machine
               </h3>
               <p
-                className="mt-4 text-sm leading-relaxed text-[#2A2926]"
+                className="mt-4 text-sm leading-relaxed text-[#1F1E1B]"
                 style={{ fontFamily: "var(--font-signal-serif), Georgia, serif" }}
               >
                 {FEATURE_COPY.deck}
@@ -247,11 +254,11 @@ function SpreadCanvas({
         {spreadId === "intro" ? (
           <div className="mt-6 grid h-[82%] grid-cols-12 gap-4">
             <div className="col-span-12 sm:col-span-8">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2F4F8A]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2160D4]">
                 Words by {FEATURE_COPY.author}
               </p>
               <div
-                className="mt-4 columns-1 gap-6 text-[15px] leading-relaxed text-[#2A2926] sm:columns-2"
+                className="mt-4 columns-1 gap-6 text-[15px] leading-relaxed text-[#1F1E1B] sm:columns-2"
                 style={{ fontFamily: "var(--font-signal-serif), Georgia, serif" }}
               >
                 {FEATURE_COPY.body.map((paragraph) => (
@@ -261,9 +268,9 @@ function SpreadCanvas({
                 ))}
               </div>
             </div>
-            <aside className="col-span-12 border-l border-[#E85D04]/50 pl-4 sm:col-span-4">
+            <aside className="col-span-12 border-l border-[#FF4F00]/50 pl-4 sm:col-span-4">
               <MetaLabel>Side note</MetaLabel>
-              <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+              <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                 Across twelve studios, teams described tools as amplifiers of existing
                 taste—not substitutes for editorial judgment.
               </p>
@@ -273,7 +280,7 @@ function SpreadCanvas({
 
         {spreadId === "image" ? (
           <div className="mt-4 grid h-[85%] grid-cols-12 gap-3">
-            <div className="relative col-span-9 overflow-hidden rounded-sm bg-[#121212]">
+            <div className="relative col-span-9 overflow-hidden rounded-sm bg-[#111111]">
               <Image
                 src="/projects/signal-magazine/images/hardware-detail.svg"
                 alt="Close-up of hands adjusting a prototype console"
@@ -283,7 +290,7 @@ function SpreadCanvas({
               />
             </div>
             <div className="col-span-3 flex flex-col justify-end">
-              <p className="text-xs leading-relaxed text-[#8A847A]">
+              <p className="text-xs leading-relaxed text-[#6F6960]">
                 Fig. 04 — Hands adjusting a prototype console.
               </p>
             </div>
@@ -292,18 +299,18 @@ function SpreadCanvas({
 
         {spreadId === "quote" ? (
           <div className="mt-10 flex h-[75%] flex-col justify-center px-[8%]">
-            <span className="mb-6 h-1 w-16 bg-[#E85D04]" />
+            <span className="mb-6 h-1 w-16 bg-[#FF4F00]" />
             <blockquote className="font-display text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">
               {FEATURE_COPY.pullQuote}
             </blockquote>
-            <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A847A]">
+            <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6F6960]">
               — Studio lead, excerpted interview
             </p>
           </div>
         ) : null}
 
         {spreadId === "dense" ? (
-          <div className="mt-5 grid h-[82%] grid-cols-12 gap-3 text-[13px] leading-relaxed text-[#2A2926]">
+          <div className="mt-5 grid h-[82%] grid-cols-12 gap-3 text-[13px] leading-relaxed text-[#1F1E1B]">
             {[0, 1, 2].map((column) => (
               <div
                 key={column}
@@ -320,8 +327,8 @@ function SpreadCanvas({
                 </p>
               </div>
             ))}
-            <aside className="col-span-12 rounded-sm bg-[#121212] p-4 text-[#F7F4EF] sm:col-span-3">
-              <MetaLabel className="text-[#E85D04]">Glossary</MetaLabel>
+            <aside className="col-span-12 rounded-sm bg-[#111111] p-4 text-[#FAF7F2] sm:col-span-3">
+              <MetaLabel className="text-[#FF4F00]">Glossary</MetaLabel>
               <p className="mt-3 text-sm">Authorship · Constraint · Taste · Tempo</p>
             </aside>
           </div>
@@ -333,18 +340,18 @@ function SpreadCanvas({
               <div>
                 <h3 className="font-display text-3xl font-semibold">What remains human</h3>
                 <p
-                  className="mt-4 max-w-prose text-[15px] leading-relaxed text-[#2A2926]"
+                  className="mt-4 max-w-prose text-[15px] leading-relaxed text-[#1F1E1B]"
                   style={{ fontFamily: "var(--font-signal-serif), Georgia, serif" }}
                 >
                   The machine can propose. The publication still asks who decides, who
                   is credited, and who is accountable when the work meets an audience.
                 </p>
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2F4F8A]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2160D4]">
                 Continued in Interview · p.22
               </p>
             </div>
-            <div className="col-span-12 rounded-sm bg-gradient-to-b from-[#E85D04]/25 to-[#121212]/15 sm:col-span-5" />
+            <div className="col-span-12 rounded-sm bg-gradient-to-b from-[#FF4F00]/45 to-[#2160D4]/25 sm:col-span-5" />
           </div>
         ) : null}
 
@@ -359,14 +366,14 @@ function DepartmentSample({
 }: {
   id: (typeof SIGNAL_DEPARTMENTS)[number]["id"];
 }) {
-  const line = "h-1.5 rounded-full bg-[#121212]/12";
+  const line = "h-1.5 rounded-full bg-[#111111]/12";
 
   if (id === "news") {
     return (
       <div className="grid grid-cols-2 gap-2">
         {["Briefing", "Dispatch", "Update", "Signal"].map((label, index) => (
-          <div key={label} className="border-t-2 border-[#E85D04] bg-[#121212]/[0.04] p-2">
-            <p className="font-mono text-[7px] uppercase tracking-wider text-[#2F4F8A]">
+          <div key={label} className="border-t-2 border-[#FF4F00] bg-[#111111]/[0.04] p-2">
+            <p className="font-mono text-[7px] uppercase tracking-wider text-[#2160D4]">
               0{index + 1} · {label}
             </p>
             <div className={cn("mt-2 w-full", line)} />
@@ -379,17 +386,17 @@ function DepartmentSample({
 
   if (id === "interview") {
     return (
-      <div className="space-y-3 border-l border-[#E85D04]/50 pl-3">
+      <div className="space-y-3 border-l border-[#FF4F00]/50 pl-3">
         {["What should tools make visible?", "Constraints, authorship, and consequence."].map(
           (copy, index) => (
             <div key={copy} className="grid grid-cols-[1.5rem_1fr] gap-2">
-              <span className="font-mono text-[10px] font-bold text-[#E85D04]">
+              <span className="font-mono text-[10px] font-bold text-[#FF4F00]">
                 {index === 0 ? "Q" : "A"}
               </span>
               <p
                 className={cn(
                   "text-[10px] leading-relaxed",
-                  index === 0 ? "font-mono uppercase" : "text-[#2A2926]",
+                  index === 0 ? "font-mono uppercase" : "text-[#1F1E1B]",
                 )}
               >
                 {copy}
@@ -404,8 +411,8 @@ function DepartmentSample({
   if (id === "profile") {
     return (
       <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
-        <div className="min-h-24 bg-gradient-to-br from-[#121212] via-[#2F4F8A] to-[#E85D04]/60" />
-        <div className="flex flex-col justify-between border-l border-[#121212]/15 pl-2">
+        <div className="min-h-24 bg-gradient-to-br from-[#111111] via-[#2160D4] to-[#FF4F00]/85" />
+        <div className="flex flex-col justify-between border-l border-[#111111]/15 pl-2">
           <MetaLabel>Studio 04</MetaLabel>
           <div className="space-y-1">
             <div className={cn("w-full", line)} />
@@ -420,7 +427,7 @@ function DepartmentSample({
   if (id === "opinion") {
     return (
       <div className="grid grid-cols-[2.5rem_1fr] gap-2">
-        <span className="font-display text-6xl font-semibold leading-[0.75] text-[#E85D04]">
+        <span className="font-display text-6xl font-semibold leading-[0.75] text-[#FF4F00]">
           T
         </span>
         <div className="space-y-1.5 pt-1">
@@ -436,12 +443,12 @@ function DepartmentSample({
     return (
       <ol className="space-y-2">
         {["Studio light", "Input console", "Proof display"].map((tool, index) => (
-          <li key={tool} className="grid grid-cols-[1.5rem_1fr_auto] items-center gap-2 border-b border-[#121212]/10 pb-2">
-            <span className="font-display text-lg font-semibold text-[#E85D04]">
+          <li key={tool} className="grid grid-cols-[1.5rem_1fr_auto] items-center gap-2 border-b border-[#111111]/10 pb-2">
+            <span className="font-display text-lg font-semibold text-[#FF4F00]">
               {index + 1}
             </span>
-            <span className="text-[10px] text-[#2A2926]">{tool}</span>
-            <span className="rounded-full bg-[#121212] px-1.5 py-0.5 font-mono text-[7px] text-[#F7F4EF]">
+            <span className="text-[10px] text-[#1F1E1B]">{tool}</span>
+            <span className="rounded-full bg-[#111111] px-1.5 py-0.5 font-mono text-[7px] text-[#FAF7F2]">
               {9 - index}.0
             </span>
           </li>
@@ -452,14 +459,14 @@ function DepartmentSample({
 
   return (
     <div className="flex min-h-24 flex-col justify-between px-5">
-      <span className="h-px w-10 bg-[#E85D04]" />
+      <span className="h-px w-10 bg-[#FF4F00]" />
       <p
-        className="max-w-[22ch] text-xs leading-relaxed text-[#2A2926]"
+        className="max-w-[22ch] text-xs leading-relaxed text-[#1F1E1B]"
         style={{ fontFamily: "var(--font-signal-serif), Georgia, serif" }}
       >
         Attention returns slowly when the page leaves enough room for silence.
       </p>
-      <span className="self-end font-mono text-[8px] text-[#8A847A]">46—47</span>
+      <span className="self-end font-mono text-[8px] text-[#6F6960]">46—47</span>
     </div>
   );
 }
@@ -487,8 +494,8 @@ function LightboxPreview({ title }: { title: string }) {
 
   if (title === "Spine view") {
     return (
-      <PaperFrame className="mx-auto flex h-[26rem] w-28 items-center justify-center bg-[#121212]">
-        <p className="rotate-180 font-display tracking-[0.3em] text-[#F7F4EF] [writing-mode:vertical-rl]">
+      <PaperFrame className="mx-auto flex h-[26rem] w-28 items-center justify-center bg-[#111111]">
+        <p className="rotate-180 font-display tracking-[0.3em] text-[#FAF7F2] [writing-mode:vertical-rl]">
           SIGNAL · HUMAN / MACHINE · 01
         </p>
       </PaperFrame>
@@ -505,7 +512,7 @@ function LightboxPreview({ title }: { title: string }) {
           height={42}
           className="h-auto w-36"
         />
-        <p className="max-w-[24ch] font-display text-2xl font-semibold text-[#2A2926]">
+        <p className="max-w-[24ch] font-display text-2xl font-semibold text-[#1F1E1B]">
           Create after thinking.
         </p>
         <BarcodePlaceholder className="w-32" />
@@ -618,25 +625,25 @@ export function SignalCaseStudy() {
         accent={SIGNAL_ACCENT}
       />
 
-      <section className="relative overflow-hidden border-b border-white/8 bg-[#1A1917]">
+      <section className="relative overflow-hidden border-b border-white/8 bg-[#100E0C]">
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at 70% 20%, rgba(232,93,4,.18), transparent 40%), radial-gradient(circle at 15% 80%, rgba(47,79,138,.2), transparent 35%)",
+              "radial-gradient(circle at 70% 20%, rgba(255,79,0,.32), transparent 42%), radial-gradient(circle at 15% 80%, rgba(33,96,212,.30), transparent 38%)",
           }}
         />
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
           <div>
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 text-sm text-muted transition hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]"
             >
               <ArrowLeft className="size-4" />
               Back to Projects
             </Link>
-            <p className="mt-8 font-mono text-xs uppercase tracking-[0.28em] text-[#E85D04]">
+            <p className="mt-8 font-mono text-xs uppercase tracking-[0.28em] text-[#FF4F00]">
               {SIGNAL.category} · {SIGNAL.year}
             </p>
             <Image
@@ -647,25 +654,25 @@ export function SignalCaseStudy() {
               priority
               className="mt-5 h-auto w-full max-w-md brightness-0 invert"
             />
-            <p className="mt-3 font-display text-2xl text-[#F7F4EF]/90">
+            <p className="mt-3 font-display text-2xl text-[#FAF7F2]/90">
               {SIGNAL.issue}: {SIGNAL.theme}
             </p>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-[#B8B2A8] sm:text-lg">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-[#D6D0C6] sm:text-lg">
               {SIGNAL.description} Issue 01 asks how technology reshapes creativity,
               identity, work, and daily habits—without losing readability.
             </p>
             <dl className="mt-8 grid gap-4 sm:grid-cols-2">
               <div>
-                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A847A]">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6F6960]">
                   Role
                 </dt>
-                <dd className="mt-1 text-sm text-[#E8E2D9]">{SIGNAL.role}</dd>
+                <dd className="mt-1 text-sm text-[#F2EDE5]">{SIGNAL.role}</dd>
               </div>
               <div>
-                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A847A]">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6F6960]">
                   Tools
                 </dt>
-                <dd className="mt-1 text-sm text-[#E8E2D9]">{SIGNAL.tools.join(" · ")}</dd>
+                <dd className="mt-1 text-sm text-[#F2EDE5]">{SIGNAL.tools.join(" · ")}</dd>
               </div>
             </dl>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -707,12 +714,12 @@ export function SignalCaseStudy() {
           <CaseStudyScrollCue
             href="#overview"
             reducedMotion={reducedMotion}
-            className="text-[#8A847A] hover:text-[#F7F4EF] focus-visible:outline-[#E85D04]"
+            className="text-[#6F6960] hover:text-[#FAF7F2] focus-visible:outline-[#FF4F00]"
           />
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl space-y-28 px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-6 sm:py-16 md:space-y-28 lg:px-8">
         <CaseStudyMobileToc
           sections={SIGNAL_SECTIONS}
           activeSection={activeSection}
@@ -726,14 +733,14 @@ export function SignalCaseStudy() {
           />
           <PaperFrame className="p-6 sm:p-8">
             <p
-              className="max-w-3xl text-xl leading-relaxed text-[#2A2926] sm:text-2xl"
+              className="max-w-3xl text-xl leading-relaxed text-[#1F1E1B] sm:text-2xl"
               style={{ fontFamily: "var(--font-signal-serif), Georgia, serif" }}
             >
               {SIGNAL.statement}
             </p>
             <a
               href="#feature"
-              className="mt-6 inline-flex items-center gap-2 border-b border-[#E85D04] pb-1 font-mono text-xs uppercase tracking-[0.16em] text-[#2A2926] transition hover:text-[#E85D04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E85D04]"
+              className="mt-6 inline-flex items-center gap-2 border-b border-[#FF4F00] pb-1 font-mono text-xs uppercase tracking-[0.16em] text-[#1F1E1B] transition hover:text-[#FF4F00] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4F00]"
             >
               Jump to feature spreads
               <ArrowLeft className="size-3.5 -rotate-90" />
@@ -749,7 +756,7 @@ export function SignalCaseStudy() {
           <div className="grid gap-4 lg:grid-cols-2">
             <PaperFrame className="p-6">
               <h3 className="font-display text-xl font-semibold">The brief</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+              <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                 Create a magazine that feels visually experimental for a creative
                 audience while remaining readable across long articles, interviews,
                 reviews, and data-heavy pages.
@@ -757,7 +764,7 @@ export function SignalCaseStudy() {
             </PaperFrame>
             <PaperFrame ink className="p-6">
               <h3 className="font-display text-xl font-semibold">The constraint</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#C8C2B8]">
+              <p className="mt-3 text-sm leading-relaxed text-[#E6E0D6]">
                 The system must support multiple content types without making every
                 spread look identical—and without sacrificing hierarchy when density rises.
               </p>
@@ -784,7 +791,7 @@ export function SignalCaseStudy() {
             <ul className="space-y-3">
               {SIGNAL_VOICE.map((item) => (
                 <li key={item} className="flex gap-3 text-sm text-muted">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#E85D04]" />
+                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#FF4F00]" />
                   {item}
                 </li>
               ))}
@@ -810,7 +817,7 @@ export function SignalCaseStudy() {
               <tbody>
                 {SIGNAL_ARCHITECTURE.map((row) => (
                   <tr key={row.title} className="border-t border-white/6">
-                    <td className="px-4 py-3 font-mono text-xs text-[#E85D04]">
+                    <td className="px-4 py-3 font-mono text-xs text-[#FF4F00]">
                       {row.page}
                     </td>
                     <td className="px-4 py-3 text-secondary">{row.title}</td>
@@ -857,7 +864,7 @@ export function SignalCaseStudy() {
                   {Array.from({ length: 12 }).map((_, index) => (
                     <span
                       key={index}
-                      className="h-8 rounded-[2px] bg-[#121212]/8"
+                      className="h-8 rounded-[2px] bg-[#111111]/8"
                       style={{ opacity: 0.15 + (index % 4) * 0.08 }}
                     />
                   ))}
@@ -895,7 +902,7 @@ export function SignalCaseStudy() {
                     item.role === "Pull quote" && "font-display text-2xl font-semibold leading-tight",
                     item.role === "Caption" && "text-sm text-muted",
                     item.role === "Folio" && "font-mono text-xs uppercase tracking-[0.16em] text-muted",
-                    item.role === "Sidebar" && "border-l-2 border-[#2F4F8A] pl-3 text-sm",
+                    item.role === "Sidebar" && "border-l-2 border-[#2160D4] pl-3 text-sm",
                     item.role === "Metadata" && "font-mono text-xs uppercase tracking-[0.14em]",
                   )}
                   style={
@@ -915,7 +922,7 @@ export function SignalCaseStudy() {
           <SectionHeading
             eyebrow="07 · Color and image direction"
             title="Restrained palette, strong photography rules"
-            description="Signal works primarily through type, layout, and imagery. Color is a quiet signal—not a neon takeover. Image direction: high-contrast portraits, hardware close-ups, studio environments, screen light, hands with tools, restrained duotone."
+            description="Signal leads with type, layout, and imagery—supported by a confident orange/cobalt system. Color is editorial energy, not a neon interface. Image direction: high-contrast portraits, hardware close-ups, studio environments, screen light, hands with tools, saturated duotone."
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {SIGNAL_COLORS.map((color) => (
@@ -923,7 +930,7 @@ export function SignalCaseStudy() {
                 key={color.hex}
                 type="button"
                 onClick={() => copyHex(color.hex)}
-                className="rounded-2xl border border-white/8 p-4 text-left transition hover:border-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]"
+                className="rounded-2xl border border-white/8 p-4 text-left transition hover:border-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]"
               >
                 <span
                   className="block h-16 rounded-xl border border-black/10"
@@ -933,7 +940,7 @@ export function SignalCaseStudy() {
                 <p className="mt-1 flex items-center gap-2 font-mono text-xs text-muted">
                   {color.hex}
                   {copied === color.hex ? (
-                    <Check className="size-3.5 text-[#E85D04]" />
+                    <Check className="size-3.5 text-[#FF4F00]" />
                   ) : (
                     <Copy className="size-3.5" />
                   )}
@@ -949,7 +956,7 @@ export function SignalCaseStudy() {
               ["studio-environment.svg", "Studio environment"],
             ].map(([file, label]) => (
               <PaperFrame key={file} className="overflow-hidden p-4">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-[#121212]">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-[#111111]">
                   <Image
                     src={`/projects/signal-magazine/images/${file}`}
                     alt={label}
@@ -958,7 +965,7 @@ export function SignalCaseStudy() {
                     className="object-cover"
                   />
                 </div>
-                <p className="mt-3 text-sm font-medium text-[#2A2926]">{label}</p>
+                <p className="mt-3 text-sm font-medium text-[#1F1E1B]">{label}</p>
               </PaperFrame>
             ))}
           </div>
@@ -976,9 +983,9 @@ export function SignalCaseStudy() {
                 type="button"
                 onClick={() => setCoverId(cover.id)}
                 className={cn(
-                  "rounded-full border px-4 py-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]",
+                  "rounded-full border px-4 py-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]",
                   coverId === cover.id
-                    ? "border-[#E85D04] bg-[#E85D04]/15 text-text"
+                    ? "border-[#FF4F00] bg-[#FF4F00]/15 text-text"
                     : "border-white/10 text-muted hover:text-text",
                 )}
               >
@@ -993,11 +1000,11 @@ export function SignalCaseStudy() {
             <div className="space-y-4">
               <PaperFrame className="p-5">
                 <MetaLabel>{activeCover.approach}</MetaLabel>
-                <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+                <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                   {activeCover.note}
                 </p>
                 {coverId === "primary" ? (
-                  <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+                  <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                     The final hybrid kept masthead authority, theme clarity at distance,
                     and room for cover lines—winning the monochrome and thumbnail tests.
                   </p>
@@ -1013,7 +1020,7 @@ export function SignalCaseStudy() {
                 <button
                   type="button"
                   onClick={() => setLightbox("Newsstand comparison")}
-                  className="rounded-2xl border border-dashed border-white/15 p-4 text-left transition hover:border-[#E85D04]/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]"
+                  className="rounded-2xl border border-dashed border-white/15 p-4 text-left transition hover:border-[#FF4F00]/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]"
                 >
                   <MetaLabel>Mockup</MetaLabel>
                   <p className="mt-6 font-display text-lg font-semibold">
@@ -1032,7 +1039,7 @@ export function SignalCaseStudy() {
             title="Hierarchy you can scan, pages you can find"
           />
           <PaperFrame className="p-6 sm:p-8">
-            <div className="mb-6 flex items-end justify-between gap-4 border-b border-[#121212]/10 pb-4">
+            <div className="mb-6 flex items-end justify-between gap-4 border-b border-[#111111]/10 pb-4">
               <div>
                 <Image
                   src="/projects/signal-magazine/wordmark.svg"
@@ -1041,7 +1048,7 @@ export function SignalCaseStudy() {
                   height={42}
                   className="h-auto w-40"
                 />
-                <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-[#E85D04]">
+                <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-[#FF4F00]">
                   Contents · {SIGNAL.issue}
                 </p>
               </div>
@@ -1059,14 +1066,14 @@ export function SignalCaseStudy() {
                       onFocus={() => setTocHover(item.id)}
                       onBlur={() => setTocHover(null)}
                       className={cn(
-                        "grid w-full grid-cols-[1fr_auto] items-center gap-3 rounded-xl px-3 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04] sm:grid-cols-[7rem_1fr_5rem_4rem]",
-                        active ? "bg-[#121212] text-[#F7F4EF]" : "hover:bg-[#121212]/5",
+                        "grid w-full grid-cols-[1fr_auto] items-center gap-3 rounded-xl px-3 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00] sm:grid-cols-[7rem_1fr_5rem_4rem]",
+                        active ? "bg-[#111111] text-[#FAF7F2]" : "hover:bg-[#111111]/5",
                       )}
                     >
                       <span
                         className={cn(
                           "font-mono text-[10px] uppercase tracking-[0.16em]",
-                          active ? "text-[#E85D04]" : "text-[#8A847A]",
+                          active ? "text-[#FF4F00]" : "text-[#6F6960]",
                         )}
                       >
                         {item.section}
@@ -1078,7 +1085,7 @@ export function SignalCaseStudy() {
                         <span
                           className={cn(
                             "text-xs",
-                            active ? "text-[#C8C2B8]" : "text-[#8A847A]",
+                            active ? "text-[#E6E0D6]" : "text-[#6F6960]",
                           )}
                         >
                           {item.author}
@@ -1087,7 +1094,7 @@ export function SignalCaseStudy() {
                       <span
                         className={cn(
                           "hidden rounded-md px-2 py-1 text-xs sm:inline",
-                          active ? "bg-[#E85D04]/20 text-[#F7F4EF]" : "text-[#8A847A]",
+                          active ? "bg-[#FF4F00]/20 text-[#FAF7F2]" : "text-[#6F6960]",
                         )}
                       >
                         {item.preview}
@@ -1095,7 +1102,7 @@ export function SignalCaseStudy() {
                       <span
                         className={cn(
                           "font-mono text-sm tabular-nums",
-                          active ? "text-[#E85D04]" : "text-[#2F4F8A]",
+                          active ? "text-[#FF4F00]" : "text-[#2160D4]",
                         )}
                       >
                         {item.page}
@@ -1164,9 +1171,9 @@ export function SignalCaseStudy() {
                 onClick={() => setSpreadIndex(index)}
                 aria-current={index === spreadIndex}
                 className={cn(
-                  "min-w-[7.5rem] rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]",
+                  "min-w-[7.5rem] rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]",
                   index === spreadIndex
-                    ? "border-[#E85D04] bg-[#E85D04]/10"
+                    ? "border-[#FF4F00] bg-[#FF4F00]/10"
                     : "border-white/10 hover:border-white/25",
                 )}
               >
@@ -1191,10 +1198,10 @@ export function SignalCaseStudy() {
                 <h3 className="mt-3 font-display text-xl font-semibold">
                   {department.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#2A2926]">
+                <p className="mt-2 text-sm leading-relaxed text-[#1F1E1B]">
                   {department.pattern}
                 </p>
-                <div className="mt-5 border-t border-[#121212]/10 pt-4">
+                <div className="mt-5 border-t border-[#111111]/10 pt-4">
                   <DepartmentSample id={department.id} />
                 </div>
               </PaperFrame>
@@ -1210,7 +1217,7 @@ export function SignalCaseStudy() {
           />
           <PaperFrame className="overflow-hidden">
             <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="relative min-h-80 overflow-hidden bg-[#121212]">
+              <div className="relative min-h-80 overflow-hidden bg-[#111111]">
                 <Image
                   src="/projects/signal-magazine/images/review-lumen.svg"
                   alt="Lumen Desk Lamp Pro product still"
@@ -1218,7 +1225,7 @@ export function SignalCaseStudy() {
                   sizes="(max-width: 1024px) 100vw, 45vw"
                   className="object-cover"
                 />
-                <MetaLabel className="absolute left-6 top-6 text-[#E85D04]">
+                <MetaLabel className="absolute left-6 top-6 text-[#FF4F00]">
                   Product still
                 </MetaLabel>
               </div>
@@ -1226,28 +1233,28 @@ export function SignalCaseStudy() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h3 className="font-display text-2xl font-semibold">Lumen Desk Lamp Pro</h3>
-                    <p className="mt-1 text-sm text-[#8A847A]">
+                    <p className="mt-1 text-sm text-[#6F6960]">
                       Fictional review · Sample price $249
                     </p>
                   </div>
-                  <div className="rounded-full bg-[#121212] px-3 py-1 font-mono text-xs text-[#F7F4EF]">
+                  <div className="rounded-full bg-[#111111] px-3 py-1 font-mono text-xs text-[#FAF7F2]">
                     8.4 / 10
                   </div>
                 </div>
                 <p
-                  className="mt-4 text-[15px] leading-relaxed text-[#2A2926]"
+                  className="mt-4 text-[15px] leading-relaxed text-[#1F1E1B]"
                   style={{ fontFamily: "var(--font-signal-serif), Georgia, serif" }}
                 >
                   A focused task light that stays out of the way—until you need precise
                   color temperature shifts for late proofing sessions.
                 </p>
-                <blockquote className="mt-4 border-l-2 border-[#E85D04] pl-4 font-display text-lg font-semibold">
+                <blockquote className="mt-4 border-l-2 border-[#FF4F00] pl-4 font-display text-lg font-semibold">
                   “It behaves like a tool, not a gadget.”
                 </blockquote>
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <div>
                     <MetaLabel>Strengths</MetaLabel>
-                    <ul className="mt-2 space-y-1 text-sm text-[#2A2926]">
+                    <ul className="mt-2 space-y-1 text-sm text-[#1F1E1B]">
                       <li>Stable clamp geometry</li>
                       <li>Quiet brightness steps</li>
                       <li>Readable physical controls</li>
@@ -1255,13 +1262,13 @@ export function SignalCaseStudy() {
                   </div>
                   <div>
                     <MetaLabel>Weaknesses</MetaLabel>
-                    <ul className="mt-2 space-y-1 text-sm text-[#2A2926]">
+                    <ul className="mt-2 space-y-1 text-sm text-[#1F1E1B]">
                       <li>App pairing feels optional</li>
                       <li>Cable management is basic</li>
                     </ul>
                   </div>
                 </div>
-                <div className="mt-6 overflow-hidden rounded-xl border border-[#121212]/10">
+                <div className="mt-6 overflow-hidden rounded-xl border border-[#111111]/10">
                   <table className="w-full text-left text-sm">
                     <tbody>
                       {[
@@ -1270,11 +1277,11 @@ export function SignalCaseStudy() {
                         ["Power", "USB-C / sample draw"],
                         ["Verdict", "Recommended for small studios"],
                       ].map(([label, value]) => (
-                        <tr key={label} className="border-t border-[#121212]/8 first:border-0">
-                          <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#8A847A]">
+                        <tr key={label} className="border-t border-[#111111]/8 first:border-0">
+                          <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6F6960]">
                             {label}
                           </th>
-                          <td className="px-3 py-2 text-[#2A2926]">{value}</td>
+                          <td className="px-3 py-2 text-[#1F1E1B]">{value}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1297,8 +1304,8 @@ export function SignalCaseStudy() {
               <div className="mt-4 h-56" role="img" aria-label="Bar chart of primary creative tools">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={[...SIGNAL_SURVEY.tools]}>
-                    <XAxis dataKey="name" tick={{ fill: "#8A847A", fontSize: 11 }} />
-                    <YAxis tick={{ fill: "#8A847A", fontSize: 11 }} />
+                    <XAxis dataKey="name" tick={{ fill: "#6F6960", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "#6F6960", fontSize: 11 }} />
                     <Tooltip contentStyle={TOOLTIP_STYLE} />
                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                       {SIGNAL_SURVEY.tools.map((entry, index) => (
@@ -1337,7 +1344,7 @@ export function SignalCaseStudy() {
               </div>
               <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
                 {SIGNAL_SURVEY.aiUse.map((entry, index) => (
-                  <li key={entry.name} className="flex items-center justify-between gap-3 text-xs text-[#2A2926]">
+                  <li key={entry.name} className="flex items-center justify-between gap-3 text-xs text-[#1F1E1B]">
                     <span className="flex items-center gap-2">
                       <span
                         className="size-2.5 rounded-full"
@@ -1345,7 +1352,7 @@ export function SignalCaseStudy() {
                       />
                       {entry.name}
                     </span>
-                    <span className="font-mono text-[#8A847A]">{entry.value}%</span>
+                    <span className="font-mono text-[#6F6960]">{entry.value}%</span>
                   </li>
                 ))}
               </ul>
@@ -1391,16 +1398,16 @@ export function SignalCaseStudy() {
                     <MetaLabel>{block.title}</MetaLabel>
                     <ul className="mt-2 space-y-2">
                       {block.rows.map((row) => (
-                        <li key={row.label} className="text-sm text-[#2A2926]">
+                        <li key={row.label} className="text-sm text-[#1F1E1B]">
                           <div className="mb-1 flex justify-between gap-2">
                             <span>{row.label}</span>
-                            <span className="font-mono text-xs text-[#8A847A]">
+                            <span className="font-mono text-xs text-[#6F6960]">
                               {row.value}%
                             </span>
                           </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-[#121212]/10">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-[#111111]/10">
                             <div
-                              className="h-full rounded-full bg-[#E85D04]"
+                              className="h-full rounded-full bg-[#FF4F00]"
                               style={{ width: `${row.value}%` }}
                             />
                           </div>
@@ -1440,7 +1447,7 @@ export function SignalCaseStudy() {
                 key={label}
                 type="button"
                 onClick={() => setLightbox(label)}
-                className="group text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]"
+                className="group text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]"
               >
                 <PaperFrame className="p-4 transition group-hover:-translate-y-0.5">
                   {label === "Front cover" ? (
@@ -1448,33 +1455,33 @@ export function SignalCaseStudy() {
                       <CoverArt concept="primary" compact />
                     </div>
                   ) : label === "Open spread" ? (
-                    <div className="aspect-[11/8.5] bg-[#F7F4EF] p-3">
+                    <div className="aspect-[11/8.5] bg-[#FAF7F2] p-3">
                       <div className="grid h-full grid-cols-2 gap-2">
-                        <div className="bg-[#121212]/90" />
+                        <div className="bg-[#111111]/90" />
                         <div className="space-y-2 p-2">
-                          <div className="h-3 w-2/3 bg-[#121212]/20" />
-                          <div className="h-2 w-full bg-[#121212]/10" />
-                          <div className="h-2 w-full bg-[#121212]/10" />
-                          <div className="h-2 w-4/5 bg-[#121212]/10" />
+                          <div className="h-3 w-2/3 bg-[#111111]/20" />
+                          <div className="h-2 w-full bg-[#111111]/10" />
+                          <div className="h-2 w-full bg-[#111111]/10" />
+                          <div className="h-2 w-4/5 bg-[#111111]/10" />
                         </div>
                       </div>
                     </div>
                   ) : label === "Spine view" ? (
-                    <div className="flex aspect-[3/4] items-center justify-center bg-[#121212]">
-                      <p className="rotate-180 font-display text-sm tracking-[0.3em] text-[#F7F4EF] [writing-mode:vertical-rl]">
+                    <div className="flex aspect-[3/4] items-center justify-center bg-[#111111]">
+                      <p className="rotate-180 font-display text-sm tracking-[0.3em] text-[#FAF7F2] [writing-mode:vertical-rl]">
                         SIGNAL 01
                       </p>
                     </div>
                   ) : label === "Back cover" ? (
-                    <div className="flex aspect-[3/4] flex-col justify-between bg-[#F7F4EF] p-4">
+                    <div className="flex aspect-[3/4] flex-col justify-between bg-[#FAF7F2] p-4">
                       <p className="font-display text-lg font-bold tracking-[0.12em]">SIGNAL</p>
-                      <p className="text-sm text-[#2A2926]">
+                      <p className="text-sm text-[#1F1E1B]">
                         Create after thinking. Subscribe at signal.example
                       </p>
                       <BarcodePlaceholder className="w-28" />
                     </div>
                   ) : (
-                    <div className="flex aspect-[3/4] flex-col justify-end bg-gradient-to-br from-[#8A847A]/30 to-[#121212]/20 p-4">
+                    <div className="flex aspect-[3/4] flex-col justify-end bg-gradient-to-br from-[#6F6960]/30 to-[#111111]/20 p-4">
                       <MetaLabel>Print mockup</MetaLabel>
                       <p className="mt-2 font-display text-lg font-semibold">{label}</p>
                     </div>
@@ -1502,9 +1509,9 @@ export function SignalCaseStudy() {
                 type="button"
                 onClick={() => setPrintVsDigital(id)}
                 className={cn(
-                  "rounded-full border px-4 py-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]",
+                  "rounded-full border px-4 py-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]",
                   printVsDigital === id
-                    ? "border-[#E85D04] bg-[#E85D04]/15"
+                    ? "border-[#FF4F00] bg-[#FF4F00]/15"
                     : "border-white/10 text-muted",
                 )}
               >
@@ -1522,14 +1529,14 @@ export function SignalCaseStudy() {
                   <SpreadCanvas spreadId="intro" showGrid={showGrid} />
                 </div>
               ) : (
-                <div className="mt-3 rounded-xl bg-white p-5 text-[#121212]">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#E85D04]">
+                <div className="mt-3 rounded-xl bg-white p-5 text-[#111111]">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#FF4F00]">
                     Signal · Feature
                   </p>
                   <h3 className="mt-3 font-display text-3xl font-semibold leading-tight">
                     The New Creative Machine
                   </h3>
-                  <p className="mt-2 text-sm text-[#8A847A]">
+                  <p className="mt-2 text-sm text-[#6F6960]">
                     By {FEATURE_COPY.author} · 12 min read
                   </p>
                   <p
@@ -1550,7 +1557,7 @@ export function SignalCaseStudy() {
             <div className="space-y-4">
               <PaperFrame className="mx-auto w-full max-w-xs p-3">
                 <MetaLabel>Mobile article</MetaLabel>
-                <div className="mt-3 rounded-2xl border border-[#121212]/10 bg-white p-4 text-[#121212]">
+                <div className="mt-3 rounded-2xl border border-[#111111]/10 bg-white p-4 text-[#111111]">
                   <p className="font-display text-xl font-semibold leading-tight">
                     The New Creative Machine
                   </p>
@@ -1564,7 +1571,7 @@ export function SignalCaseStudy() {
               </PaperFrame>
               <PaperFrame className="p-5">
                 <h3 className="font-display text-lg font-semibold">What changes digitally</h3>
-                <ul className="mt-3 space-y-2 text-sm text-[#2A2926]">
+                <ul className="mt-3 space-y-2 text-sm text-[#1F1E1B]">
                   <li>Columns collapse to a single readable measure.</li>
                   <li>Side notes become expandable callouts under paragraphs.</li>
                   <li>Folios become progress and section labels.</li>
@@ -1607,7 +1614,7 @@ export function SignalCaseStudy() {
                     {String(index + 1).padStart(2, "0")} · Process stage
                   </MetaLabel>
                   <p className="mt-4 font-display text-lg font-semibold">{item.title}</p>
-                  <p className="mt-2 text-sm text-[#2A2926]">
+                  <p className="mt-2 text-sm text-[#1F1E1B]">
                     {item.title === "Thumbnail sketches"
                       ? "Pencil studies established hierarchy, pacing, and image rhythm."
                       : item.note}
@@ -1626,28 +1633,28 @@ export function SignalCaseStudy() {
           <div className="grid gap-4 lg:grid-cols-2">
             <PaperFrame className="p-6">
               <h3 className="font-display text-xl font-semibold">Hierarchy</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+              <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                 I learned that hierarchy is not decoration—it is navigation for attention.
                 When every element shouts, readers stop trusting the page.
               </p>
             </PaperFrame>
             <PaperFrame className="p-6">
               <h3 className="font-display text-xl font-semibold">Consistency and variation</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+              <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                 Departments stay recognizable through recurring structures, while features
                 earn more dramatic scale and image sequencing.
               </p>
             </PaperFrame>
             <PaperFrame className="p-6">
               <h3 className="font-display text-xl font-semibold">Why the grid mattered</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#2A2926]">
+              <p className="mt-3 text-sm leading-relaxed text-[#1F1E1B]">
                 The 12-column master let me change rhythm without inventing a new system
                 every spread. Variation felt intentional instead of accidental.
               </p>
             </PaperFrame>
             <PaperFrame ink className="p-6">
               <h3 className="font-display text-xl font-semibold">Hardest challenge / next</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#C8C2B8]">
+              <p className="mt-3 text-sm leading-relaxed text-[#E6E0D6]">
                 Dense editorial with side notes was hardest—protecting measure while
                 keeping the page alive. Before professional printing I would refine
                 ink limits, commission real photography, and soft-proof the orange accent
@@ -1677,13 +1684,13 @@ export function SignalCaseStudy() {
             aria-label="Feature spread full screen"
           >
             <div className="mb-3 flex items-center justify-between gap-3">
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#E85D04]">
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#FF4F00]">
                 {activeSpread.title} · {activeSpread.folio}
               </p>
               <button
                 type="button"
                 onClick={() => setFullscreen(false)}
-                className="rounded-full border border-white/15 p-2 text-[#F7F4EF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E85D04]"
+                className="rounded-full border border-white/15 p-2 text-[#FAF7F2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F00]"
                 aria-label="Close full screen"
               >
                 <X className="size-5" />

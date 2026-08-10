@@ -12,6 +12,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { TaskflowMark } from "@/components/demos/taskflow/brand/TaskflowMark";
 import { NAV_ITEMS } from "@/lib/demos/taskflow/data";
 import { useActiveWorkspaceId } from "@/lib/demos/taskflow/api/hooks";
 import { cn } from "@/lib/demos/taskflow/utils";
@@ -33,10 +34,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <aside className="flex h-full w-[var(--sidebar)] flex-col border-r border-border bg-surface">
-      <div className="flex h-14 items-center gap-2 border-b border-border px-4">
-        <span className="inline-flex size-7 items-center justify-center rounded-md bg-accent text-xs font-bold text-bg">
-          TF
-        </span>
+      <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
+        <TaskflowMark size="sm" decorative />
         <Link
           href="/demos/taskflow/dashboard"
           className="font-display text-sm font-semibold tracking-tight"

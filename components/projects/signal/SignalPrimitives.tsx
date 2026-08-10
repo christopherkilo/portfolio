@@ -15,7 +15,7 @@ export function PaperFrame({
     <div
       className={cn(
         "relative overflow-hidden rounded-2xl border border-black/8 shadow-[0_18px_50px_-28px_rgba(18,18,18,0.45)]",
-        ink ? "bg-[#121212] text-[#F7F4EF]" : "bg-[#F7F4EF] text-[#121212]",
+        ink ? "bg-[#111111] text-[#FAF7F2]" : "bg-[#FAF7F2] text-[#111111]",
         className,
       )}
     >
@@ -34,7 +34,7 @@ export function MetaLabel({
   return (
     <span
       className={cn(
-        "font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A847A]",
+        "font-mono text-[10px] uppercase tracking-[0.2em] text-[#6F6960]",
         className,
       )}
     >
@@ -65,11 +65,11 @@ export function GridOverlay({
       {Array.from({ length: columns }).map((_, index) => (
         <span
           key={index}
-          className="border-x border-[#E85D04]/35 bg-[#E85D04]/[0.04]"
+          className="border-x border-[#FF4F00]/45 bg-[#FF4F00]/[0.07]"
         />
       ))}
-      <span className="absolute inset-x-[6%] top-[5%] border-t border-[#2F4F8A]/40" />
-      <span className="absolute inset-x-[6%] bottom-[5%] border-b border-[#2F4F8A]/40" />
+      <span className="absolute inset-x-[6%] top-[5%] border-t border-[#2160D4]/55" />
+      <span className="absolute inset-x-[6%] bottom-[5%] border-b border-[#2160D4]/55" />
     </div>
   );
 }
@@ -86,7 +86,7 @@ export function Folio({
   return (
     <div
       className={cn(
-        "absolute inset-x-4 bottom-3 flex justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-[#8A847A]",
+        "absolute inset-x-4 bottom-3 flex justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-[#6F6960]",
         className,
       )}
     >
@@ -105,7 +105,7 @@ export function BarcodePlaceholder({ className }: { className?: string }) {
       {Array.from({ length: 28 }).map((_, index) => (
         <span
           key={index}
-          className="bg-[#121212]"
+          className="bg-[#111111]"
           style={{
             width: index % 5 === 0 ? 2 : 1,
             height: `${40 + ((index * 17) % 60)}%`,

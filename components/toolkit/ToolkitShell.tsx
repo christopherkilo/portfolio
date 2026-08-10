@@ -170,19 +170,19 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
   return (
     <MotionConfig reducedMotion={settings.animations ? "user" : "always"}>
     <div
-      className="toolkit-root min-h-screen bg-[#050505] text-text"
+      className="toolkit-root min-h-screen bg-bg text-text"
       data-density={settings.density}
       data-animations={settings.animations ? "on" : "off"}
       data-theme={settings.theme}
     >
-      <a href="#toolkit-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-3 focus:py-2 focus:text-black">
+      <a href="#toolkit-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-3 focus:py-2 focus:text-white">
         Skip to toolkit content
       </a>
-      <div className="pointer-events-none fixed inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
+      <div className="pointer-events-none fixed inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] [background-size:48px_48px]" aria-hidden />
 
-      <aside className={cn("fixed inset-y-0 left-0 z-40 hidden border-r border-white/7 bg-black/75 backdrop-blur-2xl transition-[width] duration-300 lg:flex lg:flex-col", collapsed ? "w-[78px]" : "w-64")}>
-        <div className="flex h-20 items-center gap-3 border-b border-white/7 px-5">
-          <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.05] font-display text-sm font-bold">K</span>
+      <aside className={cn("fixed inset-y-0 left-0 z-40 hidden border-r border-white/8 bg-surface/95 backdrop-blur-xl transition-[width] duration-300 lg:flex lg:flex-col", collapsed ? "w-[78px]" : "w-64")}>
+        <div className="flex h-20 items-center gap-3 border-b border-white/8 px-5">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-primary/30 bg-primary/10 font-display text-sm font-bold text-primary">K</span>
           {!collapsed ? <div><p className="font-display font-semibold">KILO TOOLKIT</p><p className="font-mono text-[9px] uppercase tracking-wider text-muted">Diagnostics suite</p></div> : null}
         </div>
         <nav className="flex-1 space-y-1 p-3" aria-label="Toolkit navigation">
@@ -198,7 +198,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-white/7 p-3">
-          {!collapsed ? <div className="mb-3 rounded-xl bg-white/[0.03] p-3"><DemoModeBadge compact /><p className="mt-2 text-[11px] leading-relaxed text-muted">Illustrative diagnostics for portfolio demonstration.</p></div> : null}
+          {!collapsed ? <div className="mb-3 rounded-xl bg-surface/80 p-3"><DemoModeBadge compact /><p className="mt-2 text-[11px] leading-relaxed text-muted">Illustrative diagnostics for portfolio demonstration.</p></div> : null}
           <Link href="/" title={collapsed ? "Back to portfolio" : undefined} className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-text">
             <ChevronLeft className="size-4 shrink-0" />
             {!collapsed ? <span>Back to portfolio</span> : <span className="sr-only">Back to portfolio</span>}
@@ -210,14 +210,14 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className={cn("relative transition-[padding] duration-300", collapsed ? "lg:pl-[78px]" : "lg:pl-64")}>
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/7 bg-black/70 px-4 backdrop-blur-2xl sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/8 bg-surface/90 px-4 backdrop-blur-xl sm:px-6">
           <button type="button" className="rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
             <Menu className="size-5" />
           </button>
-          <button type="button" onClick={() => setCommandOpen(true)} className="flex min-w-0 max-w-md flex-1 items-center gap-3 rounded-xl border border-white/8 bg-white/[0.035] px-3 py-2 text-left text-sm text-muted hover:border-white/15 hover:text-text">
+          <button type="button" onClick={() => setCommandOpen(true)} className="flex min-w-0 max-w-md flex-1 items-center gap-3 rounded-xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] px-3 py-2 text-left text-sm text-muted hover:border-white/15 hover:text-text">
             <Search className="size-4" /><span className="truncate">Search modules and actions</span><kbd className="ml-auto hidden rounded border border-white/10 px-1.5 py-0.5 font-mono text-[10px] sm:block">⌘K</kbd>
           </button>
-          <div className="hidden items-center gap-2 text-xs text-muted xl:flex"><span className="size-1.5 rounded-full bg-emerald-400" />{sessionLabel}</div>
+          <div className="hidden items-center gap-2 text-xs text-muted xl:flex"><span className="size-1.5 rounded-full bg-success" />{sessionLabel}</div>
           <DemoModeBadge compact />
           <Link href="/" className="hidden items-center gap-1.5 rounded-lg px-2 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-text xl:flex">
             <ChevronLeft className="size-4" />Portfolio
@@ -240,7 +240,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
           <button type="button" onClick={() => void refreshDiagnostics()} disabled={scanning} className="hidden items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm text-muted transition hover:border-white/20 hover:text-text disabled:opacity-50 xl:flex" aria-label="Refresh diagnostics">
             <RotateCcw className={`size-4 ${scanning ? "animate-spin" : ""}`} />Refresh
           </button>
-          <button type="button" onClick={startScan} className="hidden items-center gap-2 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-black transition hover:bg-primary sm:flex">
+          <button type="button" onClick={startScan} className="hidden items-center gap-2 tk-btn-primary px-3.5 py-2 sm:flex">
             <Play className="size-4" />Run Full Scan
           </button>
         </header>
@@ -249,21 +249,21 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
         <StartupOverlay open={startupOpen} stageLabel={startupLabel} />
 
         {providerError ? (
-          <div role="alert" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-400/20 bg-rose-400/[0.06] px-4 py-3 text-sm text-rose-100 sm:mx-6 lg:mx-8">
+          <div role="alert" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger sm:mx-6 lg:mx-8">
             <span>{providerError}</span>
-            <button type="button" onClick={() => void refreshAll()} className="rounded-lg border border-rose-300/20 px-3 py-1.5 font-medium hover:bg-rose-300/10">Retry providers</button>
+            <button type="button" onClick={() => void refreshAll()} className="rounded-lg border border-danger/25 px-3 py-1.5 font-medium hover:bg-danger/10">Retry providers</button>
           </div>
         ) : null}
         {reportStorageStatus === "malformed" ? (
-          <div role="alert" className="mx-4 mt-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm text-amber-100 sm:mx-6 lg:mx-8">
+          <div role="alert" className="mx-4 mt-4 rounded-xl border border-warning/25 bg-warning/[0.06] px-4 py-3 text-sm text-warning sm:mx-6 lg:mx-8">
             Saved report data was malformed and could not be loaded. Clear saved reports in Settings to reset local storage safely.
           </div>
         ) : null}
 
         {notificationsOpen && settings.notifications ? (
-          <aside className="fixed right-4 top-20 z-50 w-[min(360px,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0b0b0b]/95 p-4 shadow-2xl backdrop-blur-2xl" aria-label="Notifications">
+          <aside className="fixed right-4 top-20 z-50 w-[min(360px,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-surface/95 p-4 shadow-2xl backdrop-blur-2xl" aria-label="Notifications">
             <div className="flex items-center justify-between"><h2 className="font-display font-semibold">Notifications</h2><button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications"><X className="size-4" /></button></div>
-            <div className="mt-4 space-y-3 text-sm"><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Storage check</span>Primary-drive utilization is above 70%.</p><p className="rounded-xl bg-white/[0.04] p-3 text-muted"><span className="block font-medium text-text">Providers ready</span>SystemScope, MemoryMedic, and NetCheck are available.</p></div>
+            <div className="mt-4 space-y-3 text-sm"><p className="rounded-xl bg-surface-elevated/60 p-3 text-muted"><span className="block font-medium text-text">Storage check</span>Primary-drive utilization is above 70%.</p><p className="rounded-xl bg-surface-elevated/60 p-3 text-muted"><span className="block font-medium text-text">Providers ready</span>SystemScope, MemoryMedic, and NetCheck are available.</p></div>
           </aside>
         ) : null}
 
@@ -273,7 +273,7 @@ function ToolkitShellInner({ children }: { children: React.ReactNode }) {
       <AnimatePresence>
         {mobileOpen ? (
           <motion.div className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMobileOpen(false)}>
-            <motion.aside className="h-full w-[min(320px,86vw)] border-r border-white/10 bg-[#080808] p-4" initial={{ x: -330 }} animate={{ x: 0 }} exit={{ x: -330 }} onClick={(event) => event.stopPropagation()}>
+            <motion.aside className="h-full w-[min(320px,86vw)] border-r border-white/10 bg-surface p-4" initial={{ x: -330 }} animate={{ x: 0 }} exit={{ x: -330 }} onClick={(event) => event.stopPropagation()}>
               <div className="flex items-center justify-between p-2"><p className="font-display font-semibold">KILO TOOLKIT</p><button type="button" onClick={() => setMobileOpen(false)} aria-label="Close navigation"><X className="size-5" /></button></div>
               <nav className="mt-6 space-y-1">{TOOLKIT_NAV.map((item) => <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-muted hover:bg-white/5 hover:text-text"><item.icon className="size-4" />{item.label}</Link>)}</nav>
               <Link href="/" className="mt-8 flex items-center gap-2 px-3 text-sm text-muted hover:text-text"><ChevronLeft className="size-4" />Back to portfolio</Link>
@@ -368,7 +368,7 @@ function CommandDialog({ open, onClose, commands }: { open: boolean; onClose: ()
     <AnimatePresence>
       {open ? (
         <motion.div className="fixed inset-0 z-[90] flex items-start justify-center bg-black/70 px-4 pt-[12vh] backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={close} role="dialog" aria-modal="true" aria-labelledby="toolkit-command-title">
-          <motion.div ref={panelRef} className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b]" initial={{ y: -10, scale: .98 }} animate={{ y: 0, scale: 1 }} onClick={(event) => event.stopPropagation()}>
+          <motion.div ref={panelRef} className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-surface" initial={{ y: -10, scale: .98 }} animate={{ y: 0, scale: 1 }} onClick={(event) => event.stopPropagation()}>
             <h2 id="toolkit-command-title" className="sr-only">Toolkit command palette</h2>
             <div className="flex items-center gap-3 border-b border-white/8 px-4 py-3">
               <Command className="size-4 text-muted" />
@@ -408,7 +408,7 @@ function CommandDialog({ open, onClose, commands }: { open: boolean; onClose: ()
                   key={item.label}
                   onMouseEnter={() => setActive(index)}
                   onClick={() => runCommand(index)}
-                  className={cn("flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm", index === active ? "bg-white/[0.07] text-text" : "text-muted hover:bg-white/[0.05] hover:text-text")}
+                  className={cn("flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm", index === active ? "bg-white/[0.07] text-text" : "text-muted hover:bg-surface-elevated/70 hover:text-text")}
                 >
                   <span className="flex-1">{item.label}</span><span className="text-xs text-muted">{item.hint}</span>
                 </button>
@@ -426,6 +426,6 @@ function ScanDialog({ open, onClose, state, stage, onStart, onCancel }: { open: 
   const progress = Math.min(100, Math.round((stage / SCAN_STAGES.length) * 100));
   const panelRef = useDialogFocus(open, onClose);
   return (
-    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[95] grid place-items-center bg-black/75 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-labelledby="diagnostic-scan-title"><motion.div ref={panelRef} className="w-full max-w-xl rounded-3xl border border-white/10 bg-[#0b0b0b] p-6 shadow-2xl" initial={{ scale: .97, y: 10 }} animate={{ scale: 1, y: 0 }}><div className="flex items-start justify-between"><div><DemoModeBadge compact /><h2 id="diagnostic-scan-title" className="mt-3 font-display text-2xl font-semibold">Full diagnostic scan</h2><p className="mt-2 text-sm text-muted">{state === "complete" ? "Scan complete. A report was saved locally." : state === "cancelled" ? "Scan cancelled. No report was created." : "Reviewing SystemScope, MemoryMedic, and NetCheck."}</p></div><button type="button" onClick={onClose} aria-label="Close scan"><X className="size-5 text-muted" /></button></div><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]" role="progressbar" aria-label="Diagnostic scan progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={state === "complete" ? 100 : progress}><motion.div className="h-full bg-primary" animate={{ width: `${state === "complete" ? 100 : progress}%` }} /></div><p className="mt-2 text-right font-mono text-xs text-muted" aria-live="polite">{state === "complete" ? 100 : progress}%</p><ol className="mt-5 space-y-2">{SCAN_STAGES.map((item, index) => <li key={item.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", index === stage && state === "running" ? "bg-white/[0.05] text-text" : index < stage || state === "complete" ? "text-secondary" : "text-muted")}><span className={cn("size-2 rounded-full border border-white/20", (index < stage || state === "complete") && "border-primary bg-primary")} />{item.label}</li>)}</ol><p className="mt-5 rounded-xl border border-white/7 bg-white/[0.025] p-3 text-xs leading-relaxed text-muted">{DEMO_DISCLOSURE}</p><div className="mt-5 flex justify-end gap-3">{state === "running" ? <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-muted hover:text-text">Cancel scan</button> : <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-primary"><RotateCcw className="size-4" />{state === "idle" ? "Start scan" : "Run again"}</button>}{state === "complete" ? <Link href="/toolkit/reports" onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm"><Download className="size-4" />View report</Link> : null}</div></motion.div></motion.div> : null}</AnimatePresence>
+    <AnimatePresence>{open ? <motion.div className="fixed inset-0 z-[95] grid place-items-center bg-black/75 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-labelledby="diagnostic-scan-title"><motion.div ref={panelRef} className="w-full max-w-xl rounded-3xl border border-white/10 bg-surface p-6 shadow-2xl" initial={{ scale: .97, y: 10 }} animate={{ scale: 1, y: 0 }}><div className="flex items-start justify-between"><div><DemoModeBadge compact /><h2 id="diagnostic-scan-title" className="mt-3 font-display text-2xl font-semibold">Full diagnostic scan</h2><p className="mt-2 text-sm text-muted">{state === "complete" ? "Scan complete. A report was saved locally." : state === "cancelled" ? "Scan cancelled. No report was created." : "Reviewing SystemScope, MemoryMedic, and NetCheck."}</p></div><button type="button" onClick={onClose} aria-label="Close scan"><X className="size-5 text-muted" /></button></div><div className="mt-6 h-2 overflow-hidden rounded-full bg-white/[0.06]" role="progressbar" aria-label="Diagnostic scan progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={state === "complete" ? 100 : progress}><motion.div className="h-full bg-primary" animate={{ width: `${state === "complete" ? 100 : progress}%` }} /></div><p className="mt-2 text-right font-mono text-xs text-muted" aria-live="polite">{state === "complete" ? 100 : progress}%</p><ol className="mt-5 space-y-2">{SCAN_STAGES.map((item, index) => <li key={item.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", index === stage && state === "running" ? "bg-surface-elevated/70 text-text" : index < stage || state === "complete" ? "text-secondary" : "text-muted")}><span className={cn("size-2 rounded-full border border-white/20", (index < stage || state === "complete") && "border-primary bg-primary")} />{item.label}</li>)}</ol><p className="mt-5 rounded-xl border border-white/7 bg-white/[0.025] p-3 text-xs leading-relaxed text-muted">{DEMO_DISCLOSURE}</p><div className="mt-5 flex justify-end gap-3">{state === "running" ? <button type="button" onClick={onCancel} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-muted hover:text-text">Cancel scan</button> : <button type="button" onClick={onStart} className="tk-btn-primary gap-2 px-4 py-2"><RotateCcw className="size-4" />{state === "idle" ? "Start scan" : "Run again"}</button>}{state === "complete" ? <Link href="/toolkit/reports" onClick={onClose} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm"><Download className="size-4" />View report</Link> : null}</div></motion.div></motion.div> : null}</AnimatePresence>
   );
 }

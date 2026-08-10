@@ -42,13 +42,13 @@ import { cn } from "@/lib/utils";
 function statusTone(status: CheckStatus) {
   switch (status) {
     case "normal":
-      return "text-emerald-300 border-emerald-400/25 bg-emerald-400/10";
+      return "text-success border-success/25 bg-success/10";
     case "monitor":
-      return "text-sky-200 border-sky-400/25 bg-sky-400/10";
+      return "text-primary border-primary/25 bg-primary/10";
     case "attention":
-      return "text-amber-200 border-amber-400/25 bg-amber-400/10";
+      return "text-warning border-warning/25 bg-warning/10";
     case "high":
-      return "text-rose-200 border-rose-400/30 bg-rose-400/10";
+      return "text-danger border-danger/30 bg-danger/10";
   }
 }
 
@@ -379,7 +379,7 @@ function GuidedTroubleshootingInner() {
       ) : null}
 
       {(session.status === "active" || session.status === "completed") && workflow ? (
-        <section className="rounded-3xl border border-white/8 bg-white/[0.035] p-4 sm:p-6">
+        <section className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-4 sm:p-6">
           <ProgressHeader
             workflowTitle={workflow.title}
             progress={progress}
@@ -388,12 +388,12 @@ function GuidedTroubleshootingInner() {
           />
 
           {session.scenarioNotice ? (
-            <p className="mt-4 rounded-xl border border-sky-400/20 bg-sky-400/[0.08] px-4 py-3 text-sm text-sky-100">
+            <p className="mt-4 rounded-xl border border-primary/25 bg-primary/10 px-4 py-3 text-sm text-primary">
               {session.scenarioNotice}
             </p>
           ) : null}
           {actionFlash ? (
-            <p className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.08] px-4 py-3 text-sm text-emerald-100">
+            <p className="mt-3 rounded-xl border border-success/25 bg-success/[0.08] px-4 py-3 text-sm text-success">
               {actionFlash}
             </p>
           ) : null}
@@ -465,7 +465,7 @@ function HomePanel({
 }) {
   return (
     <section className="space-y-5">
-      <article className="rounded-3xl border border-white/8 bg-white/[0.035] p-5 sm:p-6">
+      <article className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <LifeBuoy className="mt-1 size-6 shrink-0 text-secondary" aria-hidden />
           <div>
@@ -485,7 +485,7 @@ function HomePanel({
         {workflows.map((item) => (
           <article
             key={item.id}
-            className="flex flex-col rounded-2xl border border-white/8 bg-white/[0.03] p-5"
+            className="flex flex-col rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5"
           >
             <h3 className="font-display text-lg font-semibold">{item.title}</h3>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.shortDescription}</p>
@@ -495,7 +495,7 @@ function HomePanel({
             <button
               type="button"
               onClick={() => onStart(item.id)}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="mt-4 inline-flex items-center justify-center gap-2 tk-btn-primary px-4 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               Start guide <ArrowRight className="size-4" />
             </button>
@@ -516,7 +516,7 @@ function ResumeBanner({
   onRestart: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-surface-elevated/60 p-4 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-muted">
         Resume <strong className="text-text">{title}</strong> from this browser session?
       </p>
@@ -524,7 +524,7 @@ function ResumeBanner({
         <button
           type="button"
           onClick={onResume}
-          className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black"
+          className="tk-btn-primary px-3 py-2"
         >
           Resume Current Guide
         </button>
@@ -559,7 +559,7 @@ function ScenarioPrompt({
 }) {
   return (
     <section
-      className="rounded-3xl border border-white/8 bg-white/[0.035] p-5 sm:p-6"
+      className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 sm:p-6"
       aria-labelledby="scenario-prompt-title"
     >
       <h2 id="scenario-prompt-title" className="font-display text-2xl font-semibold">
@@ -576,7 +576,7 @@ function ScenarioPrompt({
         <button
           type="button"
           onClick={onLoadRecommended}
-          className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-primary"
+          className="tk-btn-primary px-4 py-2.5"
         >
           Load Recommended Scenario
         </button>
@@ -711,7 +711,7 @@ function StepBody({
             {step.linkLabel} <ExternalLink className="size-4" />
           </Link>
           {session.reviewedModules.includes(step.module) ? (
-            <p className="inline-flex items-center gap-2 text-sm text-emerald-300">
+            <p className="inline-flex items-center gap-2 text-sm text-success">
               <CheckCircle2 className="size-4" /> Related module marked as reviewed
             </p>
           ) : (
@@ -744,7 +744,7 @@ function StepBody({
                   </div>
                   <p className="mt-2 text-sm text-muted">{action.why}</p>
                   {action.caution ? (
-                    <p className="mt-2 text-xs text-amber-200/90">{action.caution}</p>
+                    <p className="mt-2 text-xs text-warning/90">{action.caution}</p>
                   ) : null}
                 </li>
               );
@@ -760,7 +760,7 @@ function StepBody({
             type="button"
             disabled={actionBusy}
             onClick={() => onAction(step.remediation, step.next)}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-primary disabled:opacity-50"
+            className="inline-flex items-center gap-2 tk-btn-primary px-4 py-2.5 disabled:opacity-50"
           >
             {actionBusy ? "Running simulation…" : step.actionLabel}
           </button>
@@ -807,7 +807,7 @@ function StepBody({
           <button
             type="button"
             onClick={onContinueCheck}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-primary"
+            className="inline-flex items-center justify-center gap-2 tk-btn-primary px-4 py-2.5"
           >
             Continue <ArrowRight className="size-4" />
           </button>
@@ -827,7 +827,7 @@ function StepBody({
               }
               onContinueSimple(step.next);
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-primary"
+            className="inline-flex items-center justify-center gap-2 tk-btn-primary px-4 py-2.5"
           >
             {step.type === "recommendation" ? "View summary" : "Continue"} <ArrowRight className="size-4" />
           </button>
@@ -995,7 +995,7 @@ function SummaryPanel({
         <button
           type="button"
           onClick={() => onExport("pdf")}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black"
+          className="tk-btn-primary inline-flex items-center justify-center gap-2 px-4 py-2.5"
         >
           <Download className="size-4" /> Export PDF
         </button>

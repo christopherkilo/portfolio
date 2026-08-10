@@ -63,6 +63,14 @@ describe("web project routing metadata", () => {
     }
   });
 
+  it("exposes only the three active web case studies", () => {
+    expect(getAllCaseStudyIds().sort()).toEqual([...WEB_IDS].sort());
+    expect(getCaseStudy("signal-board")).toBeNull();
+    expect(getCaseStudy("edge-lab-network")).toBeNull();
+    expect(getCaseStudy("fleet-image-pipeline")).toBeNull();
+    expect(getCaseStudy("bench-diagnostics")).toBeNull();
+  });
+
   it("does not expose localhost liveDemo values on web projects", () => {
     for (const id of WEB_IDS) {
       const project = getProjectById(id);
@@ -87,8 +95,11 @@ describe("web project routing metadata", () => {
     expect(getProjectsByCategory("web").map((p) => p.id)).toEqual([...WEB_IDS]);
   });
 
-  it("features three web apps on the homepage and keeps toolkit separate", () => {
-    expect(getHomepageFeaturedProjects().map((p) => p.id)).toEqual([...WEB_IDS]);
+  it("features all four software apps on the homepage carousel", () => {
+    expect(getHomepageFeaturedProjects().map((p) => p.id)).toEqual([
+      ...WEB_IDS,
+      "kilo-toolkit",
+    ]);
     expect(getPortfolioProjects().map((p) => p.id)).toEqual([
       ...WEB_IDS,
       "kilo-toolkit",
@@ -118,6 +129,44 @@ describe("web project routing metadata", () => {
     const { SITE } = await import("./constants");
     expect(SITE.email).toBe("christopherkilo.pro@gmail.com");
     expect(SITE.email).not.toContain("hello@");
+  });
+
+  it("points resume links at the approved public PDF filename", async () => {
+    const { SITE } = await import("./constants");
+    expect(SITE.resume).toBe("/Christopher_Kilo_Resume.pdf");
+    expect(SITE.resumeFileName).toBe("Christopher_Kilo_Resume.pdf");
+    expect(SITE.github).toBe("https://github.com/christopherkilo");
+    expect(SITE.url).toBe("https://christopherkilo.com");
+    expect(SITE.linkedin).toBe(
+      "https://www.linkedin.com/in/christopher-kilo-312467425/",
+    );
+  });
+
+  it("includes Resume in primary navigation between About and Contact", async () => {
+    const { NAV_LINKS } = await import("./constants");
+    expect(NAV_LINKS.map((link) => link.id)).toEqual([
+      "home",
+      "projects",
+      "about",
+      "resume",
+      "contact",
+    ]);
+    expect(NAV_LINKS.find((link) => link.id === "resume")?.href).toBe("/resume");
+  });
+
+  it("keeps resume page data aligned with the three flagship case studies", async () => {
+    const { resumeProjects, resumeCertifications } = await import("./resume");
+    expect(resumeProjects.map((p) => p.id)).toEqual([
+      "event-horizon",
+      "novatech-solutions",
+      "taskflow",
+    ]);
+    expect(resumeProjects.every((p) => p.href.startsWith("/projects/"))).toBe(
+      true,
+    );
+    expect(
+      resumeCertifications.some((c) => c.name === "CompTIA A+" && c.highlight),
+    ).toBe(true);
   });
 
   it("keeps cards pointed at case studies rather than demos", () => {

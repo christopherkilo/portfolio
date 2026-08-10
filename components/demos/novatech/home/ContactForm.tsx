@@ -215,8 +215,8 @@ function ContactFormInner() {
               noValidate
               aria-describedby={formError ? formErrorId : undefined}
             >
-              <div className="mb-5 rounded-xl border border-accent/25 bg-accent-soft px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+              <div className="mb-5 rounded-xl border border-info/25 bg-info-soft px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-info">
                   Consultation context
                 </p>
                 <p className="mt-1 text-sm font-medium text-ink">{contextTitle}</p>

@@ -23,7 +23,7 @@ export function ContactFormSkeleton() {
         aria-hidden="true"
       >
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-7">
-          <div className="mb-5 rounded-xl border border-accent/20 bg-accent-soft/50 px-4 py-3 space-y-2">
+          <div className="mb-5 rounded-xl border border-info/20 bg-info-soft/50 px-4 py-3 space-y-2">
             <div className="h-2.5 w-32 rounded bg-border motion-safe:animate-pulse" />
             <div className="h-4 w-48 rounded bg-border/70 motion-safe:animate-pulse" />
           </div>

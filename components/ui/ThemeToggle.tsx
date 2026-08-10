@@ -20,7 +20,7 @@ export function ThemeToggle({
       type="button"
       onClick={toggleTheme}
       className={cn(
-        "inline-flex h-10 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2.5 text-muted backdrop-blur-xl transition hover:border-white/20 hover:text-text",
+        "inline-flex min-h-11 h-11 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2.5 text-muted backdrop-blur-xl transition hover:border-white/20 hover:text-text",
         showLabel && "w-full justify-start px-3",
         className,
       )}

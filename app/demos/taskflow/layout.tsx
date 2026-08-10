@@ -20,12 +20,12 @@ export default function TaskFlowDemoLayout({
     <DemoShell
       projectTitle="TaskFlow"
       caseStudyHref="/projects/taskflow"
-      notice="TaskFlow Phase 1 — authenticated Supabase workspace with React Query."
+      notice="TaskFlow — authenticated Supabase workspace with realtime, RLS, and React Query."
     >
       <div data-demo="taskflow" className="flex min-h-full flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-3 focus:py-2 focus:text-sm focus:text-bg"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-3 focus:py-2 focus:text-sm focus:text-white"
         >
           Skip to content
         </a>

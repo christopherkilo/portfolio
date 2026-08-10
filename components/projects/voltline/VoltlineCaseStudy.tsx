@@ -122,7 +122,7 @@ function SectionHeading({
         {title}
       </h2>
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
+        <p className="mt-3 text-sm leading-relaxed text-secondary sm:text-base">
           {description}
         </p>
       ) : null}
@@ -194,7 +194,7 @@ export function VoltlineCaseStudy() {
           <div>
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 text-sm text-muted transition hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8FF3D]"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8FF3D]"
             >
               <ArrowLeft className="size-4" />
               Back to Projects
@@ -202,10 +202,10 @@ export function VoltlineCaseStudy() {
             <p className="mt-8 font-mono text-xs uppercase tracking-[0.28em] text-[#C8FF3D]">
               {VOLTLINE.category} · {VOLTLINE.year}
             </p>
-            <h1 className="mt-4 font-display text-5xl font-semibold tracking-[0.08em] text-text sm:text-6xl lg:text-7xl">
+            <h1 className="mt-4 font-display text-4xl font-semibold tracking-[0.08em] text-text sm:text-5xl md:text-6xl lg:text-7xl">
               VOLTLINE
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-secondary">
               A complete brand identity for a premium technology-accessories
               company—built around precision geometry, controlled energy, and
               systems that stay consistent from packaging to product launch ads.
@@ -257,7 +257,7 @@ export function VoltlineCaseStudy() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl space-y-28 px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-6 sm:py-16 md:space-y-28 lg:px-8">
         <CaseStudyMobileToc
           sections={VOLTLINE_SECTIONS}
           activeSection={activeSection}
@@ -292,7 +292,7 @@ export function VoltlineCaseStudy() {
           <div className="grid gap-6 lg:grid-cols-2">
             <ModularFrame>
               <h3 className="font-display text-xl font-semibold">Constraints</h3>
-              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted">
+              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-secondary">
                 <li>No animal mascots, flames, or lightning-bolt marks.</li>
                 <li>Accent color reserved for interaction and product ID, not decoration.</li>
                 <li>Logo must survive embroidery, packaging foil, and 16px favicons.</li>
@@ -301,7 +301,7 @@ export function VoltlineCaseStudy() {
             </ModularFrame>
             <ModularFrame>
               <h3 className="font-display text-xl font-semibold">Design opportunity</h3>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
+              <p className="mt-4 text-sm leading-relaxed text-secondary">
                 Precision can be emotional. Controlled forward angles, modular
                 spacing, and quiet accent moments create a sense of speed without
                 relying on aggressive gaming conventions. The identity uses
@@ -442,7 +442,7 @@ export function VoltlineCaseStudy() {
                     {concept.status}
                   </span>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-muted">{concept.note}</p>
+                <p className="mt-3 text-sm leading-relaxed text-secondary">{concept.note}</p>
               </article>
             ))}
           </div>
@@ -846,7 +846,7 @@ export function VoltlineCaseStudy() {
               <h3 className="mt-4 font-display text-3xl font-semibold">
                 {GUIDELINE_PAGES[guidelinePage]}
               </h3>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-secondary">
                 {GUIDELINE_CONTENT[GUIDELINE_PAGES[guidelinePage]]}
               </p>
               <div className="mt-10 grid gap-3 sm:grid-cols-2">
@@ -870,7 +870,7 @@ export function VoltlineCaseStudy() {
           <div className="grid gap-4 lg:grid-cols-2">
             <ModularFrame>
               <h3 className="font-display text-xl font-semibold">Strongest decision</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 Reserving Electric Lime for functional moments. Once the accent
                 stopped decorating every surface, the brand immediately felt more
                 premium and more intentional.
@@ -878,7 +878,7 @@ export function VoltlineCaseStudy() {
             </ModularFrame>
             <ModularFrame>
               <h3 className="font-display text-xl font-semibold">Challenge</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 Designing energy without gaming clichés. Forward motion had to
                 come from alignment, spacing, and modular geometry instead of
                 lightning metaphors or RGB excess.
@@ -886,7 +886,7 @@ export function VoltlineCaseStudy() {
             </ModularFrame>
             <ModularFrame>
               <h3 className="font-display text-xl font-semibold">What I learned</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 A complete identity is a system of relationships. The logo only
                 works if packaging, type, and campaign layouts can carry the same
                 logic when the mark is small—or missing entirely.
@@ -894,7 +894,7 @@ export function VoltlineCaseStudy() {
             </ModularFrame>
             <ModularFrame>
               <h3 className="font-display text-xl font-semibold">Future revision</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-secondary">
                 I would refine the interim artwork into final composed mockups,
                 photograph real print pieces, and expand the guidelines into a
                 shareable PDF with production-ready spacing diagrams.

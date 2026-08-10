@@ -42,9 +42,9 @@ export default function ReportsPage() {
         action={<DemoModeBadge compact />}
       />
       {reports.length === 0 ? (
-        <section className="grid min-h-[420px] place-items-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-center">
+        <section className="grid min-h-[420px] place-items-center rounded-3xl border border-dashed border-white/12 bg-surface/60 p-6 text-center">
           <div className="max-w-md">
-            <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-white/[0.05]">
+            <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-elevated/70">
               <FileText className="size-6 text-secondary" />
             </span>
             <h2 className="mt-5 font-display text-2xl font-semibold">No saved reports yet</h2>
@@ -57,7 +57,7 @@ export default function ReportsPage() {
       ) : (
         <div className="grid gap-5 xl:grid-cols-2">
           {reports.map((report) => (
-            <article key={report.id} className="rounded-3xl border border-white/8 bg-white/[0.03] p-5">
+            <article key={report.id} className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -131,7 +131,7 @@ function Action({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-xs transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${danger ? "text-rose-300" : "text-muted hover:text-text"}`}
+      className={`inline-flex items-center gap-2 rounded-xl border border-white/8 px-3 py-2 text-xs transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${danger ? "text-danger" : "text-muted hover:text-text"}`}
     >
       {icon && <span className="[&_svg]:size-3.5">{icon}</span>}
       {label}

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
@@ -6,12 +5,12 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { GithubIcon } from "@/components/ui/BrandIcons";
 import { CaseStudyChartView } from "@/components/projects/CaseStudyChart";
+import { CaseStudyHeroCover } from "@/components/projects/CaseStudyHeroCover";
 import {
   getAllCaseStudyIds,
   getCaseStudy,
 } from "@/lib/caseStudies";
 import { categoryBadgeLabels, hasLiveDemo, isInternalHref } from "@/lib/projectData";
-import { isSvgImageSrc } from "@/lib/utils";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -43,14 +42,14 @@ export default async function CaseStudyPage({ params }: PageProps) {
       <nav className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/projects"
-          className="inline-flex items-center gap-2 text-sm text-muted transition hover:text-text"
+          className="inline-flex min-h-11 items-center gap-2 text-sm text-secondary transition hover:text-text"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Back to Projects
         </Link>
         <Link
           href="/"
-          className="text-sm text-muted transition hover:text-text"
+          className="inline-flex min-h-11 items-center text-sm text-secondary transition hover:text-text"
         >
           Home
         </Link>
@@ -60,10 +59,10 @@ export default async function CaseStudyPage({ params }: PageProps) {
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-muted">
           Case study · {categoryBadgeLabels[project.category]}
         </p>
-        <h1 className="font-display text-4xl font-semibold tracking-tight text-text md:text-5xl">
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-text sm:text-4xl md:text-5xl">
           {project.title}
         </h1>
-        <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted md:text-lg">
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-secondary md:text-lg">
           {study.overview}
         </p>
 
@@ -99,19 +98,13 @@ export default async function CaseStudyPage({ params }: PageProps) {
         </div>
       </header>
 
-      <div className="relative mb-12 aspect-[21/9] overflow-hidden rounded-[1.5rem] border border-white/8 bg-surface-elevated">
-        <Image
-          src={project.image}
-          alt={`${project.title} visual`}
-          fill
-          priority
-          unoptimized={isSvgImageSrc(project.image)}
-          className="object-cover"
-          sizes="(max-width: 1200px) 100vw, 1100px"
-        />
-      </div>
+      <CaseStudyHeroCover
+        projectId={project.id}
+        title={project.title}
+        image={project.image}
+      />
 
-      <div className="mb-12 grid gap-4 sm:grid-cols-3">
+      <div className="mb-12 grid gap-4 md:grid-cols-3">
         {study.metrics.map((m) => (
           <div
             key={m.label}
@@ -123,7 +116,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
             <p className="mt-2 font-display text-3xl font-semibold text-primary">
               {m.value}
             </p>
-            <p className="mt-2 text-sm text-muted">{m.detail}</p>
+            <p className="mt-2 text-sm text-secondary">{m.detail}</p>
           </div>
         ))}
       </div>
@@ -131,23 +124,58 @@ export default async function CaseStudyPage({ params }: PageProps) {
       <div className="mb-12 grid gap-8 lg:grid-cols-2">
         <section className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
           <h2 className="font-display text-xl font-semibold text-text">Problem</h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
+          <p className="mt-3 text-sm leading-relaxed text-secondary md:text-base">
             {study.problem}
           </p>
         </section>
         <section className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
           <h2 className="font-display text-xl font-semibold text-text">Approach</h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
+          <p className="mt-3 text-sm leading-relaxed text-secondary md:text-base">
             {study.approach}
           </p>
         </section>
       </div>
 
+      {study.howItWorks || study.architecture?.length ? (
+        <section className="mb-12 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
+          <h2 className="font-display text-xl font-semibold text-text">How it works</h2>
+          {study.howItWorks ? (
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary md:text-base">
+              {study.howItWorks}
+            </p>
+          ) : null}
+          {study.architecture?.length ? (
+            <ol className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-3">
+              {study.architecture.map((step, index) => (
+                <li key={step} className="flex items-center gap-2 text-sm text-secondary">
+                  <span className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-xs text-text">
+                    {step}
+                  </span>
+                  {index < (study.architecture?.length ?? 0) - 1 ? (
+                    <span className="hidden text-muted sm:inline" aria-hidden>
+                      →
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="mb-12 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
-        <h2 className="font-display text-xl font-semibold text-text">Outcome</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted md:text-base">
+        <h2 className="font-display text-xl font-semibold text-text">
+          Current state
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary md:text-base">
           {study.outcome}
         </p>
+        {study.learned ? (
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-secondary md:text-base">
+            <span className="font-medium text-text">What I learned. </span>
+            {study.learned}
+          </p>
+        ) : null}
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {study.highlights.map((h) => (
             <li
@@ -159,6 +187,50 @@ export default async function CaseStudyPage({ params }: PageProps) {
             </li>
           ))}
         </ul>
+        {study.currentState ? (
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+                Implemented
+              </p>
+              <ul className="mt-3 space-y-2">
+                {study.currentState.implemented.map((item) => (
+                  <li key={item} className="text-sm leading-relaxed text-secondary">
+                    ✓ {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {study.currentState.demo?.length ? (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                  Demo / seeded
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {study.currentState.demo.map((item) => (
+                    <li key={item} className="text-sm leading-relaxed text-secondary">
+                      △ {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {study.currentState.planned?.length ? (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                  Next
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {study.currentState.planned.map((item) => (
+                    <li key={item} className="text-sm leading-relaxed text-secondary">
+                      → {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       {study.decisions?.length ? (
@@ -167,8 +239,8 @@ export default async function CaseStudyPage({ params }: PageProps) {
             <h2 className="font-display text-2xl font-semibold text-text">
               Key decisions and why
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              The reasoning, scope choices, and tradeoffs behind the implementation.
+            <p className="mt-2 text-sm leading-relaxed text-secondary">
+              The reasoning and tradeoffs behind the current implementation.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -180,7 +252,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
                 <h3 className="font-display text-lg font-semibold text-text">
                   {decision.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
+                <p className="mt-3 text-sm leading-relaxed text-secondary">
                   {decision.explanation}
                 </p>
               </section>
@@ -189,30 +261,33 @@ export default async function CaseStudyPage({ params }: PageProps) {
         </section>
       ) : null}
 
-      <section className="mb-12 space-y-6">
-        <div>
-          <h2 className="font-display text-2xl font-semibold text-text">
-            Results & analysis
-          </h2>
-          <p className="mt-2 text-sm text-muted">
-            High-resolution vector charts — crisp at any display density.
-          </p>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-1">
-          {study.charts.map((chart) => (
-            <CaseStudyChartView key={chart.id} chart={chart} />
-          ))}
-        </div>
-      </section>
+      {study.charts.length ? (
+        <section className="mb-12 space-y-6">
+          <div>
+            <h2 className="font-display text-2xl font-semibold text-text">
+              Results & analysis
+            </h2>
+            <p className="mt-2 text-sm text-secondary">
+              Charts appear only when they communicate something useful about the
+              current project.
+            </p>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-1">
+            {study.charts.map((chart) => (
+              <CaseStudyChartView key={chart.id} chart={chart} />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {study.nextSteps?.length ? (
         <section className="mb-12 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
           <h2 className="font-display text-xl font-semibold text-text">
             What I would build next
           </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-            These are the deliberate gaps between the current frontend prototype
-            and a production event marketplace.
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-secondary">
+            {study.nextStepsIntro ??
+              "Focused next steps based on the current implementation—not a wish list of work already shipped."}
           </p>
           <ol className="mt-5 grid gap-3 md:grid-cols-2">
             {study.nextSteps.map((step, index) => (
@@ -237,7 +312,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
               ? "Explore the live build"
               : "Continue exploring"}
           </p>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-secondary">
             {hasLiveDemo(project.liveDemo)
               ? "Open the demo, then return here anytime via the demo chrome or browser Back."
               : "Return to the projects index or open the repository when available."}

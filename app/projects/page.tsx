@@ -66,7 +66,7 @@ function ProjectGrid({
 
 export default function ProjectsPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <SectionHeader
         eyebrow="Projects"
         title="Selected work across disciplines"
@@ -77,12 +77,12 @@ export default function ProjectsPage() {
         const items = getPortfolioProjectsByCategory(section.category);
         if (!items.length) return null;
         return (
-          <section key={section.category} className="mb-16 last:mb-0">
+          <section key={section.category} className="mb-12 last:mb-0 sm:mb-16">
             <div className="mb-6 max-w-3xl">
               <h2 className="font-display text-2xl font-semibold text-text">
                 {section.title}
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">
+              <p className="mt-2 text-sm leading-relaxed text-secondary sm:text-base">
                 {section.description}
               </p>
             </div>

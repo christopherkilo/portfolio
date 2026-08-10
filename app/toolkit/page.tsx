@@ -100,7 +100,7 @@ export default function ToolkitOverviewPage() {
               type="button"
               onClick={() => void refreshDiagnostics()}
               disabled={scanning}
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-primary disabled:opacity-50"
+              className="inline-flex items-center gap-2 tk-btn-primary px-4 py-2 disabled:opacity-50"
             >
               <RefreshCw className={`size-4 ${scanning ? "animate-spin" : ""}`} />
               Refresh Diagnostics
@@ -118,7 +118,7 @@ export default function ToolkitOverviewPage() {
       />
 
       <section className="grid gap-4 xl:grid-cols-[1.3fr_2fr]">
-        <article className="rounded-3xl border border-white/8 bg-white/[0.035] p-6 backdrop-blur-xl">
+        <article className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-6 backdrop-blur-xl">
           <HealthGauge score={healthScore} />
           <div className="mt-4 flex items-center justify-center gap-2">
             <ModuleStatusBadge score={healthScore} />
@@ -202,7 +202,7 @@ export default function ToolkitOverviewPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08 }}
               whileHover={reduced ? undefined : { y: -5 }}
-              className="gradient-border group relative overflow-hidden rounded-3xl border border-white/8 bg-white/[0.035] p-6"
+              className="gradient-border group relative overflow-hidden rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-6"
             >
               <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-primary/[0.04] blur-3xl transition group-hover:bg-primary/[0.08]" />
               <module.icon className="size-6 text-secondary transition group-hover:text-primary" aria-hidden />
@@ -215,7 +215,7 @@ export default function ToolkitOverviewPage() {
                 </div>
                 <Link
                   href={module.href}
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-black transition hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="inline-flex items-center gap-2 tk-btn-primary px-3.5 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   Open Module <ArrowRight className="size-4" />
                 </Link>
@@ -226,7 +226,7 @@ export default function ToolkitOverviewPage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
-        <article className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+        <article className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5">
           <div className="flex items-center gap-3">
             <ShieldCheck className="size-5 text-secondary" />
             <h2 className="font-display text-lg font-semibold">Recommendations</h2>
@@ -243,7 +243,7 @@ export default function ToolkitOverviewPage() {
             )}
           </div>
         </article>
-        <article className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+        <article className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5">
           <h2 className="font-display text-lg font-semibold">Quick diagnostic actions</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Link

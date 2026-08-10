@@ -19,7 +19,7 @@ export default function EventHorizonDemoLayout({
     <DemoShell
       projectTitle="Event Horizon"
       caseStudyHref="/projects/event-horizon"
-      notice="Interactive frontend demo with fictional event listings."
+      notice="Full-stack demo: Auth.js, PostgreSQL, and fictional event listings."
     >
       <div data-demo="event-horizon" className="flex min-h-full flex-col">
         <Providers>{children}</Providers>

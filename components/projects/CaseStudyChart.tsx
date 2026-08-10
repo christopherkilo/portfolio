@@ -59,10 +59,10 @@ export function CaseStudyChartView({ chart, className }: CaseStudyChartProps) {
         <p className="mt-1 text-sm text-muted">{chart.description}</p>
       </figcaption>
 
-      <div className="relative w-full overflow-x-auto">
+      <div className="relative w-full overflow-hidden">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="h-auto w-full min-w-[320px]"
+          className="h-auto w-full"
           role="img"
           aria-label={`${chart.title} chart`}
         >

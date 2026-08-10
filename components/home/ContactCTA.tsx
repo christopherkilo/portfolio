@@ -1,7 +1,8 @@
 "use client";
 
 import { useId, useState } from "react";
-import { CheckCircle2, Loader2, Mail, FileText, Send } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, FileText, Loader2, Mail, Send } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/BrandIcons";
@@ -13,7 +14,7 @@ type FormStatus = "idle" | "submitting" | "sent" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "message", string>>;
 
 const fieldClass =
-  "w-full rounded-[var(--radius-sm)] border border-white/10 bg-white/[0.03] px-3 py-2.5 text-text outline-none transition duration-[var(--duration-fast)] focus:border-primary/40 focus:bg-white/[0.05] focus-visible:ring-2 focus-visible:ring-primary/50 aria-[invalid=true]:border-rose-400/50";
+  "w-full min-h-11 rounded-[var(--radius-sm)] border border-white/10 bg-white/[0.03] px-3 py-3 text-base text-text outline-none transition duration-[var(--duration-fast)] placeholder:text-tertiary focus:border-primary/40 focus:bg-white/[0.05] focus-visible:ring-2 focus-visible:ring-primary/50 aria-[invalid=true]:border-rose-400/50";
 
 export function ContactCTA() {
   const formId = useId();
@@ -40,7 +41,7 @@ export function ContactCTA() {
     return next;
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const nextErrors = validate(form);
@@ -54,8 +55,14 @@ export function ContactCTA() {
     }
 
     setStatus("submitting");
-    // Client-side acknowledgement until a mail provider is connected.
-    await new Promise((r) => setTimeout(r, 650));
+    const data = new FormData(form);
+    const name = String(data.get("name") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+    const subject = encodeURIComponent(`Portfolio contact from ${name}`);
+    const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
+    // Intentional mailto handoff — no contact-form backend.
+    window.location.href = `mailto:${SITE.email}?subject=${subject}&body=${body}`;
     setStatus("sent");
     form.reset();
   }
@@ -73,11 +80,11 @@ export function ContactCTA() {
         description="Whether you're interested in working together, discussing a project, or have an opportunity you'd like to share, I'd be happy to hear from you."
       />
 
-      <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted">
+      <p className="mb-8 max-w-2xl text-base leading-relaxed text-secondary">
         Reach me directly at{" "}
         <a
           href={`mailto:${SITE.email}`}
-          className="text-text underline decoration-white/20 underline-offset-2 transition hover:decoration-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="break-all text-text underline decoration-white/20 underline-offset-2 transition hover:decoration-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           {SITE.email}
         </a>
@@ -85,19 +92,19 @@ export function ContactCTA() {
       </p>
       <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <Reveal>
-          <div className="glass space-y-4 rounded-[var(--radius)] p-6">
+          <div className="glass space-y-4 rounded-[var(--radius)] p-4 sm:p-6">
             <a
               href={`mailto:${SITE.email}`}
-              className="group flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-muted transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="group flex min-h-11 items-center gap-3 rounded-xl px-2 py-2.5 text-sm text-secondary transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Mail className="size-4 shrink-0" aria-hidden />
-              {SITE.email}
+              <span className="min-w-0 break-all">{SITE.email}</span>
             </a>
             <a
               href={SITE.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-muted transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="group flex min-h-11 items-center gap-3 rounded-xl px-2 py-2.5 text-sm text-secondary transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <LinkedinIcon className="size-4 shrink-0" />
               LinkedIn
@@ -106,22 +113,25 @@ export function ContactCTA() {
               href={SITE.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-muted transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="group flex min-h-11 items-center gap-3 rounded-xl px-2 py-2.5 text-sm text-secondary transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <GithubIcon className="size-4 shrink-0" />
               GitHub
             </a>
-            <Button href={SITE.resume} external variant="outline" className="mt-2">
-              <FileText className="size-4" aria-hidden />
+            <Link
+              href="/resume"
+              className="group flex min-h-11 items-center gap-3 rounded-xl px-2 py-2.5 text-sm text-secondary transition duration-[var(--duration-fast)] hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <FileText className="size-4 shrink-0" aria-hidden />
               Resume
-            </Button>
+            </Link>
           </div>
         </Reveal>
 
         <Reveal delay={0.06}>
           <form
             onSubmit={handleSubmit}
-            className="glass rounded-[var(--radius)] p-6"
+            className="glass rounded-[var(--radius)] p-4 sm:p-6"
             noValidate
             aria-describedby={
               status === "sent"
@@ -133,7 +143,7 @@ export function ContactCTA() {
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="group/field block text-sm">
-                <span className="mb-1.5 block text-muted transition-colors group-focus-within/field:text-secondary">
+                <span className="mb-1.5 block text-secondary transition-colors group-focus-within/field:text-text">
                   Name
                 </span>
                 <input
@@ -157,7 +167,7 @@ export function ContactCTA() {
                 ) : null}
               </label>
               <label className="group/field block text-sm">
-                <span className="mb-1.5 block text-muted transition-colors group-focus-within/field:text-secondary">
+                <span className="mb-1.5 block text-secondary transition-colors group-focus-within/field:text-text">
                   Email
                 </span>
                 <input
@@ -183,7 +193,7 @@ export function ContactCTA() {
               </label>
             </div>
             <label className="group/field mt-4 block text-sm">
-              <span className="mb-1.5 block text-muted transition-colors group-focus-within/field:text-secondary">
+              <span className="mb-1.5 block text-secondary transition-colors group-focus-within/field:text-text">
                 Message
               </span>
               <textarea
@@ -216,23 +226,26 @@ export function ContactCTA() {
                 ) : (
                   <Send className="size-4" aria-hidden />
                 )}
-                {status === "submitting" ? "Sending…" : "Send Message"}
+                {status === "submitting" ? "Opening…" : "Send via email"}
               </Button>
               {status === "sent" ? (
                 <p
                   id={`${formId}-success`}
-                  className="inline-flex items-center gap-2 text-sm text-secondary"
+                  className="flex min-w-0 flex-wrap items-start gap-2 text-sm leading-relaxed text-secondary"
                   role="status"
                 >
-                  <CheckCircle2 className="size-4 shrink-0 text-emerald-300" aria-hidden />
-                  Thanks — for the fastest reply, email{" "}
-                  <a
-                    href={`mailto:${SITE.email}`}
-                    className="underline decoration-white/20 underline-offset-2 transition hover:text-text hover:decoration-primary/50"
-                  >
-                    {SITE.email}
-                  </a>
-                  .
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden />
+                  <span className="min-w-0">
+                    Your email app should open with this message. If it
+                    doesn&apos;t, write me at{" "}
+                    <a
+                      href={`mailto:${SITE.email}`}
+                      className="break-all underline decoration-white/20 underline-offset-2 transition hover:text-text hover:decoration-primary/50"
+                    >
+                      {SITE.email}
+                    </a>
+                    .
+                  </span>
                 </p>
               ) : null}
               {status === "error" && Object.keys(errors).length > 0 ? (

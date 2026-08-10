@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 
 type Theme = "light" | "dark";
@@ -8,13 +8,20 @@ type Theme = "light" | "dark";
 const STORAGE_KEY = "novatech-theme";
 const THEME_EVENT = "novatech-theme-change";
 
+function getNovatechRoot(): HTMLElement | null {
+  return document.querySelector<HTMLElement>('[data-demo="novatech"]');
+}
+
 function getCurrentTheme(): Theme {
-  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  return getNovatechRoot()?.dataset.theme === "light" ? "light" : "dark";
 }
 
 function applyTheme(theme: Theme, persist = false) {
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
+  const root = getNovatechRoot();
+  if (root) {
+    root.dataset.theme = theme;
+    root.style.colorScheme = theme;
+  }
 
   if (persist) {
     try {
@@ -35,6 +42,15 @@ function hasSavedTheme() {
   }
 }
 
+function readSavedTheme(): Theme | null {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved === "light" || saved === "dark" ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
 function subscribe(onStoreChange: () => void) {
   const media = window.matchMedia("(prefers-color-scheme: dark)");
   const onSystemThemeChange = (event: MediaQueryListEvent) => {
@@ -52,7 +68,11 @@ function subscribe(onStoreChange: () => void) {
 }
 
 export function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribe, getCurrentTheme, () => "light");
+  const theme = useSyncExternalStore(subscribe, getCurrentTheme, () => "dark");
+
+  useEffect(() => {
+    applyTheme(readSavedTheme() ?? "dark");
+  }, []);
 
   const nextTheme = theme === "dark" ? "light" : "dark";
   const label = `Switch to ${nextTheme} theme`;

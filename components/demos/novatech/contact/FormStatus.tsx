@@ -128,7 +128,7 @@ export function InquirySuccess({
       aria-labelledby="inquiry-success-title"
       className="rounded-2xl border border-border bg-surface p-6 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-8"
     >
-      <div className="inline-flex size-12 items-center justify-center rounded-full bg-accent-soft text-accent">
+      <div className="inline-flex size-12 items-center justify-center rounded-full bg-success/15 text-success">
         <CheckCircle2 className="size-6" aria-hidden />
       </div>
       <h2

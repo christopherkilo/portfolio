@@ -107,13 +107,13 @@ export default function SystemScopePage() {
           suffix=" / 100"
           detail="Profile-driven health"
         />
-        <article className="rounded-2xl border border-white/8 bg-white/[0.035] p-4">
+        <article className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-4">
           <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Provider status</p>
           <div className="mt-3 flex items-center gap-2">
             <ModuleStatusBadge score={healthScore} />
             <RotateCcw className="size-4 text-muted" />
           </div>
-          <p className="mt-2 text-xs text-muted">MockSystemDataProvider</p>
+          <p className="mt-2 text-xs text-muted">Simulated system data</p>
         </article>
       </section>
 
@@ -123,7 +123,7 @@ export default function SystemScopePage() {
           {system.hardware.map((item) => (
             <details
               key={item.id}
-              className="group rounded-2xl border border-white/8 bg-white/[0.03] p-4 transition hover:border-white/14"
+              className="group rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-4 transition hover:border-primary/25"
             >
               <summary className="cursor-pointer list-none">
                 <p className="text-xs uppercase tracking-wider text-muted">{item.label}</p>
@@ -139,7 +139,7 @@ export default function SystemScopePage() {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold">Live performance</h2>
           <span className="inline-flex items-center gap-2 text-xs text-muted">
-            <span className={`size-1.5 rounded-full ${paused ? "bg-amber-300" : "bg-emerald-400"}`} />
+            <span className={`size-1.5 rounded-full ${paused ? "bg-warning" : "bg-success"}`} />
             {paused
               ? "Charts paused"
               : settings.autoRefresh
@@ -192,7 +192,7 @@ export default function SystemScopePage() {
             return (
               <article
                 key={drive.id}
-                className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 transition hover:border-white/14"
+                className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 transition hover:border-primary/25"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -234,7 +234,7 @@ export default function SystemScopePage() {
             ))}
           </div>
         </div>
-        <aside className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+        <aside className="rounded-2xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5">
           <h2 className="font-display text-xl font-semibold">Recommended actions</h2>
           <ol className="mt-4 space-y-4 text-sm text-muted">
             <li className="flex gap-3">

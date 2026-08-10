@@ -30,19 +30,19 @@ export function DemoShell({
 
   return (
     <div className={cn("flex min-h-full flex-col", className)}>
-      <div className="sticky top-0 z-[70] border-b border-white/10 bg-black/80 text-[13px] text-zinc-200 backdrop-blur-xl">
+      <div className="sticky top-0 z-[70] border-b border-white/10 bg-black/80 pt-[env(safe-area-inset-top,0px)] text-[13px] text-text backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-4">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <Link
               href={caseStudyHref}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/35 bg-amber-300/10 px-2.5 py-1.5 font-medium text-amber-200 transition hover:border-amber-300/55 hover:bg-amber-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-amber-300/35 bg-amber-300/10 px-2.5 py-2 font-medium text-amber-200 transition hover:border-amber-300/55 hover:bg-amber-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
               aria-label={returnLabel}
             >
               <ArrowLeft className="size-3.5 shrink-0" aria-hidden />
               <span className="truncate">{returnLabel}</span>
             </Link>
             {notice ? (
-              <p className="hidden text-zinc-400 sm:block" role="note">
+              <p className="hidden text-secondary sm:block" role="note">
                 {notice}
               </p>
             ) : null}
@@ -50,7 +50,7 @@ export function DemoShell({
           {showHomeLink ? (
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-zinc-400 transition hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 py-2 text-muted transition hover:bg-white/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             >
               <House className="size-3.5" aria-hidden />
               Portfolio home
@@ -58,7 +58,7 @@ export function DemoShell({
           ) : null}
         </div>
         {notice ? (
-          <p className="border-t border-white/5 px-3 py-1.5 text-zinc-500 sm:hidden" role="note">
+          <p className="border-t border-white/5 px-3 py-1.5 text-muted sm:hidden" role="note">
             {notice}
           </p>
         ) : null}

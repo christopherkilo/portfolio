@@ -20,7 +20,7 @@ export default function AboutPage() {
         <p>{SITE.description}</p>
         <p>
           This interactive concept demonstrates searchable event discovery,
-          precise filters, browser-saved favorites, and a complete simulated
+          precise filters, authenticated favorites, and a simulated
           reservation experience. The featured events and checkout are
           illustrative; no real tickets or payments are processed.
         </p>

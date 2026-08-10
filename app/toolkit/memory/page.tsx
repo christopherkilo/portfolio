@@ -125,7 +125,7 @@ export default function MemoryMedicPage() {
       <section>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-xl font-semibold">Usage timeline</h2>
-          <div className="flex rounded-xl border border-white/8 bg-white/[0.03] p-1">
+          <div className="flex rounded-xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-1">
             {(["5m", "30m", "1h"] as const).map((item) => (
               <button
                 type="button"
@@ -153,7 +153,7 @@ export default function MemoryMedicPage() {
           processes.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto_auto]">
-          <label className="flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.03] px-3">
+          <label className="flex items-center gap-2 rounded-xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] px-3">
             <Search className="size-4 text-muted" />
             <span className="sr-only">Search processes</span>
             <input
@@ -167,7 +167,7 @@ export default function MemoryMedicPage() {
             value={category}
             onChange={(event) => setCategory(event.target.value)}
             aria-label="Filter process category"
-            className="rounded-xl border border-white/8 bg-[#0a0a0a] px-3 py-2 text-sm text-muted"
+            className="rounded-xl border border-white/8 bg-bg px-3 py-2 text-sm text-muted"
           >
             <option>All</option>
             {[...new Set(memory.processes.map((item) => item.category))].map((item) => (
@@ -185,7 +185,7 @@ export default function MemoryMedicPage() {
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-white/8">
-          <div className="hidden grid-cols-[1.4fr_1fr_.8fr_.7fr_.8fr_.8fr] gap-3 bg-white/[0.04] px-4 py-3 text-xs uppercase tracking-wider text-muted md:grid">
+          <div className="hidden grid-cols-[1.4fr_1fr_.8fr_.7fr_.8fr_.8fr] gap-3 bg-surface-elevated/60 px-4 py-3 text-xs uppercase tracking-wider text-muted md:grid">
             <SortHeader label="Process" active={sort === "name"} dir={sortDir} onClick={() => toggleSort("name")} />
             <span>Category</span>
             <SortHeader label="Memory" active={sort === "memory"} dir={sortDir} onClick={() => toggleSort("memory")} />
@@ -217,7 +217,7 @@ export default function MemoryMedicPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/8 bg-white/[0.03] p-5 sm:p-6">
+      <section className="rounded-3xl border border-white/8 bg-surface/90 shadow-[var(--card-shadow)] p-5 sm:p-6">
         <h2 className="font-display text-2xl font-semibold">RAM recommendation tool</h2>
         <p className="mt-2 text-sm text-muted">
           Answer a few workload questions to receive general capacity guidance.
@@ -228,7 +228,7 @@ export default function MemoryMedicPage() {
             <select
               value={ram}
               onChange={(event) => setRam(Number(event.target.value))}
-              className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"
+              className="mt-2 w-full rounded-xl border border-white/8 bg-bg p-3 text-text"
             >
               <option value={8}>8 GB</option>
               <option value={16}>16 GB</option>
@@ -241,7 +241,7 @@ export default function MemoryMedicPage() {
             <select
               value={workload}
               onChange={(event) => setWorkload(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"
+              className="mt-2 w-full rounded-xl border border-white/8 bg-bg p-3 text-text"
             >
               {workloads.map((item) => (
                 <option key={item}>{item}</option>
@@ -268,7 +268,7 @@ export default function MemoryMedicPage() {
             <select
               value={future}
               onChange={(event) => setFuture(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-white/8 bg-[#0a0a0a] p-3 text-text"
+              className="mt-2 w-full rounded-xl border border-white/8 bg-bg p-3 text-text"
             >
               <option>Similar</option>
               <option>Moderately heavier</option>
@@ -279,7 +279,7 @@ export default function MemoryMedicPage() {
         <button
           type="button"
           onClick={() => setShowRecommendation(true)}
-          className="mt-6 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="mt-6 tk-btn-primary px-5 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           Generate Recommendation
         </button>
@@ -380,7 +380,7 @@ function Toggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between rounded-xl border border-white/8 p-3 text-sm text-muted transition hover:border-white/14">
+    <label className="flex items-center justify-between rounded-xl border border-white/8 p-3 text-sm text-muted transition hover:border-primary/25">
       <span>{label}</span>
       <input
         type="checkbox"

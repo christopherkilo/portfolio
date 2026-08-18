@@ -19,13 +19,14 @@ from fpdf.enums import XPos, YPos
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "public" / "Christopher_Kilo_Resume.pdf"
 
-# Contact fields must match lib/constants.ts + lib/resume.ts (LinkedIn is site-only).
+# Contact fields must match lib/constants.ts + lib/resume.ts.
 NAME = "CHRISTOPHER KILO"
 TITLE = "Full-Stack Developer"
 LOCATION = "DeSoto, TX"
 EMAIL = "christopherkilo.pro@gmail.com"
-SITE_URL = "christopherkilo.com"
+SITE_URL = "www.christopherkilo.com"
 GITHUB = "github.com/christopherkilo"
+LINKEDIN = "linkedin.com/in/christopher-kilo-312467425"
 
 PROFILE = (
     "I build responsive web apps that pair clean interfaces with practical backend "
@@ -73,8 +74,8 @@ EXPERIENCE = (
 )
 
 EDUCATION = [
-    ("Davis Technical College", "Web & Graphic Design | May 2026"),
-    ("Clearfield Job Corps Center", "Computer Technician Program | June 2025"),
+    ("Davis Technical College", "Web & Graphic Design | July 2025 - May 2026"),
+    ("Clearfield Job Corps Center", "Computer Technician Program | August 2024 - June 2025"),
 ]
 
 # Intentional wrap: keep the full cabling credential readable on its own line.
@@ -134,7 +135,13 @@ def main() -> None:
     pdf.multi_cell(
         width,
         4.5,
-        f"{LOCATION}  |  {EMAIL}  |  {SITE_URL}  |  {GITHUB}",
+        f"{LOCATION}  |  {EMAIL}  |  {SITE_URL}",
+    )
+    pdf.set_x(left)
+    pdf.multi_cell(
+        width,
+        4.5,
+        f"{LINKEDIN}  |  {GITHUB}",
     )
     pdf.ln(1.5)
     rule()

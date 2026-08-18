@@ -78,12 +78,12 @@ export const resumeEducation = [
   {
     school: "Davis Technical College",
     credential: "Web & Graphic Design",
-    dates: "May 2026",
+    dates: "July 2025 – May 2026",
   },
   {
     school: "Clearfield Job Corps Center",
     credential: "Computer Technician Program",
-    dates: "June 2025",
+    dates: "August 2024 – June 2025",
   },
 ] as const;
 

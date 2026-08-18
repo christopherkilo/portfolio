@@ -9,6 +9,7 @@ import {
   FolderKanban,
   Home,
   Mail,
+  PenLine,
   Search,
   User,
 } from "lucide-react";
@@ -37,6 +38,7 @@ type CommandPaletteProps = {
 const iconMap: Record<string, ReactNode> = {
   home: <Home className="size-4" />,
   projects: <FolderKanban className="size-4" />,
+  blog: <PenLine className="size-4" />,
   about: <User className="size-4" />,
   resume: <FileText className="size-4" />,
   contact: <Mail className="size-4" />,

@@ -136,7 +136,7 @@ describe("web project routing metadata", () => {
     expect(SITE.resume).toBe("/Christopher_Kilo_Resume.pdf");
     expect(SITE.resumeFileName).toBe("Christopher_Kilo_Resume.pdf");
     expect(SITE.github).toBe("https://github.com/christopherkilo");
-    expect(SITE.url).toBe("https://christopherkilo.com");
+    expect(SITE.url).toBe("https://www.christopherkilo.com");
     expect(SITE.linkedin).toBe(
       "https://www.linkedin.com/in/christopher-kilo-312467425/",
     );
@@ -147,11 +147,13 @@ describe("web project routing metadata", () => {
     expect(NAV_LINKS.map((link) => link.id)).toEqual([
       "home",
       "projects",
+      "blog",
       "about",
       "resume",
       "contact",
     ]);
     expect(NAV_LINKS.find((link) => link.id === "resume")?.href).toBe("/resume");
+    expect(NAV_LINKS.find((link) => link.id === "blog")?.href).toBe("/blog");
   });
 
   it("keeps resume page data aligned with the three flagship case studies", async () => {

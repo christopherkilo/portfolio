@@ -13,13 +13,14 @@ export const SITE = {
   /** Suggested download filename for the resume PDF. */
   resumeFileName: "Christopher_Kilo_Resume.pdf",
   resumeUpdatedLabel: "Updated August 2026",
-  url: "https://christopherkilo.com",
+  url: "https://www.christopherkilo.com",
   copyright: `© ${new Date().getFullYear()} Christopher Kilo. All rights reserved.`,
 } as const;
 
 export const NAV_LINKS = [
   { href: "/", label: "Home", id: "home" },
   { href: "/projects", label: "Projects", id: "projects" },
+  { href: "/blog", label: "Blog", id: "blog" },
   { href: "/about", label: "About", id: "about" },
   { href: "/resume", label: "Resume", id: "resume" },
   { href: "/contact", label: "Contact", id: "contact" },

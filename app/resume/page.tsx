@@ -86,6 +86,15 @@ export default function ResumePage() {
                 <span className="min-w-0 break-all">{SITE.email}</span>
               </a>
               <a
+                href={SITE.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-2 transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <ArrowUpRight className="size-4 shrink-0 text-muted" aria-hidden />
+                www.christopherkilo.com
+              </a>
+              <a
                 href={SITE.github}
                 target="_blank"
                 rel="noopener noreferrer"

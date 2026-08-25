@@ -6,6 +6,7 @@ import { EventGridSkeleton } from "@/components/demos/event-horizon/ui/Skeleton"
 export const metadata: Metadata = {
   title: "Browse Events",
   description: "Search and filter local events by category, date, and city.",
+  robots: { index: false, follow: false },
 };
 
 export default function BrowsePage() {

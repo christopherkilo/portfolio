@@ -17,10 +17,11 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const event = getEventById(id);
-  if (!event) return { title: "Event not found" };
+  if (!event) return { title: "Event not found", robots: { index: false, follow: false } };
   return {
     title: event.title,
     description: event.shortDescription,
+    robots: { index: false, follow: false },
   };
 }
 

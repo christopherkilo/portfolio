@@ -26,7 +26,10 @@ function toDbStatus(status: string): EventStatus | undefined {
 }
 
 export async function findEventsPage(query: EventQueryInput) {
-  const where: Prisma.EventWhereInput = {};
+  const where: Prisma.EventWhereInput = {
+    endDateTime: { gt: new Date() },
+    status: { not: "cancelled" },
+  };
 
   const q = query.q.trim();
   if (q) {

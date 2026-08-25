@@ -1,5 +1,5 @@
 import type { EventItem, TicketType } from "@/lib/demos/event-horizon/eventData";
-import { getTicketById } from "@/lib/demos/event-horizon/eventData";
+import { getTicketById, isUpcomingEvent } from "@/lib/demos/event-horizon/eventData";
 
 /** Percentage service fee applied to ticket subtotal. */
 export const SERVICE_FEE_RATE = 0.08;
@@ -48,6 +48,9 @@ export function validateReservation(
   ticketId: string,
   quantity: number,
 ): ReservationValidation {
+  if (!isUpcomingEvent(event)) {
+    return { ok: false, error: "This event has already ended." };
+  }
   if (event.status === "sold-out") {
     return { ok: false, error: "This event is sold out." };
   }

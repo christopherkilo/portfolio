@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "Services",
   description:
     "Choose the right illustrative NovaTech Solutions capability for your business needs.",
+  robots: { index: false, follow: false },
 };
 
 const NEED_GUIDES = [

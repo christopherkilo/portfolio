@@ -2,6 +2,7 @@ import {
   events,
   getInterestScore,
   getLowestTicketPrice,
+  isUpcomingEvent,
   type EventCategory,
   type EventItem,
 } from "@/lib/demos/event-horizon/eventData";
@@ -126,24 +127,24 @@ export const STAFF_PICK_REASONS: Record<string, string> = {
   "cedar-chamber-night": "Quiet luxury: unamplified sound in a wood-lined hall.",
 };
 
-/** Simulated announce dates for “Just Announced”. */
+/** Simulated announce dates for “Just Announced”. Kept in the recent past relative to Aug 24, 2026. */
 export const ANNOUNCED_AT: Record<string, string> = {
-  "aurora-synth-night": "2026-07-20T12:00:00Z",
-  "frontier-dev-summit": "2026-07-28T15:00:00Z",
-  "canvas-after-dark": "2026-08-01T10:00:00Z",
-  "taste-of-the-grid": "2026-08-02T18:00:00Z",
-  "harbor-run-classic": "2026-07-15T09:00:00Z",
-  "velvet-room-sessions": "2026-07-22T20:00:00Z",
-  "circuit-makers-lab": "2026-08-03T14:00:00Z",
-  "pulse-film-garden": "2026-08-03T16:00:00Z",
-  "orbit-community-cup": "2026-07-30T11:00:00Z",
-  "amber-room-comedy": "2026-08-04T09:00:00Z",
-  "skyline-rooftop-market": "2026-08-04T11:30:00Z",
-  "foundry-after-hours": "2026-08-03T20:00:00Z",
-  "neon-lane-sessions": "2026-08-04T08:00:00Z",
-  "cedar-chamber-night": "2026-08-02T12:00:00Z",
-  "lumen-yoga-dawn": "2026-08-01T07:00:00Z",
-  "harbor-lights-festival": "2026-08-04T10:00:00Z",
+  "aurora-synth-night": "2026-08-18T12:00:00Z",
+  "frontier-dev-summit": "2026-08-12T15:00:00Z",
+  "canvas-after-dark": "2026-08-16T10:00:00Z",
+  "taste-of-the-grid": "2026-08-22T18:00:00Z",
+  "harbor-run-classic": "2026-08-10T09:00:00Z",
+  "velvet-room-sessions": "2026-08-19T20:00:00Z",
+  "circuit-makers-lab": "2026-08-23T14:00:00Z",
+  "pulse-film-garden": "2026-08-23T16:00:00Z",
+  "orbit-community-cup": "2026-08-11T11:00:00Z",
+  "amber-room-comedy": "2026-08-21T09:00:00Z",
+  "skyline-rooftop-market": "2026-08-22T11:30:00Z",
+  "foundry-after-hours": "2026-08-20T20:00:00Z",
+  "neon-lane-sessions": "2026-08-21T08:00:00Z",
+  "cedar-chamber-night": "2026-08-17T12:00:00Z",
+  "lumen-yoga-dawn": "2026-08-15T07:00:00Z",
+  "harbor-lights-festival": "2026-08-20T10:00:00Z",
 };
 
 function byCategory(list: EventItem[], category: EventCategory): EventItem[] {
@@ -229,7 +230,7 @@ export function getHomeDiscoverySections(
   list: EventItem[] = events,
   now: number = Date.now(),
 ): DiscoverySection[] {
-  const active = list.filter((event) => event.status !== "cancelled");
+  const active = list.filter((event) => isUpcomingEvent(event, now));
   const trending = getTrendingEvents(active, 10, now);
   const tonight = active.filter((event) => isLiveTonight(event, now)).slice(0, 8);
   const weekend = trending.filter((event) => isWeekendish(event, now));
@@ -263,9 +264,9 @@ export function getHomeDiscoverySections(
       title: "Live Tonight",
       description: "Doors, countdowns, and experiences starting before the night ends.",
       viewAllHref: "/demos/event-horizon/browse?sort=date-asc",
-      events: tonight.length ? tonight : active.slice(0, 4),
+      events: tonight,
       highlights: Object.fromEntries(
-        (tonight.length ? tonight : active.slice(0, 4)).map((event) => [
+        tonight.map((event) => [
           event.id,
           getTimingLabel(event, now) ?? "Starts Tonight",
         ]),
@@ -371,7 +372,11 @@ export function getHomeDiscoverySections(
   return sections.filter((section) => section.events.length > 0);
 }
 
-export function getFeaturedDiscoveryEvents(list: EventItem[] = events): EventItem[] {
+export function getFeaturedDiscoveryEvents(
+  list: EventItem[] = events,
+  now: number = Date.now(),
+): EventItem[] {
+  const upcoming = list.filter((event) => isUpcomingEvent(event, now));
   const preferred = [
     "aurora-synth-night",
     "velvet-room-sessions",
@@ -382,8 +387,8 @@ export function getFeaturedDiscoveryEvents(list: EventItem[] = events): EventIte
     "skyline-rooftop-market",
   ];
   const featured = preferred
-    .map((id) => list.find((event) => event.id === id && event.featured))
+    .map((id) => upcoming.find((event) => event.id === id && event.featured))
     .filter((event): event is EventItem => Boolean(event));
   if (featured.length >= 3) return featured;
-  return list.filter((event) => event.featured);
+  return upcoming.filter((event) => event.featured);
 }

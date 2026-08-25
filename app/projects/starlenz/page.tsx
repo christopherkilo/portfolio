@@ -6,19 +6,15 @@ import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SITE } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "StarLenz",
   description:
     "StarLenz is an interactive astronomy experience in active development — currently documented through a development update on the blog.",
-  alternates: { canonical: "/projects/starlenz" },
-  openGraph: {
-    title: `StarLenz · ${SITE.name}`,
-    description:
-      "An interactive astronomy experience moving from graphic design concept to the web.",
-    url: `${SITE.url}/projects/starlenz`,
-  },
-};
+  path: "/projects/starlenz",
+  ogTitle: `StarLenz · ${SITE.name}`,
+});
 
 export default function StarLenzProjectPage() {
   return (

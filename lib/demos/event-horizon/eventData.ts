@@ -103,8 +103,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "2101 E Riverside Dr, Austin, TX 78741",
     timezone: "America/Chicago",
-    startDateTime: "2026-08-14T20:00:00-05:00",
-    endDateTime: "2026-08-15T01:00:00-05:00",
+    startDateTime: "2026-09-25T20:00:00-05:00",
+    endDateTime: "2026-09-26T01:00:00-05:00",
     image: `${IMG}/aurora.svg`,
     gallery: [`${IMG}/aurora.svg`, `${IMG}/pulse.svg`, `${IMG}/orbit.svg`],
     featured: true,
@@ -148,8 +148,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "2301 S Lake Shore Dr, Chicago, IL 60616",
     timezone: "America/Chicago",
-    startDateTime: "2026-08-22T09:00:00-05:00",
-    endDateTime: "2026-08-22T18:00:00-05:00",
+    startDateTime: "2026-10-03T09:00:00-05:00",
+    endDateTime: "2026-10-03T18:00:00-05:00",
     image: `${IMG}/frontier.svg`,
     gallery: [`${IMG}/frontier.svg`, `${IMG}/circuit.svg`, `${IMG}/orbit.svg`],
     featured: true,
@@ -202,8 +202,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "88 S Holgate St, Seattle, WA 98134",
     timezone: "America/Los_Angeles",
-    startDateTime: "2026-08-09T18:30:00-07:00",
-    endDateTime: "2026-08-09T22:30:00-07:00",
+    startDateTime: "2026-09-20T18:30:00-07:00",
+    endDateTime: "2026-09-20T22:30:00-07:00",
     image: `${IMG}/canvas.svg`,
     gallery: [`${IMG}/canvas.svg`, `${IMG}/pulse.svg`, `${IMG}/aurora.svg`],
     featured: true,
@@ -238,8 +238,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "3501 Wazee St, Denver, CO 80216",
     timezone: "America/Denver",
-    startDateTime: "2026-08-30T17:00:00-06:00",
-    endDateTime: "2026-08-30T22:00:00-06:00",
+    startDateTime: "2026-10-11T17:00:00-06:00",
+    endDateTime: "2026-10-11T22:00:00-06:00",
     image: `${IMG}/taste.svg`,
     gallery: [`${IMG}/taste.svg`, `${IMG}/canvas.svg`, `${IMG}/pulse.svg`],
     featured: false,
@@ -283,8 +283,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "100 Chopin Plaza, Miami, FL 33131",
     timezone: "America/New_York",
-    startDateTime: "2026-09-06T07:30:00-04:00",
-    endDateTime: "2026-09-06T12:00:00-04:00",
+    startDateTime: "2026-10-18T07:30:00-04:00",
+    endDateTime: "2026-10-18T12:00:00-04:00",
     image: `${IMG}/harbor.svg`,
     gallery: [`${IMG}/harbor.svg`, `${IMG}/orbit.svg`, `${IMG}/circuit.svg`],
     featured: false,
@@ -328,8 +328,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "180 N 10th St, Brooklyn, NY 11211",
     timezone: "America/New_York",
-    startDateTime: "2026-08-16T21:00:00-04:00",
-    endDateTime: "2026-08-17T02:00:00-04:00",
+    startDateTime: "2026-09-27T21:00:00-04:00",
+    endDateTime: "2026-09-28T02:00:00-04:00",
     image: `${IMG}/velvet.svg`,
     gallery: [`${IMG}/velvet.svg`, `${IMG}/aurora.svg`, `${IMG}/pulse.svg`],
     featured: true,
@@ -373,8 +373,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "916 Springdale Rd, Austin, TX 78702",
     timezone: "America/Chicago",
-    startDateTime: "2026-09-12T13:00:00-05:00",
-    endDateTime: "2026-09-12T17:00:00-05:00",
+    startDateTime: "2026-10-24T13:00:00-05:00",
+    endDateTime: "2026-10-24T17:00:00-05:00",
     image: `${IMG}/circuit.svg`,
     gallery: [`${IMG}/circuit.svg`, `${IMG}/frontier.svg`, `${IMG}/orbit.svg`],
     featured: false,
@@ -418,8 +418,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "1400 E Pine St, Seattle, WA 98122",
     timezone: "America/Los_Angeles",
-    startDateTime: "2026-08-28T19:30:00-07:00",
-    endDateTime: "2026-08-28T22:30:00-07:00",
+    startDateTime: "2026-10-09T19:30:00-07:00",
+    endDateTime: "2026-10-09T22:30:00-07:00",
     image: `${IMG}/pulse.svg`,
     gallery: [`${IMG}/pulse.svg`, `${IMG}/canvas.svg`, `${IMG}/velvet.svg`],
     featured: false,
@@ -463,8 +463,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "2230 N Central Park Ave, Chicago, IL 60647",
     timezone: "America/Chicago",
-    startDateTime: "2026-09-20T10:00:00-05:00",
-    endDateTime: "2026-09-20T18:00:00-05:00",
+    startDateTime: "2026-11-01T10:00:00-05:00",
+    endDateTime: "2026-11-01T18:00:00-05:00",
     image: `${IMG}/orbit.svg`,
     gallery: [`${IMG}/orbit.svg`, `${IMG}/harbor.svg`, `${IMG}/taste.svg`],
     featured: false,
@@ -508,8 +508,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "1200 E 6th St, Austin, TX 78702",
     timezone: "America/Chicago",
-    startDateTime: "2026-08-04T20:00:00-05:00",
-    endDateTime: "2026-08-05T01:00:00-05:00",
+    startDateTime: "2026-09-15T20:00:00-05:00",
+    endDateTime: "2026-09-16T01:00:00-05:00",
     image: `${IMG}/aurora.svg`,
     gallery: [`${IMG}/aurora.svg`, `${IMG}/velvet.svg`, `${IMG}/pulse.svg`],
     featured: false,
@@ -553,8 +553,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "2301 S Lake Shore Dr, Chicago, IL 60616",
     timezone: "America/Chicago",
-    startDateTime: "2026-08-04T18:30:00-05:00",
-    endDateTime: "2026-08-04T22:00:00-05:00",
+    startDateTime: "2026-09-15T18:30:00-05:00",
+    endDateTime: "2026-09-15T22:00:00-05:00",
     image: `${IMG}/frontier.svg`,
     gallery: [`${IMG}/frontier.svg`, `${IMG}/circuit.svg`],
     featured: false,
@@ -589,8 +589,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "88 Berry St, Brooklyn, NY 11249",
     timezone: "America/New_York",
-    startDateTime: "2026-08-07T20:00:00-04:00",
-    endDateTime: "2026-08-07T22:30:00-04:00",
+    startDateTime: "2026-09-18T20:00:00-04:00",
+    endDateTime: "2026-09-18T22:30:00-04:00",
     image: `${IMG}/velvet.svg`,
     gallery: [`${IMG}/velvet.svg`, `${IMG}/canvas.svg`],
     featured: false,
@@ -625,8 +625,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "300 N State St, Chicago, IL 60654",
     timezone: "America/Chicago",
-    startDateTime: "2026-08-08T17:00:00-05:00",
-    endDateTime: "2026-08-08T22:00:00-05:00",
+    startDateTime: "2026-09-19T17:00:00-05:00",
+    endDateTime: "2026-09-19T22:00:00-05:00",
     image: `${IMG}/taste.svg`,
     gallery: [`${IMG}/taste.svg`, `${IMG}/harbor.svg`],
     featured: true,
@@ -670,8 +670,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "901 12th Ave, Seattle, WA 98122",
     timezone: "America/Los_Angeles",
-    startDateTime: "2026-08-10T19:00:00-07:00",
-    endDateTime: "2026-08-10T21:00:00-07:00",
+    startDateTime: "2026-09-21T19:00:00-07:00",
+    endDateTime: "2026-09-21T21:00:00-07:00",
     image: `${IMG}/canvas.svg`,
     gallery: [`${IMG}/canvas.svg`, `${IMG}/pulse.svg`],
     featured: false,
@@ -706,8 +706,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "2101 E Riverside Dr, Austin, TX 78741",
     timezone: "America/Chicago",
-    startDateTime: "2026-08-09T06:30:00-05:00",
-    endDateTime: "2026-08-09T08:00:00-05:00",
+    startDateTime: "2026-09-20T06:30:00-05:00",
+    endDateTime: "2026-09-20T08:00:00-05:00",
     image: `${IMG}/orbit.svg`,
     gallery: [`${IMG}/orbit.svg`, `${IMG}/aurora.svg`],
     featured: false,
@@ -742,8 +742,8 @@ const CATALOG_EVENTS: EventItem[] = [
     country: "US",
     address: "100 Chopin Plaza, Miami, FL 33131",
     timezone: "America/New_York",
-    startDateTime: "2026-08-06T18:00:00-04:00",
-    endDateTime: "2026-08-06T23:00:00-04:00",
+    startDateTime: "2026-09-17T18:00:00-04:00",
+    endDateTime: "2026-09-17T23:00:00-04:00",
     image: `${IMG}/harbor.svg`,
     gallery: [`${IMG}/harbor.svg`, `${IMG}/taste.svg`, `${IMG}/pulse.svg`],
     featured: true,
@@ -790,8 +790,29 @@ export function getEventById(id: string) {
   return events.find((event) => event.id === id || event.slug === id);
 }
 
-export function getFeaturedEvents() {
-  return events.filter((event) => event.featured);
+/**
+ * True when the event has not ended and is not cancelled.
+ * Sold-out / postponed future events still count as upcoming for discovery,
+ * but reservation flows decide bookability separately.
+ */
+export function isUpcomingEvent(
+  event: Pick<EventItem, "endDateTime" | "status">,
+  now: number = Date.now(),
+): boolean {
+  if (event.status === "cancelled") return false;
+  const end = Date.parse(event.endDateTime);
+  return Number.isFinite(end) && end > now;
+}
+
+export function getUpcomingEvents(
+  list: EventItem[] = events,
+  now: number = Date.now(),
+): EventItem[] {
+  return list.filter((event) => isUpcomingEvent(event, now));
+}
+
+export function getFeaturedEvents(now: number = Date.now()) {
+  return getUpcomingEvents(events, now).filter((event) => event.featured);
 }
 
 export function getTicketById(event: EventItem, ticketId: string) {
@@ -860,7 +881,7 @@ export function filterEvents(
   list: EventItem[],
   filters: EventFilters,
 ): EventItem[] {
-  let result = [...list];
+  let result = getUpcomingEvents(list);
 
   const q = filters.query.trim().toLowerCase();
   if (q) {

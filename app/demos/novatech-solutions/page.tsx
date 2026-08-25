@@ -21,6 +21,7 @@ import { Reveal } from "@/components/demos/novatech/shared/Reveal";
 export const metadata: Metadata = {
   title: "Home",
   description: SITE.description,
+  robots: { index: false, follow: false },
 };
 
 export default function NovaTechDemoHome() {

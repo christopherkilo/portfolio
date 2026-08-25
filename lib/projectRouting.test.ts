@@ -7,6 +7,7 @@ import {
   getProjectHref,
   getProjectsByCategory,
   hasLiveDemo,
+  homepageFeaturedProjectIds,
   isExternalHref,
   isInternalHref,
   isPublicLiveDemoUrl,
@@ -98,6 +99,12 @@ describe("web project routing metadata", () => {
   it("features all four software apps on the homepage carousel", () => {
     expect(getHomepageFeaturedProjects().map((p) => p.id)).toEqual([
       ...WEB_IDS,
+      "kilo-toolkit",
+    ]);
+    expect(homepageFeaturedProjectIds).toEqual([
+      "event-horizon",
+      "novatech-solutions",
+      "taskflow",
       "kilo-toolkit",
     ]);
     expect(getPortfolioProjects().map((p) => p.id)).toEqual([

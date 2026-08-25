@@ -11,6 +11,7 @@ import {
   getCaseStudy,
 } from "@/lib/caseStudies";
 import { categoryBadgeLabels, hasLiveDemo, isInternalHref } from "@/lib/projectData";
+import { pageMetadata } from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -24,10 +25,11 @@ export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const study = getCaseStudy(id);
   if (!study) return { title: "Case study" };
-  return {
+  return pageMetadata({
     title: `${study.project.title} — Case Study`,
     description: study.overview,
-  };
+    path: `/projects/${id}`,
+  });
 }
 
 export default async function CaseStudyPage({ params }: PageProps) {

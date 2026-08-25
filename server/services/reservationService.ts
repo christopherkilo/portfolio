@@ -69,6 +69,9 @@ export async function createReservation(
   if (event.status === "sold_out") {
     throw new InventoryError("This event is sold out.");
   }
+  if (event.endDateTime.getTime() <= Date.now()) {
+    throw new ConflictError("This event has already ended.");
+  }
 
   const ticket = event.ticketTypes.find(
     (item) => item.id === input.ticketTypeId,

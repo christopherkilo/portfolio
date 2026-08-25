@@ -4,24 +4,19 @@ import { TagFilter } from "@/components/blog/TagFilter";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { getAllPosts, getAllTags, getFeaturedPost } from "@/lib/blog";
 import { SITE } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
 type PageProps = {
   searchParams: Promise<{ tag?: string }>;
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Blog",
   description:
     "Development notes, design decisions, experiments, and lessons from the projects Christopher Kilo is building.",
-  alternates: { canonical: "/blog" },
-  openGraph: {
-    title: `Blog · ${SITE.name}`,
-    description:
-      "Development notes, design decisions, experiments, and lessons from active projects.",
-    url: `${SITE.url}/blog`,
-    type: "website",
-  },
-};
+  path: "/blog",
+  ogTitle: `Blog · ${SITE.name}`,
+});
 
 export default async function BlogIndexPage({ searchParams }: PageProps) {
   const { tag } = await searchParams;

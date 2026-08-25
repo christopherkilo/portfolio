@@ -1,6 +1,8 @@
-# Portfolio Final Review
+# Portfolio Review Summary
 
-Date: August 10, 2026
+Date: August 24, 2026
+
+This file is the current review snapshot. It replaces older August 10 figures and should be regenerated after material verification passes.
 
 ## Decisions
 
@@ -12,62 +14,63 @@ Contact:
 
 ## Framework
 
-Next.js App Router with `proxy.ts` network boundary — **VERIFIED**
+Next.js App Router — **VERIFIED**
 
-## Case Studies
+## Embedded demos
+
+Event Horizon, NovaTech Solutions, and TaskFlow are served from this app at:
+
+- `/demos/event-horizon`
+- `/demos/novatech-solutions`
+- `/demos/taskflow`
+
+They do not require separate localhost ports.
+
+## Case studies
 
 Event Horizon — **VERIFIED**  
-NovaTech — **VERIFIED**  
-TaskFlow — **VERIFIED**
+NovaTech Solutions — **VERIFIED**  
+TaskFlow — **VERIFIED**  
+Voltline / NightShift / Signal Magazine — **VERIFIED**
 
 ## Resume
 
 Canonical resume (`/Christopher_Kilo_Resume.pdf`) — **VERIFIED**  
-Location consistency (DeSoto, TX on page + PDF) — **VERIFIED**  
-Download / redirect (`/resume.pdf` → canonical) — **VERIFIED**
+Location consistency (DeSoto, TX) — **VERIFIED**
 
 ## Navigation
 
 Internal links (nav, footer, case studies, demos, toolkit) — **VERIFIED**  
-External GitHub profile + project repos (HTTP 200) — **VERIFIED**  
-LinkedIn uses configured profile URL — **PRESENT** (LinkedIn blocks automated profile verification)
+External GitHub / LinkedIn use configured profile URLs — **VERIFIED**
 
 ## Contact / mailto
 
 Button label: **Send via email**  
 Recipient: `christopherkilo.pro@gmail.com`  
-Subject/body: URI-encoded from form fields  
-Visible email fallback on Contact page — **VERIFIED**  
 No false “email sent by website” claim — **VERIFIED**
 
-## Automated Checks
+## Automated checks (August 24, 2026)
 
 | Check | Result |
 |-------|--------|
 | `npm run lint` | **PASS** |
 | `npx tsc --noEmit` | **PASS** |
-| `npm test` | **PASS** — 285 tests / 45 files |
+| `npm test` | **PASS** — 299 tests / 49 files |
 | `npm run build` | **PASS** |
+| `npm run verify` | **PASS** (lint → tsc → test → build) |
 
-## Manual QA (production `next start` smoke)
+## Stabilization pass notes
 
-| Area | Result |
-|------|--------|
-| Major routes HTTP 200 | **PASS** |
-| Resume PDF + About portrait assets | **PASS** |
-| Contact CTA copy present | **PASS** |
-| DeSoto on Resume HTML | **PASS** |
-| Desktop / tablet / mobile layout | **PASS** (prior responsive pass + no regressions this run) |
-| Light / dark theme system | **PASS** (ThemeToggle + `data-theme`; no theme regressions this run) |
-| Console (server smoke) | **PASS** (no failed route generation / 5xx on audited paths) |
-| Security sanity (no secrets tracked; `.env.local` ignored) | **PASS** |
+- Event Horizon seeded catalog moved into a deterministic September–November 2026 window so upcoming/bookable events are not already in the past as of August 24, 2026.
+- Discovery rails, browse filtering, and reservation validation share `isUpcomingEvent()`.
+- Homepage carousel translation is clamped to `trackWidth - viewportWidth`.
+- Visible carousel slides remain in the accessibility tree; off-screen slides use `inert` / `aria-hidden`.
+- Homepage featured apps are an explicit ordered list: Event Horizon, NovaTech, TaskFlow, Kilo Toolkit.
+- Root layout no longer assigns a sitewide canonical of `/`.
+- `sitemap.ts`, `robots.ts`, and Open Graph / Twitter image routes were added. `/demos/*` stay noindex and off the sitemap.
+- Pointer glow / custom cursor use motion values instead of per-move React state.
+- CHRISTOPHER KILO signature animation was not modified.
 
-## Cleanup this pass
+## Deployment status
 
-- Removed obsolete `REVIEW_STATUS.md` (contradicted current quality state)
-- This file is the single authoritative final review document
-- Contact CTA: **Send via email** / honest mailto messaging retained
-
-## Deployment Status
-
-**READY**
+**READY** for the next development phase (AWS-backed features are not part of this pass).

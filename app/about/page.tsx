@@ -4,11 +4,13 @@ import { Code2, Cpu, Palette } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ROLES, SITE } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description: `About ${SITE.name} — full-stack developer with a background in IT and web design.`,
-};
+  path: "/about",
+});
 
 const icons = {
   Code2,

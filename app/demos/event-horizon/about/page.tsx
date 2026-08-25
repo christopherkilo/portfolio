@@ -5,6 +5,7 @@ import { Button } from "@/components/demos/event-horizon/ui/Button";
 export const metadata: Metadata = {
   title: "About",
   description: `About ${SITE.name} — a modern event discovery platform.`,
+  robots: { index: false, follow: false },
 };
 
 export default function AboutPage() {

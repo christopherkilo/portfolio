@@ -1,28 +1,30 @@
 # Christopher Kilo Portfolio — Review Package
 
-> **Final quality status:** see [`REVIEW_SUMMARY.md`](./REVIEW_SUMMARY.md) (authoritative). Do not use obsolete status snapshots.
+> **Current quality status:** see [`REVIEW_SUMMARY.md`](./REVIEW_SUMMARY.md). That file is regenerated from the current source, not copied from an older pass.
 
 ## 1. Project name
 Christopher Kilo Portfolio (`portfolio`)
 
 ## 2. Portfolio purpose
 A personal professional portfolio showcasing work across three disciplines:
+
 - Web applications (Event Horizon, NovaTech Solutions, TaskFlow, Kilo Toolkit)
 - Graphic design (Voltline, NightShift, Signal Magazine)
-- IT diagnostics suite (Kilo Toolkit modules: SystemScope, MemoryMedic, NetCheck)
+- IT diagnostics suite (Kilo Toolkit modules)
 
 ## 3. Technology stack
 - Next.js 16 (App Router)
 - React 19
 - TypeScript
-- Tailwind CSS v4 (`@tailwindcss/postcss`)
+- Tailwind CSS v4
 - Framer Motion
 - Lucide React
-- Recharts (toolkit + Signal Magazine charts)
-- Zod (toolkit validation)
-- Vitest (toolkit unit tests)
+- Prisma + PostgreSQL (Event Horizon)
+- Auth.js (Event Horizon)
+- Supabase (TaskFlow)
+- Vitest
 
-No Pages Router. No separate `src/` directory (app-rooted).
+No Pages Router. No separate `src/` directory.
 
 ## 4. Package manager
 npm (`package-lock.json`)
@@ -38,30 +40,35 @@ npm run dev
 ```
 Then open http://localhost:3000
 
-## 7. Production build command
+## 7. Production build / verify
 ```bash
 npm run build
 npm start
+
+# lint → tsc → tests → production build (fails on first error)
+npm run verify
 ```
 
 ## 8. Main folder structure
 ```
-app/                 # App Router pages, layouts, globals.css
+app/                 # App Router pages, layouts, globals.css, sitemap, robots
 components/
-  home/              # Hero, FeaturedProjects carousel, previews
+  home/              # Hero, featured carousel, previews
   layout/            # Navbar, Footer, SiteShell
-  projects/          # Case studies (voltline, nightshift, signal) + shared chrome
-  toolkit/           # Kilo Toolkit UI + providers context
-  ui/                # Card, Button, Shimmer, Carousel, Badge, etc.
-  shared/            # Reveal, CommandPalette, cursor, scroll progress
-contexts/            # Theme context
+  projects/          # Case studies
+  toolkit/           # Kilo Toolkit UI
+  demos/             # Embedded Event Horizon / NovaTech / TaskFlow UI
+  ui/                # Card, Button, Carousel, etc.
+  shared/            # Blueprint background, cursor, command palette
 lib/
-  projectData.ts     # Central project metadata for cards
-  caseStudies.ts     # Web project case-study content + charts
-  constants.ts       # Site identity, nav, tech badges
-  voltline|nightshift|signal/  # Design case-study content
-  toolkit/           # Mock diagnostics providers + tests
-public/              # SVG covers, logos, mock assets
+  projectData.ts     # Project metadata + homepageFeaturedProjectIds
+  caseStudies.ts     # Web case-study content
+  constants.ts       # Site identity
+  seo.ts             # Canonical / Open Graph helpers
+  demos/             # Demo catalogs, discovery, TaskFlow/NovaTech clients
+server/              # Event Horizon Prisma repositories + services
+prisma/              # Schema, migrations, seed
+public/              # SVG covers, logos, resume PDF
 ```
 
 ## 9. Important routes
@@ -69,80 +76,45 @@ public/              # SVG covers, logos, mock assets
 |-------|---------|
 | `/` | Homepage (hero + featured carousel) |
 | `/projects` | Full projects index by category |
-| `/projects/event-horizon` | Web case study (dynamic `[id]`) |
+| `/projects/event-horizon` | Web case study |
 | `/projects/novatech-solutions` | Web case study |
 | `/projects/taskflow` | Web case study |
 | `/projects/voltline` | Brand identity case study |
 | `/projects/nightshift` | Campaign case study |
 | `/projects/signal-magazine` | Editorial case study |
+| `/demos/event-horizon` | Embedded Event Horizon app (noindex) |
+| `/demos/novatech-solutions` | Embedded NovaTech app (noindex) |
+| `/demos/taskflow` | Embedded TaskFlow app (noindex) |
 | `/toolkit/*` | Kilo Toolkit modules |
-| `/about`, `/contact` | Supporting pages |
+| `/blog`, `/about`, `/resume`, `/contact` | Supporting pages |
 | `/lab` | Redirects permanently to `/projects` |
 
 ## 10. Where project-card data is stored
-`lib/projectData.ts` — `projects` array, categories, `getProjectHref()`, `getHomepageFeaturedProjects()`.
+`lib/projectData.ts` — `projects` array, categories, `homepageFeaturedProjectIds`, `getHomepageFeaturedProjects()`.
 
 Web long-form case studies: `lib/caseStudies.ts` consumed by `app/projects/[id]/page.tsx`.
 
-## 11. Where the homepage carousel is implemented
-- `components/home/FeaturedProject.tsx` — four featured web applications
-- `components/ui/Carousel.tsx` — motion carousel
-- `components/ui/Card.tsx` — shared `ProjectCard` (`carousel` + `grid` variants)
+## 11. Homepage carousel
+- `components/home/FeaturedProject.tsx` — four featured software applications
+- `components/ui/Carousel.tsx` — motion carousel with clamped end-of-track translation
+- `components/ui/Card.tsx` — shared `ProjectCard`
 
-Homepage wiring: `app/page.tsx`
-Projects page grid: `app/projects/page.tsx` (same `ProjectCard`)
+Graphic design remains on `/projects` and dedicated case-study routes. It is not required on the homepage carousel.
 
-## 12. Where the hero code panels and floating labels are implemented
-`components/home/Hero.tsx`
-- Code panels: terminal, editor.tsx, diagnostics, status chip
-- Floating labels: typed `floatingLabels` slot map with collision-safe gutters
+## 12. Hero name animation
+`components/home/Hero.tsx` / `components/home/SignatureName.tsx`
 
-## 13. Where the shimmer effect is implemented
-- Component: `components/ui/Shimmer.tsx`
-- Styles: `app/globals.css` (`.shimmer-host`, `.shimmer-beam`, `.shimmer-beam--active`)
-- Used on GitHub card buttons and primary GitHub CTAs via `Button` / card wrappers
+The traveling yellow shimmer and KILO’s permanent electric-yellow end state are intentional. Do not treat that as a defect.
 
-## 14. Known issues / review focus
-Please verify (do not assume fixed without checking the running app):
+## 13. Environment variables
+See `.env.example`. Copy to `.env.local` and fill real values there only.
 
-1. Web project cards previously failed to open (Turbopack root / module resolution was implicated)
-2. Project routes and slugs should match `projectData` + `caseStudies` / static design routes
-3. Homepage should contain **one** featured carousel with **one** project from each category
-4. Homepage cards should be fully clickable
-5. Small GitHub buttons should appear when `project.github` exists
-6. GitHub buttons should retain electric-yellow hover shimmer
-7. Floating labels around hero code panels must never cover code text
-8. Responsive behavior across desktop / tablet / mobile
-9. TypeScript, hydration, and console errors
-10. Lint currently reports React hooks/`setState`-in-effect issues (see `REVIEW_STATUS.md`)
+Demos are embedded in this Next.js app. They do not require `localhost:3001`, `localhost:3002`, or `localhost:3003`.
 
-## 15. Simulated or placeholder content
-- Design case studies (Voltline, NightShift, Signal) use composed SVG/CSS mockups; many image paths are replaceable assets under `public/projects/*/images|mockups`
-- Kilo Toolkit uses mock providers (`lib/toolkit/providers/mock-providers.ts`) — Demo Mode diagnostics, not live hardware
-- Web demos (Event Horizon / NovaTech / TaskFlow) are separate local apps; portfolio links to `localhost:3001–3003` when those demos run
-- Contact form is UI-only (no backend mailer)
-- About portrait uses a placeholder asset when present under `public/about/`
-
-## 16. Environment variables
-No `.env` files are required to run the portfolio as packaged.
-
-Optional (documented in `.env.example`):
-```
-NEXT_PUBLIC_SITE_URL=
-NEXT_PUBLIC_CONTACT_EMAIL=
-```
-Site metadata currently uses a hardcoded `metadataBase` in `app/layout.tsx`. Public contact email / social URLs live in `lib/constants.ts`.
-
-## 17. Intentionally excluded from this review ZIP
-- `node_modules/`
-- `.next/`
-- `.git/`
-- `.vercel/`, `.turbo/`, coverage, dist/build/out
-- `.env*` (none present in source; secrets pattern excluded)
-- `.DS_Store`, logs, `*.tsbuildinfo`
-- `.vscode/`
-- Nested review/output folders
-- External sibling demo apps (`event-horizon`, `novatech-solutions`, `taskflow` on Desktop) — not part of this repo
+## 14. Intentionally excluded from review ZIPs
+- `node_modules/`, `.next/`, `.git/`
+- `.env*` secrets (keep `.env.example`)
+- caches, logs, coverage, OS junk files
 
 ## Upload instruction
-Upload `christopher-kilo-portfolio-review.zip` to ChatGPT and ask it to review the codebase, routing, responsiveness, accessibility, and visual consistency.
+Upload the latest `christopher-kilo-portfolio-gpt-review-*.zip` and ask for a review of routing, responsiveness, accessibility, demo correctness, and visual consistency.

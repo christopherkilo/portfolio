@@ -17,6 +17,7 @@ import {
   getRelatedProject,
 } from "@/lib/blog";
 import { SITE } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -32,9 +33,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return { title: "Article" };
 
   return {
-    title: post.title,
-    description: post.description,
-    alternates: { canonical: post.href },
+    ...pageMetadata({
+      title: post.title,
+      description: post.description,
+      path: post.href,
+      type: "article",
+    }),
     openGraph: {
       type: "article",
       url: `${SITE.url}${post.href}`,

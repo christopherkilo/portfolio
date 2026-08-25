@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -14,6 +15,16 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  clampCarouselIndex,
+  clampCarouselOffset,
+  getCarouselAnnouncement,
+  getCarouselDestination,
+  getCarouselStride,
+  getMaxCarouselIndex,
+  getMaxCarouselOffset,
+  getVisibleCarouselIndices,
+} from "@/lib/carouselMetrics";
 import { cn } from "@/lib/utils";
 
 type CarouselProps = {
@@ -24,6 +35,7 @@ type CarouselProps = {
 };
 
 const DRAG_THRESHOLD = 48;
+const GAP = 24;
 
 export function Carousel({
   children,
@@ -32,11 +44,14 @@ export function Carousel({
   autoPlayMs = 4200,
 }: CarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [paused, setPaused] = useState(false);
   const [itemWidth, setItemWidth] = useState(340);
+  const [viewportWidth, setViewportWidth] = useState(0);
+  const [trackWidth, setTrackWidth] = useState(0);
   const x = useMotionValue(0);
   const dragStartX = useRef(0);
   const scrollStart = useRef(0);
@@ -46,6 +61,11 @@ export function Carousel({
   const didDrag = useRef(false);
   const activePointer = useRef<number | null>(null);
   const resumeTimer = useRef<number | null>(null);
+  const indexRef = useRef(0);
+
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
 
   const clearResumeTimer = useCallback(() => {
     if (resumeTimer.current != null) {
@@ -57,37 +77,62 @@ export function Carousel({
   useEffect(() => () => clearResumeTimer(), [clearResumeTimer]);
 
   const count = children.length;
-  const gap = 24;
+  const stride = getCarouselStride(itemWidth, GAP);
+  const maxOffset = getMaxCarouselOffset(trackWidth, viewportWidth);
+  const maxIndex = getMaxCarouselIndex(maxOffset, stride);
+  const clampedIndex = Math.min(index, maxIndex);
 
   const measure = useCallback(() => {
     const track = trackRef.current;
-    if (!track) return;
-    const first = track.querySelector<HTMLElement>("[data-carousel-item]");
+    const viewport = viewportRef.current;
+    if (!track || !viewport) return;
+    const items = [
+      ...track.querySelectorAll<HTMLElement>("[data-carousel-item]"),
+    ];
+    const first = items[0];
     if (first) {
-      setItemWidth(first.offsetWidth + gap);
+      setItemWidth(first.offsetWidth);
     }
-  }, []);
+    const measuredTrack = items.reduce(
+      (sum, el, i) => sum + el.offsetWidth + (i > 0 ? GAP : 0),
+      0,
+    );
+    setTrackWidth(measuredTrack);
+    setViewportWidth(viewport.clientWidth);
+    const nextStride = getCarouselStride(
+      first?.offsetWidth ?? itemWidth,
+      GAP,
+    );
+    const nextMaxOffset = getMaxCarouselOffset(
+      measuredTrack,
+      viewport.clientWidth,
+    );
+    const nextMaxIndex = getMaxCarouselIndex(nextMaxOffset, nextStride);
+    const nextIndex = Math.min(indexRef.current, nextMaxIndex);
+    x.set(getCarouselDestination(nextIndex, nextStride, nextMaxOffset));
+  }, [itemWidth, x]);
 
   useEffect(() => {
     measure();
+    const viewport = viewportRef.current;
+    const observer =
+      typeof ResizeObserver !== "undefined" && viewport
+        ? new ResizeObserver(() => measure())
+        : null;
+    if (observer && viewport) observer.observe(viewport);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [measure, children]);
-
-  const clampIndex = useCallback(
-    (value: number) => {
-      if (count <= 1) return 0;
-      return ((value % count) + count) % count;
-    },
-    [count],
-  );
 
   const scrollToIndex = useCallback(
     (next: number, withMomentum = false) => {
-      const target = clampIndex(next);
+      const target = clampCarouselIndex(next, maxIndex);
       setIndex(target);
-      const destination = -target * itemWidth;
-      if (reducedMotion) {
+      const destination = getCarouselDestination(target, stride, maxOffset);
+      if (reducedMotion || maxIndex <= 0) {
         x.set(destination);
         return;
       }
@@ -99,30 +144,29 @@ export function Carousel({
         ease: [0.22, 1, 0.36, 1],
       });
     },
-    [clampIndex, itemWidth, reducedMotion, x],
+    [maxIndex, maxOffset, reducedMotion, stride, x],
   );
 
   useEffect(() => {
-    if (reducedMotion || paused || isDragging || count <= 1) return;
+    if (reducedMotion || paused || isDragging || maxIndex <= 0) return;
+    if (clampedIndex >= maxIndex) return;
     const id = window.setInterval(() => {
-      scrollToIndex(index + 1);
+      scrollToIndex(clampedIndex + 1);
     }, autoPlayMs);
     return () => window.clearInterval(id);
   }, [
     autoPlayMs,
-    count,
-    index,
+    clampedIndex,
     isDragging,
+    maxIndex,
     paused,
     reducedMotion,
     scrollToIndex,
   ]);
 
   function onPointerDown(e: React.PointerEvent) {
-    // Ignore non-primary buttons; let dedicated controls receive clean clicks
     if (e.button !== 0) return;
     const target = e.target as HTMLElement | null;
-    // Card overlay links must still allow swipe; exclude only real controls.
     if (
       target?.closest(
         "button, input, textarea, select, [data-no-drag], [role='button']",
@@ -151,8 +195,6 @@ export function Carousel({
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     }
 
-    // Don't move the track until we've crossed the drag threshold —
-    // keeps taps feeling like clicks.
     if (!didDrag.current) return;
 
     const now = performance.now();
@@ -161,7 +203,7 @@ export function Carousel({
     velocity.current = dx / dt;
     lastX.current = e.clientX;
     lastTime.current = now;
-    x.set(scrollStart.current + delta);
+    x.set(clampCarouselOffset(scrollStart.current + delta, maxOffset));
   }
 
   function onPointerUp(e: React.PointerEvent) {
@@ -174,11 +216,10 @@ export function Carousel({
     if (didDrag.current) {
       const current = x.get();
       const projected = current + velocity.current * 180;
-      const rawIndex = Math.round(-projected / itemWidth);
+      const rawIndex = Math.round(-projected / stride);
       scrollToIndex(rawIndex, true);
     }
 
-    // Resume autoplay after a short idle so touch browsing isn't fighty
     clearResumeTimer();
     resumeTimer.current = window.setTimeout(() => {
       setPaused(false);
@@ -187,7 +228,6 @@ export function Carousel({
   }
 
   function onClickCapture(e: React.MouseEvent) {
-    // After a real drag, suppress the synthetic click so cards don't navigate mid-swipe
     if (didDrag.current) {
       e.preventDefault();
       e.stopPropagation();
@@ -195,7 +235,24 @@ export function Carousel({
     }
   }
 
-  const progress = count > 0 ? ((index + 1) / count) * 100 : 0;
+  const offset = getCarouselDestination(clampedIndex, stride, maxOffset);
+  const visibleList = useMemo(
+    () =>
+      getVisibleCarouselIndices({
+        count,
+        itemWidth,
+        gap: GAP,
+        offset,
+        viewportWidth: viewportWidth || itemWidth,
+      }),
+    [count, itemWidth, offset, viewportWidth],
+  );
+  const announcement = getCarouselAnnouncement(visibleList, count);
+  const atStart = clampedIndex <= 0;
+  const atEnd = clampedIndex >= maxIndex;
+
+  const progress =
+    maxIndex > 0 ? ((clampedIndex + 1) / (maxIndex + 1)) * 100 : 100;
 
   return (
     <div
@@ -224,27 +281,29 @@ export function Carousel({
           <button
             type="button"
             aria-label={`Previous ${label}`}
-            onClick={() => scrollToIndex(index - 1)}
-            className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            disabled={atStart}
+            onClick={() => scrollToIndex(clampedIndex - 1)}
+            className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-white/10 disabled:hover:text-text"
           >
             <ChevronLeft className="size-4" />
           </button>
           <button
             type="button"
             aria-label={`Next ${label}`}
-            onClick={() => scrollToIndex(index + 1)}
-            className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            disabled={atEnd}
+            onClick={() => scrollToIndex(clampedIndex + 1)}
+            className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl transition hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-white/10 disabled:hover:text-text"
           >
             <ChevronRight className="size-4" />
           </button>
         </div>
       </div>
 
-      <div className="overflow-hidden">
+      <div ref={viewportRef} className="overflow-hidden">
         <motion.div
           ref={trackRef}
           className="flex cursor-grab touch-pan-y active:cursor-grabbing"
-          style={{ x, gap }}
+          style={{ x, gap: GAP }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -260,7 +319,6 @@ export function Carousel({
               key={i}
               data-carousel-item
               className="shrink-0"
-              aria-hidden={i !== index ? true : undefined}
               role="group"
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${count}`}
@@ -272,7 +330,7 @@ export function Carousel({
       </div>
 
       <p className="sr-only" aria-live="polite">
-        Slide {index + 1} of {count}
+        {announcement}
       </p>
     </div>
   );

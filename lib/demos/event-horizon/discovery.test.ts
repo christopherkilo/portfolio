@@ -32,7 +32,7 @@ describe("event horizon discovery", () => {
     expect(neon).toBeTruthy();
     const label = getTimingLabel(
       neon!,
-      Date.parse("2026-08-04T18:00:00-05:00"),
+      Date.parse("2026-09-15T18:00:00-05:00"),
     );
     expect(label).toBeTruthy();
   });

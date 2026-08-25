@@ -15,6 +15,7 @@ import { CtaBand } from "@/components/demos/novatech/home/CtaBand";
 export const metadata: Metadata = {
   title: "About",
   description: `How the fictional ${SITE.name} team approaches discovery, communication, documentation, and phased recommendations.`,
+  robots: { index: false, follow: false },
 };
 
 export default function AboutPage() {

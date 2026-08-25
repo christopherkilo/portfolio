@@ -1,11 +1,12 @@
-# Premium Developer Portfolio
+# Christopher Kilo — Portfolio
 
-Production-ready portfolio built with Next.js (App Router), TypeScript, Tailwind CSS, Framer Motion, and Lucide React.
+Production Next.js App Router portfolio with embedded software demos, case studies, graphic design work, and Kilo Toolkit.
 
 ## Getting started
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
@@ -16,69 +17,109 @@ npm run build
 npm start
 ```
 
-### Environment setup
+### Quality gates
 
-1. Copy `.env.example` to `.env.local`
-2. Fill real values in `.env.local` only (this file is gitignored)
-3. Never commit secrets into `.env.example` or the repository
+```bash
+npm run verify
+```
 
-NovaTech upcoming / live integrations (values only in `.env.local`):
+Runs, in order, and stops on the first failure:
 
-| Variable | Purpose | Source |
-|----------|---------|--------|
-| `NEXT_PUBLIC_APP_URL` | Public app URL | Local or deployed origin |
-| `HUBSPOT_ACCESS_TOKEN` | HubSpot Private App | HubSpot Private Apps |
-| `HUBSPOT_PIPELINE_ID` / `HUBSPOT_DEAL_STAGE_ID` | Deal pipeline/stage | HubSpot deal settings |
-| `RESEND_API_KEY` | Transactional email | Resend dashboard |
-| `NOVATECH_FROM_EMAIL` / `NOVATECH_STAFF_EMAIL` | From + staff notify | Resend + your inbox |
-| `TURNSTILE_SECRET_KEY` | Spam protection (server) | Cloudflare Turnstile |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Spam protection (client) | Cloudflare Turnstile |
+1. `npm run lint`
+2. `npx tsc --noEmit`
+3. `npm test`
+4. `npm run build`
 
-See `NOVATECH_INTEGRATION_SETUP.md` and `NOVATECH_BACKEND_ARCHITECTURE.md`.
+Individual commands remain available if you need a narrower check.
 
-TaskFlow Supabase env (values only in `.env.local`):
+## Embedded demos
+
+All three software applications live in this repo under `/demos/*`. They do **not** require separate localhost ports.
+
+| Application | Route | Persistence / services |
+| --- | --- | --- |
+| Event Horizon | `/demos/event-horizon` | PostgreSQL + Prisma + Auth.js |
+| NovaTech Solutions | `/demos/novatech-solutions` | HubSpot, Resend, Cloudflare Turnstile |
+| TaskFlow | `/demos/taskflow` | Supabase (Auth, Postgres/RLS, Realtime, Storage) |
+| Kilo Toolkit | `/toolkit` | Client-side simulated diagnostics |
+
+Copy `.env.example` → `.env.local` and fill only the services you need locally. Never commit secrets.
+
+### Event Horizon
+
+Requires PostgreSQL for browse, favorites, and reservations:
+
+- `DATABASE_URL` / `DIRECT_DATABASE_URL`
+- `AUTH_SECRET`
+- Google and/or GitHub OAuth credentials (`AUTH_GOOGLE_*`, optional `AUTH_GITHUB_*`)
+- `NEXT_PUBLIC_APP_URL=http://localhost:3000`
+
+Then:
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+```
+
+See `app/demos/event-horizon/README.md`.
+
+### NovaTech Solutions
+
+Optional live inquiry pipeline (values only in `.env.local`):
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_APP_URL` | Public origin |
+| `HUBSPOT_ACCESS_TOKEN` | HubSpot Private App |
+| `HUBSPOT_PIPELINE_ID` / `HUBSPOT_DEAL_STAGE_ID` | Deal pipeline/stage |
+| `RESEND_API_KEY` | Transactional email |
+| `NOVATECH_FROM_EMAIL` / `NOVATECH_STAFF_EMAIL` | From + staff notify |
+| `TURNSTILE_SECRET_KEY` / `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Spam protection |
+
+See `NOVATECH_INTEGRATION_SETUP.md`.
+
+### TaskFlow
 
 | Variable | Purpose |
 |----------|---------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser publishable key (RLS-protected) |
-| `SUPABASE_SECRET_KEY` | Server-only secret (never commit) |
+| `SUPABASE_SECRET_KEY` | Server-only secret (never expose to the client) |
 
-See `TASKFLOW_INTEGRATION_SETUP.md` and `TASKFLOW_AUTHENTICATION.md`.
-
-Local OAuth callback used by the app:
+Realtime presence, conflict handling, and attachments use this same Supabase project. OAuth callback:
 
 `http://localhost:3000/auth/callback`
 
-(or `{NEXT_PUBLIC_APP_URL}/auth/callback`). Production must allowlist the deployed origin’s `/auth/callback` in Supabase — never only localhost.
+See `TASKFLOW_INTEGRATION_SETUP.md`.
 
 ## Customize
 
 | What | Where |
 | --- | --- |
 | Name, links, tagline | `lib/constants.ts` |
-| Projects (web + design + toolkit modules) | `lib/projectData.ts` |
+| Projects + homepage featured IDs | `lib/projectData.ts` |
 | Motion tokens | `lib/animation.ts` |
 | Theme colors | `app/globals.css` |
 | Project images | `public/projects/` |
-| Resume PDF | `public/Christopher_Kilo_Resume.pdf` (regenerate: `python3 scripts/generate-resume-pdf.py`) |
+| Resume PDF | `public/Christopher_Kilo_Resume.pdf` |
 
 ## Pages
 
-- `/` — Home (hero, featured web apps, about, contact)
-- `/projects` — Web applications + graphic design grids (shared `ProjectCard`)
-- `/toolkit/*` — Kilo Toolkit diagnostics suite
-- `/about` — Roles and biography
-- `/contact` — Links + contact form
-- `/lab` — Permanent redirect → `/projects`
+- `/` — Home (hero, featured applications carousel, writing, about, contact)
+- `/projects` — Featured applications, Kilo Toolkit, graphic design
+- `/projects/[id]` — Web case studies (Event Horizon, NovaTech, TaskFlow)
+- `/projects/voltline`, `/projects/nightshift`, `/projects/signal-magazine` — Design case studies
+- `/blog`, `/blog/[slug]` — Writing
+- `/toolkit` — Kilo Toolkit diagnostics suite
+- `/about`, `/resume`, `/contact`
+- `/demos/event-horizon`, `/demos/novatech-solutions`, `/demos/taskflow` — Embedded apps (noindex)
 
 ## Features
 
-- Sticky nav + animated mobile menu
-- Command palette (`⌘K` / `Ctrl+K`)
-- Scroll progress bar
-- Blueprint background with subtle motion
-- Drag / snap / autoplay project carousels
-- Shared 3D tilt `ProjectCard` (carousel + grid variants)
-- Kilo Toolkit interactive diagnostics
+- Sticky nav, command palette (`⌘K` / `Ctrl+K`), theme toggle
+- Homepage featured carousel with clamped translation and accessible slides
+- Blueprint background + custom cursor (motion values, reduced-motion aware)
+- Embedded full-stack demos with real auth and persistence where configured
+- Sitemap, robots, and per-route canonical metadata
 - Reduced-motion support, focus states, semantic HTML

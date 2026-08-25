@@ -15,7 +15,8 @@
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio",
     "prisma:reset": "prisma migrate reset",
-    "taskflow:seed": "tsx scripts/taskflow/seed-demo.ts"
+    "taskflow:seed": "tsx scripts/taskflow/seed-demo.ts",
+    "verify": "npm run lint && npx tsc --noEmit && npm test && npm run build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

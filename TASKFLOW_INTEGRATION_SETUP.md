@@ -67,9 +67,20 @@ Uses the Supabase **secret** key from `.env.local`. Idempotent (fixed UUIDs + up
 
 Do not ship with only localhost redirects configured if the app is deployed.
 
-## Future integrations (comments only)
+## Current integrations
 
-`.env.local` / `.env.example` may include commented stubs for realtime, storage, email, and notifications. Do not fill those until later phases.
+TaskFlow already uses the configured Supabase project for:
+
+- Authentication (Google OAuth + sessions)
+- Postgres with Row Level Security
+- Realtime / presence
+- Storage attachments
+
+Those features do not require extra environment variables beyond the Supabase keys above.
+
+## Optional later providers
+
+`.env.example` may include commented stubs for standalone email or push. Do not fill those until a later phase. They are not required for the current demo.
 
 ## Related docs
 

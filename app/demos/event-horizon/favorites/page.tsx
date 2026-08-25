@@ -4,6 +4,7 @@ import { FavoritesClient } from "@/components/demos/event-horizon/events/Favorit
 export const metadata: Metadata = {
   title: "Favorites",
   description: "Your saved events on Event Horizon.",
+  robots: { index: false, follow: false },
 };
 
 export default function FavoritesPage() {

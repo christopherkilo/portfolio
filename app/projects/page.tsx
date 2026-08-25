@@ -8,12 +8,14 @@ import {
   type Project,
   type ProjectCategory,
 } from "@/lib/projectData";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Projects",
   description:
     "Featured applications, Kilo Toolkit diagnostics utilities, and graphic design work by Christopher Kilo.",
-};
+  path: "/projects",
+});
 
 const sections: {
   category: ProjectCategory;

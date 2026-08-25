@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { ToolkitShell } from "@/components/toolkit/ToolkitShell";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Kilo Toolkit",
   description:
     "A polished simulated IT diagnostics suite covering system health, memory analysis, and network troubleshooting.",
-};
+  path: "/toolkit",
+});
 
 const themeBootScript = `
 try {

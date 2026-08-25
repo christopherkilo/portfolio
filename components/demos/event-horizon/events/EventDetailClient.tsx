@@ -8,6 +8,7 @@ import {
   formatTicketPrice,
   getEventPriceLabel,
   getInterestScore,
+  isUpcomingEvent,
   type EventItem,
   type TicketType,
 } from "@/lib/demos/event-horizon/eventData";
@@ -105,6 +106,7 @@ export function EventDetailClient({ event }: { event: EventItem }) {
     : 0;
 
   const reservationsClosed =
+    !isUpcomingEvent(event) ||
     event.status !== "upcoming" ||
     event.ticketTypes.every(
       (ticket) =>

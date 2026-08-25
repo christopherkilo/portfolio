@@ -204,6 +204,14 @@ export const categoryDescriptions: Record<ProjectCategory, string> = {
 export const HOMEPAGE_FEATURED_DESCRIPTION =
   "Four complete software applications demonstrating consumer platforms, business automation, collaborative systems, and professional IT utilities.";
 
+/** Explicit homepage carousel order — not inferred from category or `featured`. */
+export const homepageFeaturedProjectIds = [
+  "event-horizon",
+  "novatech-solutions",
+  "taskflow",
+  "kilo-toolkit",
+] as const;
+
 function isPortfolioVisible(project: Project): boolean {
   return project.portfolioVisible !== false;
 }
@@ -225,9 +233,9 @@ export function getFeaturedProject(): Project {
  * Homepage featured strip — Event Horizon, NovaTech, TaskFlow, and Kilo Toolkit.
  */
 export function getHomepageFeaturedProjects(): Project[] {
-  const web = getPortfolioProjectsByCategory("web");
-  const toolkit = getHomepageToolkitProject();
-  return toolkit ? [...web, toolkit] : web;
+  return homepageFeaturedProjectIds
+    .map((id) => getProjectById(id))
+    .filter((project): project is Project => Boolean(project));
 }
 
 /** Portfolio-visible Kilo Toolkit card for dedicated sections. */

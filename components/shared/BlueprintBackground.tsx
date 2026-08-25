@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useMemo } from "react";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from "framer-motion";
 
 type Particle = {
   id: number;
@@ -14,7 +19,10 @@ type Particle = {
 
 export function BlueprintBackground() {
   const reducedMotion = useReducedMotion();
-  const [pointer, setPointer] = useState({ x: 50, y: 35 });
+  const pointerX = useMotionValue(50);
+  const pointerY = useMotionValue(35);
+  const glowLeft = useTransform(pointerX, (value) => `${value}%`);
+  const glowTop = useTransform(pointerY, (value) => `${value}%`);
 
   const particles = useMemo<Particle[]>(
     () =>
@@ -32,14 +40,12 @@ export function BlueprintBackground() {
   useEffect(() => {
     if (reducedMotion) return;
     const onMove = (e: MouseEvent) => {
-      setPointer({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      });
+      pointerX.set((e.clientX / window.innerWidth) * 100);
+      pointerY.set((e.clientY / window.innerHeight) * 100);
     };
     window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
-  }, [reducedMotion]);
+  }, [pointerX, pointerY, reducedMotion]);
 
   return (
     <div
@@ -104,10 +110,10 @@ export function BlueprintBackground() {
         style={{
           background:
             "radial-gradient(circle, rgba(255,255,255,0.045), transparent 70%)",
-          left: `${pointer.x}%`,
-          top: `${pointer.y}%`,
-          translateX: "-50%",
-          translateY: "-50%",
+          left: glowLeft,
+          top: glowTop,
+          x: "-50%",
+          y: "-50%",
         }}
         animate={
           reducedMotion ? undefined : { opacity: [0.08, 0.16, 0.08] }

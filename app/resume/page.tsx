@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/BrandIcons";
 import { SITE } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 import {
   resumeCertifications,
   resumeEducation,
@@ -16,13 +17,12 @@ import {
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Resume",
-  description: `${SITE.name} — ${SITE.title}. Skills, selected projects, experience, education, and downloadable resume.`,
-  openGraph: {
-    title: `Resume · ${SITE.name}`,
-    description: `${SITE.title} based in ${resumeMeta.location}. Skills, selected projects, experience, and downloadable PDF.`,
-    url: "/resume",
-  },
+  ...pageMetadata({
+    title: "Resume",
+    description: `${SITE.name} — ${SITE.title}. Skills, selected projects, experience, education, and downloadable resume.`,
+    path: "/resume",
+    ogTitle: `Resume · ${SITE.name}`,
+  }),
 };
 
 function Eyebrow({ children }: { children: React.ReactNode }) {

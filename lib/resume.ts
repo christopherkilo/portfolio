@@ -68,6 +68,7 @@ export const resumeExperience = [
   {
     role: "Customer Service Representative",
     employer: "Circle K",
+    location: "Prosper, TX",
     dates: "Aug 2022 – Nov 2023",
     summary:
       "Supported customers in a high-volume retail environment—resolving issues quickly, balancing priorities, and collaborating to keep service quality high.",
@@ -77,11 +78,13 @@ export const resumeExperience = [
 export const resumeEducation = [
   {
     school: "Davis Technical College",
+    location: "Kaysville, UT",
     credential: "Web & Graphic Design",
     dates: "July 2025 – May 2026",
   },
   {
     school: "Clearfield Job Corps Center",
+    location: "Salt Lake City, UT",
     credential: "Computer Technician Program",
     dates: "August 2024 – June 2025",
   },

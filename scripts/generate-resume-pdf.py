@@ -67,15 +67,18 @@ PROJECTS = [
 ]
 
 EXPERIENCE = (
-    "Customer Service Representative  |  Circle K",
+    "Customer Service Representative  |  Circle K  |  Prosper, TX",
     "Aug 2022 - Nov 2023",
     "Supported customers in a high-volume retail environment - resolving issues quickly, "
     "balancing priorities, and collaborating to keep service quality high.",
 )
 
 EDUCATION = [
-    ("Davis Technical College", "Web & Graphic Design | July 2025 - May 2026"),
-    ("Clearfield Job Corps Center", "Computer Technician Program | August 2024 - June 2025"),
+    ("Davis Technical College  |  Kaysville, UT", "Web & Graphic Design | July 2025 - May 2026"),
+    (
+        "Clearfield Job Corps Center  |  Salt Lake City, UT",
+        "Computer Technician Program | August 2024 - June 2025",
+    ),
 ]
 
 # Intentional wrap: keep the full cabling credential readable on its own line.

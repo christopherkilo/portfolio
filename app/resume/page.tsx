@@ -220,7 +220,10 @@ export default function ResumePage() {
                     <h3 className="font-display text-lg font-semibold text-text">
                       {job.role}
                     </h3>
-                    <p className="mt-0.5 text-sm text-secondary">{job.employer}</p>
+                    <p className="mt-0.5 text-sm text-secondary">
+                      {job.employer}
+                      <span className="text-muted"> · {job.location}</span>
+                    </p>
                   </div>
                   <p className="font-mono text-xs uppercase tracking-[0.12em] text-muted">
                     {job.dates}
@@ -250,8 +253,11 @@ export default function ResumePage() {
                     {item.school}
                   </h3>
                   <p className="mt-1 text-sm text-secondary">
-                    {item.credential}
-                    <span className="text-muted"> · {item.dates}</span>
+                    {item.location}
+                    <span className="text-muted">
+                      {" "}
+                      · {item.credential} · {item.dates}
+                    </span>
                   </p>
                 </div>
               ))}

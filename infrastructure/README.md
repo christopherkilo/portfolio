@@ -2,7 +2,7 @@
 
 CDK TypeScript app for the Christopher Kilo portfolio. This is a small **dev / learning** AWS account, not a production environment.
 
-This phase is foundation only. No Lambda, DynamoDB, SQS, Step Functions, ECS, ECR, API Gateway, VPC, NAT Gateway, load balancer, database, Secrets Manager, or CloudWatch alarm resources are defined yet.
+Event Horizon Phase 1 is implemented: **SQS → Lambda → DynamoDB** for externally ingested event records. NovaTech still has no workload resources. Do not deploy until that step is explicitly approved.
 
 ## Local setup
 
@@ -39,7 +39,7 @@ npx cdk deploy EventHorizonDevStack
 npx cdk deploy NovaTechDevStack
 ```
 
-Do not run `cdk bootstrap` or `cdk deploy` until that phase is explicitly approved.
+The CDK environment in `us-east-2` is already bootstrapped. Do not run `cdk deploy` until that step is explicitly approved.
 
 ## Stacks
 
@@ -58,11 +58,13 @@ Use `resourceName(app, resource)` from `lib/naming.ts`:
 {prefix}-{environment}-{app}-{resource}
 ```
 
-Examples (not created in this phase):
+Examples:
 
 - `portfolio-dev-event-horizon-ingestion-queue`
+- `portfolio-dev-event-horizon-ingestion-dlq`
 - `portfolio-dev-event-horizon-external-events`
-- `portfolio-dev-novatech-inquiry-workflow`
+- `portfolio-dev-event-horizon-ingestion-handler`
+- `portfolio-dev-novatech-inquiry-workflow` (not created yet)
 
 ## Tags
 
@@ -89,29 +91,49 @@ Do not tag resources with emails, account IDs, usernames, machine names, or secr
 - Destructive resources must use development-appropriate cleanup behavior where safe (for example, destroy policies for throwaway dev data). Do not copy production retention blindly into this learning environment.
 - Never commit AWS credentials or application secrets.
 
-## Architecture plan (not implemented yet)
+## Architecture
 
-### Event Horizon
-
-Will later demonstrate ECS/Fargate, Docker, SQS, Lambda, and DynamoDB:
+### Event Horizon Phase 1 (implemented, not deployed until approved)
 
 ```
-External event providers
+Manual / future worker
         ↓
-Dockerized ingestion worker
+SQS ingestion queue  →  DLQ after 3 failures
         ↓
-ECS/Fargate task
+Lambda (Node.js 22)
         ↓
+DynamoDB external-events (on-demand, TTL)
+```
+
+This Lambda only consumes SQS messages. It does not call provider APIs, Prisma, or PostgreSQL.
+
+Expected SQS message body:
+
+```json
+{
+  "provider": "ticketmaster",
+  "externalId": "evt-123",
+  "title": "Harbor Lights Festival",
+  "city": "Cleveland",
+  "state": "OH",
+  "startsAt": "2026-09-15T23:00:00.000Z",
+  "sourceUrl": "https://example.com/events/harbor-lights"
+}
+```
+
+Required fields: `provider`, `externalId`, `title`, `startsAt`. The same `provider` + `externalId` overwrites the existing DynamoDB item.
+
+Later phases may add:
+
+```
+Docker worker
+    ↓
+ECS/Fargate
+    ↓
 SQS
-        ↓
-Lambda
-        ↓
-DynamoDB external-event store/cache
-        ↓
-Event Horizon discovery layer
 ```
 
-PostgreSQL / Prisma remains the transactional source of truth for reservations, ticket inventory, and other relational data. Do **not** migrate those responsibilities to DynamoDB. DynamoDB is for externally ingested event records, cache, and deduplication where that access model fits.
+PostgreSQL / Prisma remains the transactional source of truth for reservations, ticket inventory, and other relational data. Do **not** migrate those responsibilities to DynamoDB. DynamoDB is for externally ingested event records, cache, and deduplication.
 
 ### NovaTech
 

@@ -1,14 +1,31 @@
 import * as cdk from "aws-cdk-lib/core";
-import { Template } from "aws-cdk-lib/assertions";
+import { Match, Template } from "aws-cdk-lib/assertions";
 import { EventHorizonDevStack } from "../lib/event-horizon-dev-stack";
 import { NovaTechDevStack } from "../lib/novatech-dev-stack";
 import { DEFAULT_REGION, infraConfig } from "../lib/config";
 import { resourceName } from "../lib/naming";
 
-const FORBIDDEN_RESOURCE_TYPES = [
+const NOVATECH_FORBIDDEN_RESOURCE_TYPES = [
   "AWS::Lambda::Function",
   "AWS::DynamoDB::Table",
   "AWS::SQS::Queue",
+  "AWS::StepFunctions::StateMachine",
+  "AWS::ECS::Cluster",
+  "AWS::ECS::Service",
+  "AWS::ECS::TaskDefinition",
+  "AWS::ECR::Repository",
+  "AWS::ApiGateway::RestApi",
+  "AWS::ApiGatewayV2::Api",
+  "AWS::EC2::VPC",
+  "AWS::EC2::NatGateway",
+  "AWS::ElasticLoadBalancingV2::LoadBalancer",
+  "AWS::RDS::DBInstance",
+  "AWS::RDS::DBCluster",
+  "AWS::SecretsManager::Secret",
+  "AWS::CloudWatch::Alarm",
+] as const;
+
+const EVENT_HORIZON_FORBIDDEN_RESOURCE_TYPES = [
   "AWS::StepFunctions::StateMachine",
   "AWS::ECS::Cluster",
   "AWS::ECS::Service",
@@ -53,6 +70,9 @@ describe("infrastructure foundation", () => {
     expect(resourceName("event-horizon", "ingestion-queue")).toBe(
       "portfolio-dev-event-horizon-ingestion-queue",
     );
+    expect(resourceName("event-horizon", "ingestion-dlq")).toBe(
+      "portfolio-dev-event-horizon-ingestion-dlq",
+    );
     expect(resourceName("event-horizon", "external-events")).toBe(
       "portfolio-dev-event-horizon-external-events",
     );
@@ -96,15 +116,92 @@ describe("infrastructure foundation", () => {
     expect(tagBlob).not.toMatch(/@/);
     expect(tagBlob).not.toMatch(/\b\d{12}\b/);
   });
+});
 
-  it("does not introduce workload AWS resources in this phase", () => {
-    const { eventHorizon, novatech } = synthesizeDevStacks();
-    const types = [
-      ...resourceTypes(Template.fromStack(eventHorizon)),
-      ...resourceTypes(Template.fromStack(novatech)),
-    ];
+describe("EventHorizonDevStack Phase 1 ingestion", () => {
+  const template = Template.fromStack(synthesizeDevStacks().eventHorizon);
 
-    for (const type of FORBIDDEN_RESOURCE_TYPES) {
+  it("creates an on-demand DynamoDB table with provider + externalId and TTL", () => {
+    template.hasResourceProperties("AWS::DynamoDB::Table", {
+      TableName: "portfolio-dev-event-horizon-external-events",
+      BillingMode: "PAY_PER_REQUEST",
+      KeySchema: [
+        { AttributeName: "provider", KeyType: "HASH" },
+        { AttributeName: "externalId", KeyType: "RANGE" },
+      ],
+      AttributeDefinitions: Match.arrayWith([
+        { AttributeName: "provider", AttributeType: "S" },
+        { AttributeName: "externalId", AttributeType: "S" },
+      ]),
+      TimeToLiveSpecification: {
+        AttributeName: "expiresAt",
+        Enabled: true,
+      },
+    });
+    template.hasResource("AWS::DynamoDB::Table", {
+      DeletionPolicy: "Delete",
+      UpdateReplacePolicy: "Delete",
+    });
+  });
+
+  it("creates the ingestion queue, DLQ, and redrive policy", () => {
+    template.hasResourceProperties("AWS::SQS::Queue", {
+      QueueName: "portfolio-dev-event-horizon-ingestion-queue",
+      MessageRetentionPeriod: 4 * 24 * 60 * 60,
+      VisibilityTimeout: 60,
+      RedrivePolicy: {
+        maxReceiveCount: 3,
+      },
+    });
+    template.hasResourceProperties("AWS::SQS::Queue", {
+      QueueName: "portfolio-dev-event-horizon-ingestion-dlq",
+      MessageRetentionPeriod: 14 * 24 * 60 * 60,
+    });
+    expect(template.resourceCountIs("AWS::SQS::Queue", 2));
+  });
+
+  it("creates a Node.js 22 Lambda that reads the table name from the environment", () => {
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "portfolio-dev-event-horizon-ingestion-handler",
+      Runtime: "nodejs22.x",
+      MemorySize: 256,
+      Timeout: 20,
+      Environment: {
+        Variables: {
+          EXTERNAL_EVENTS_TABLE_NAME: "portfolio-dev-event-horizon-external-events",
+        },
+      },
+    });
+  });
+
+  it("maps SQS to Lambda with partial batch failure reporting", () => {
+    template.hasResourceProperties("AWS::Lambda::EventSourceMapping", {
+      BatchSize: 10,
+      FunctionResponseTypes: ["ReportBatchItemFailures"],
+    });
+  });
+
+  it("grants the Lambda DynamoDB PutItem and not a wildcard table policy", () => {
+    const policies = template.findResources("AWS::IAM::Policy");
+    const blob = JSON.stringify(policies);
+    expect(blob).toContain("dynamodb:PutItem");
+    expect(blob).not.toContain("dynamodb:*");
+    expect(blob).not.toContain("Action\":\"*\"");
+  });
+
+  it("does not add out-of-scope expensive Event Horizon resources", () => {
+    const types = resourceTypes(template);
+    for (const type of EVENT_HORIZON_FORBIDDEN_RESOURCE_TYPES) {
+      expect(types).not.toContain(type);
+    }
+  });
+});
+
+describe("NovaTechDevStack", () => {
+  it("still has no workload AWS resources", () => {
+    const template = Template.fromStack(synthesizeDevStacks().novatech);
+    const types = resourceTypes(template);
+    for (const type of NOVATECH_FORBIDDEN_RESOURCE_TYPES) {
       expect(types).not.toContain(type);
     }
   });

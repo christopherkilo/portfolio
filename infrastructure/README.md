@@ -2,7 +2,7 @@
 
 CDK TypeScript app for the Christopher Kilo portfolio. This is a small **dev / learning** AWS account, not a production environment.
 
-Event Horizon Phase 1 is implemented: **SQS → Lambda → DynamoDB** for externally ingested event records. NovaTech still has no workload resources. Do not deploy until that step is explicitly approved.
+Event Horizon Phase 3 adds **Ticketmaster Discovery ingestion** through the existing short-lived Fargate worker. The SQS → Lambda → DynamoDB pipeline is unchanged. NovaTech still has no workload resources.
 
 ## Local setup
 
@@ -39,7 +39,7 @@ npx cdk deploy EventHorizonDevStack
 npx cdk deploy NovaTechDevStack
 ```
 
-The CDK environment in `us-east-2` is already bootstrapped. Do not run `cdk deploy` until that step is explicitly approved.
+The CDK environment in `us-east-2` is already bootstrapped. Deploy named stacks only when that step is explicitly approved.
 
 ## Stacks
 
@@ -63,7 +63,8 @@ Examples:
 - `portfolio-dev-event-horizon-ingestion-queue`
 - `portfolio-dev-event-horizon-ingestion-dlq`
 - `portfolio-dev-event-horizon-external-events`
-- `portfolio-dev-event-horizon-ingestion-handler`
+- `portfolio-dev-event-horizon-ingestion-worker-task`
+- `portfolio-dev-event-horizon-cluster`
 - `portfolio-dev-novatech-inquiry-workflow` (not created yet)
 
 ## Tags
@@ -93,10 +94,14 @@ Do not tag resources with emails, account IDs, usernames, machine names, or secr
 
 ## Architecture
 
-### Event Horizon Phase 1 (implemented, not deployed until approved)
+### Event Horizon Phase 3
+
+Ticketmaster Discovery API v2 is the first real external event provider.
 
 ```
-Manual / future worker
+Ticketmaster Discovery API v2
+        ↓
+ECS/Fargate worker  (manual run, not a service)
         ↓
 SQS ingestion queue  →  DLQ after 3 failures
         ↓
@@ -105,35 +110,62 @@ Lambda (Node.js 22)
 DynamoDB external-events (on-demand, TTL)
 ```
 
-This Lambda only consumes SQS messages. It does not call provider APIs, Prisma, or PostgreSQL.
+The worker talks to **Ticketmaster and SQS only**. It does not write to DynamoDB, query DynamoDB, or touch Prisma/PostgreSQL. Reservations, users, favorites, and ticket inventory stay in PostgreSQL.
 
-Expected SQS message body:
+**Data stores**
+
+- **PostgreSQL / Prisma** remains the source of truth for reservations and ticket inventory.
+- **DynamoDB** is the external event ingestion / discovery store. Ticketmaster records cached there are discovery data, not transactional inventory.
+
+**Provider request (this phase)**
+
+- Endpoint: `https://app.ticketmaster.com/discovery/v2/events.json`
+- Scope: Dallas, TX, United States
+- One page per task (`size=20`), no further pagination
+- Future events only (`startDateTime` = worker UTC now)
+- Conservative usage: at most one normal request per task, well below Ticketmaster's 2 requests/second ceiling
+
+**Secret**
+
+The Ticketmaster Consumer Key is stored outside source control as an SSM Parameter Store SecureString:
+
+```
+/portfolio/dev/event-horizon/ticketmaster-api-key
+```
+
+CDK imports that existing parameter by name. The stack does not create a second parameter, does not own the SecureString, and does not put the value in source, `cdk.json`, `.env`, CloudFormation outputs, or logs. ECS injects it at runtime as `TICKETMASTER_API_KEY` using the task **execution** role (`ssm:GetParameters` on that parameter only). Deleting the stack does not delete the manually created secret.
+
+Worker image path (CDK asset workflow — no dedicated application ECR repository in this phase):
+
+1. CDK builds the worker Docker image from `workers/event-horizon-provider`.
+2. CDK publishes that asset to the **CDK-managed ECR asset repository** created by `cdk bootstrap`.
+3. The Fargate task definition references that asset image.
+
+This phase uses a small VPC because **Fargate tasks require VPC networking**. It uses public subnets only and `natGateways: 0`. The task can receive a public IP to reach Ticketmaster and AWS APIs. There is **no ECS Service**, so Fargate compute is not running continuously.
+
+Normalized SQS message body (optional fields omitted when absent):
 
 ```json
 {
   "provider": "ticketmaster",
-  "externalId": "evt-123",
-  "title": "Harbor Lights Festival",
-  "city": "Cleveland",
-  "state": "OH",
-  "startsAt": "2026-09-15T23:00:00.000Z",
-  "sourceUrl": "https://example.com/events/harbor-lights"
+  "externalId": "Z7r9jZ1Ad8eP8",
+  "title": "Dallas Symphony at the Meyerson",
+  "city": "Dallas",
+  "state": "TX",
+  "startsAt": "2026-09-16T00:30:00.000Z",
+  "sourceUrl": "https://www.ticketmaster.com/event/Z7r9jZ1Ad8eP8",
+  "venueName": "Morton H. Meyerson Symphony Center",
+  "imageUrl": "https://s1.ticketm.net/dam/a/event/hero-2048.jpg",
+  "category": "Music",
+  "genre": "Classical",
+  "latitude": 32.7767,
+  "longitude": -96.797
 }
 ```
 
-Required fields: `provider`, `externalId`, `title`, `startsAt`. The same `provider` + `externalId` overwrites the existing DynamoDB item.
+Required fields: `provider`, `externalId`, `title`, `startsAt`. Optional Ticketmaster fields: `venueName`, `imageUrl`, `category`, `genre`, `latitude`, `longitude`. The same `provider` + `externalId` updates the existing DynamoDB item. `ingestedAt` is set on first write (`if_not_exists`) and preserved on later ingestions; `updatedAt` always moves forward.
 
-Later phases may add:
-
-```
-Docker worker
-    ↓
-ECS/Fargate
-    ↓
-SQS
-```
-
-PostgreSQL / Prisma remains the transactional source of truth for reservations, ticket inventory, and other relational data. Do **not** migrate those responsibilities to DynamoDB. DynamoDB is for externally ingested event records, cache, and deduplication.
+Phase 2 left deterministic `ecs-demo-provider` records in DynamoDB. Those keys remain valid; this phase does not replace the table.
 
 ### NovaTech
 

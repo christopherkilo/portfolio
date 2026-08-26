@@ -1,9 +1,14 @@
 import * as cdk from "aws-cdk-lib/core";
 import { Match, Template } from "aws-cdk-lib/assertions";
-import { EventHorizonDevStack } from "../lib/event-horizon-dev-stack";
+import {
+  EventHorizonDevStack,
+  TICKETMASTER_API_KEY_PARAMETER_NAME,
+} from "../lib/event-horizon-dev-stack";
 import { NovaTechDevStack } from "../lib/novatech-dev-stack";
 import { DEFAULT_REGION, infraConfig } from "../lib/config";
 import { resourceName } from "../lib/naming";
+
+jest.setTimeout(120_000);
 
 const NOVATECH_FORBIDDEN_RESOURCE_TYPES = [
   "AWS::Lambda::Function",
@@ -27,18 +32,16 @@ const NOVATECH_FORBIDDEN_RESOURCE_TYPES = [
 
 const EVENT_HORIZON_FORBIDDEN_RESOURCE_TYPES = [
   "AWS::StepFunctions::StateMachine",
-  "AWS::ECS::Cluster",
   "AWS::ECS::Service",
-  "AWS::ECS::TaskDefinition",
   "AWS::ECR::Repository",
   "AWS::ApiGateway::RestApi",
   "AWS::ApiGatewayV2::Api",
-  "AWS::EC2::VPC",
   "AWS::EC2::NatGateway",
   "AWS::ElasticLoadBalancingV2::LoadBalancer",
   "AWS::RDS::DBInstance",
   "AWS::RDS::DBCluster",
   "AWS::SecretsManager::Secret",
+  "AWS::SSM::Parameter",
   "AWS::CloudWatch::Alarm",
 ] as const;
 
@@ -75,6 +78,9 @@ describe("infrastructure foundation", () => {
     );
     expect(resourceName("event-horizon", "external-events")).toBe(
       "portfolio-dev-event-horizon-external-events",
+    );
+    expect(resourceName("event-horizon", "ingestion-worker-task")).toBe(
+      "portfolio-dev-event-horizon-ingestion-worker-task",
     );
     expect(resourceName("novatech", "inquiry-workflow")).toBe(
       "portfolio-dev-novatech-inquiry-workflow",
@@ -181,10 +187,11 @@ describe("EventHorizonDevStack Phase 1 ingestion", () => {
     });
   });
 
-  it("grants the Lambda DynamoDB PutItem and not a wildcard table policy", () => {
+  it("grants the Lambda DynamoDB UpdateItem and not a wildcard table policy", () => {
     const policies = template.findResources("AWS::IAM::Policy");
     const blob = JSON.stringify(policies);
-    expect(blob).toContain("dynamodb:PutItem");
+    expect(blob).toContain("dynamodb:UpdateItem");
+    expect(blob).not.toContain("dynamodb:PutItem");
     expect(blob).not.toContain("dynamodb:*");
     expect(blob).not.toContain("Action\":\"*\"");
   });
@@ -193,6 +200,103 @@ describe("EventHorizonDevStack Phase 1 ingestion", () => {
     const types = resourceTypes(template);
     for (const type of EVENT_HORIZON_FORBIDDEN_RESOURCE_TYPES) {
       expect(types).not.toContain(type);
+    }
+  });
+
+  it("does not create a dedicated application ECR repository", () => {
+    expect(resourceTypes(template)).not.toContain("AWS::ECR::Repository");
+  });
+
+  it("creates an ECS cluster and Fargate task definition without an ECS service", () => {
+    template.hasResourceProperties("AWS::ECS::Cluster", {
+      ClusterName: "portfolio-dev-event-horizon-cluster",
+    });
+    template.hasResourceProperties("AWS::ECS::TaskDefinition", {
+      Family: "portfolio-dev-event-horizon-ingestion-worker-task",
+      Cpu: "256",
+      Memory: "512",
+      RequiresCompatibilities: ["FARGATE"],
+      NetworkMode: "awsvpc",
+      RuntimePlatform: {
+        CpuArchitecture: "ARM64",
+        OperatingSystemFamily: "LINUX",
+      },
+      ContainerDefinitions: Match.arrayWith([
+        Match.objectLike({
+          Name: "ingestion-worker",
+          Environment: Match.arrayWith([
+            Match.objectLike({ Name: "INGESTION_QUEUE_URL" }),
+            { Name: "EVENT_PROVIDER", Value: "ticketmaster" },
+            { Name: "EVENT_CITY", Value: "Dallas" },
+            { Name: "EVENT_STATE_CODE", Value: "TX" },
+            { Name: "EVENT_COUNTRY_CODE", Value: "US" },
+            { Name: "EVENT_PAGE_SIZE", Value: "20" },
+          ]),
+          Secrets: Match.arrayWith([
+            Match.objectLike({
+              Name: "TICKETMASTER_API_KEY",
+            }),
+          ]),
+        }),
+      ]),
+    });
+    template.resourceCountIs("AWS::ECS::TaskDefinition", 1);
+    expect(resourceTypes(template)).not.toContain("AWS::ECS::Service");
+    expect(resourceTypes(template)).not.toContain("AWS::SSM::Parameter");
+  });
+
+  it("injects the existing Ticketmaster SSM SecureString and scopes retrieval to that parameter", () => {
+    const taskDef = JSON.stringify(template.findResources("AWS::ECS::TaskDefinition"));
+    expect(taskDef).toContain("TICKETMASTER_API_KEY");
+    expect(taskDef).toContain(TICKETMASTER_API_KEY_PARAMETER_NAME);
+    expect(taskDef).not.toMatch(/"Name":"TICKETMASTER_API_KEY","Value":/);
+
+    const policies = template.findResources("AWS::IAM::Policy");
+    const executionPolicies = Object.fromEntries(
+      Object.entries(policies).filter(
+        ([id, policy]) =>
+          id.includes("ExecutionRole") || JSON.stringify(policy).includes("GetParameters"),
+      ),
+    );
+    const executionBlob = JSON.stringify(executionPolicies);
+    expect(executionBlob).toContain("ssm:GetParameters");
+    expect(executionBlob).toContain(TICKETMASTER_API_KEY_PARAMETER_NAME);
+    expect(executionBlob).not.toContain("ssm:GetParameter\"");
+    expect(executionBlob).not.toContain("ssm:DescribeParameters");
+    expect(executionBlob).not.toContain("ssm:GetParameterHistory");
+    expect(executionBlob).not.toContain("ssm:*");
+    expect(executionBlob).not.toContain("kms:*");
+    expect(executionBlob).not.toContain("dynamodb");
+
+    const outputs = JSON.stringify(template.toJSON().Outputs ?? {});
+    expect(outputs).not.toContain("TICKETMASTER_API_KEY");
+  });
+
+  it("gives the worker task role SendMessage only and no DynamoDB or SSM access", () => {
+    const policies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(
+        ([id, policy]) =>
+          id.includes("IngestionWorkerTask") &&
+          !id.includes("ExecutionRole") &&
+          JSON.stringify(policy).includes("sqs:SendMessage"),
+      ),
+    );
+    const blob = JSON.stringify(policies);
+    expect(blob).toContain("sqs:SendMessage");
+    expect(blob).not.toContain("sqs:*");
+    expect(blob).not.toContain("dynamodb");
+    expect(blob).not.toContain("lambda:");
+    expect(blob).not.toContain("ssm:");
+    expect(blob).not.toContain("kms:");
+  });
+
+  it("uses a public-only VPC with no NAT Gateway", () => {
+    template.resourceCountIs("AWS::EC2::VPC", 1);
+    expect(resourceTypes(template)).not.toContain("AWS::EC2::NatGateway");
+    const subnets = template.findResources("AWS::EC2::Subnet");
+    expect(Object.keys(subnets).length).toBeGreaterThan(0);
+    for (const subnet of Object.values(subnets)) {
+      expect(subnet.Properties?.MapPublicIpOnLaunch).toBe(true);
     }
   });
 });

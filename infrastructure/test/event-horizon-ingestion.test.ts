@@ -4,6 +4,7 @@ import {
   normalizeExternalEvent,
 } from "../lambda/event-horizon-ingestion/normalize";
 import {
+  buildExternalEventUpdate,
   processSqsBatch,
   type IngestionWriter,
 } from "../lambda/event-horizon-ingestion/handler";
@@ -76,11 +77,59 @@ describe("normalizeExternalEvent", () => {
   });
 });
 
+describe("buildExternalEventUpdate", () => {
+  it("uses provider/externalId as the key and preserves ingestedAt with if_not_exists", () => {
+    const record = normalizeExternalEvent(validEvent(), NOW);
+    const update = buildExternalEventUpdate(record);
+
+    expect(update.Key).toEqual({ provider: "ticketmaster", externalId: "evt-123" });
+    expect(update.UpdateExpression).toContain("ingestedAt = if_not_exists(ingestedAt, :ingestedAt)");
+    expect(update.UpdateExpression).toContain("updatedAt = :updatedAt");
+    expect(update.ExpressionAttributeValues[":ingestedAt"]).toBe(NOW.toISOString());
+    expect(update.ExpressionAttributeValues[":updatedAt"]).toBe(NOW.toISOString());
+    expect(update.ExpressionAttributeValues[":title"]).toBe("Harbor Lights Festival");
+  });
+
+  it("persists optional Ticketmaster fields when present and removes them when absent", () => {
+    const withOptional = normalizeExternalEvent(
+      validEvent({
+        venueName: "Globe Life Field",
+        imageUrl: "https://s1.ticketm.net/dam/a/event/hero-2048.jpg",
+        category: "Sports",
+        genre: "Baseball",
+        latitude: 32.7476,
+        longitude: "-97.0842",
+      }),
+      NOW,
+    );
+    const withOptionalUpdate = buildExternalEventUpdate(withOptional);
+    expect(withOptional.venueName).toBe("Globe Life Field");
+    expect(withOptional.imageUrl).toBe("https://s1.ticketm.net/dam/a/event/hero-2048.jpg");
+    expect(withOptional.category).toBe("Sports");
+    expect(withOptional.genre).toBe("Baseball");
+    expect(withOptional.latitude).toBeCloseTo(32.7476);
+    expect(withOptional.longitude).toBeCloseTo(-97.0842);
+    expect(withOptionalUpdate.UpdateExpression).toContain("venueName = :venueName");
+    expect(withOptionalUpdate.UpdateExpression).toContain("latitude = :latitude");
+    expect(withOptionalUpdate.UpdateExpression).not.toContain("REMOVE venueName");
+
+    const withoutOptional = buildExternalEventUpdate(normalizeExternalEvent(validEvent(), NOW));
+    expect(withoutOptional.UpdateExpression).toContain("REMOVE");
+    expect(withoutOptional.UpdateExpression).toContain("venueName");
+    expect(withoutOptional.UpdateExpression).toContain("imageUrl");
+    expect(withoutOptional.UpdateExpression).toContain("category");
+    expect(withoutOptional.UpdateExpression).toContain("genre");
+    expect(withoutOptional.UpdateExpression).toContain("latitude");
+    expect(withoutOptional.UpdateExpression).toContain("longitude");
+    expect(withoutOptional.ExpressionAttributeValues[":venueName"]).toBeUndefined();
+  });
+});
+
 describe("processSqsBatch", () => {
   it("upserts valid records and reports only failed message IDs", async () => {
     const written: string[] = [];
     const writer: IngestionWriter = {
-      async put(record) {
+      async upsert(record) {
         written.push(`${record.provider}#${record.externalId}`);
       },
     };

@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import {
   IngestionValidationError,
   normalizeExternalEvent,
@@ -21,12 +21,49 @@ export interface SqsBatchResponse {
 }
 
 export interface IngestionWriter {
-  put(record: ExternalEventRecord): Promise<void>;
+  upsert(record: ExternalEventRecord): Promise<void>;
+}
+
+export interface ExternalEventUpdate {
+  Key: { provider: string; externalId: string };
+  UpdateExpression: string;
+  ExpressionAttributeNames: { "#state": "state" };
+  ExpressionAttributeValues: Record<string, string | number>;
 }
 
 const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient({}), {
   marshallOptions: { removeUndefinedValues: true },
 });
+
+function applyOptionalString(
+  field: string,
+  value: string | undefined,
+  setClauses: string[],
+  remove: string[],
+  values: Record<string, string | number>,
+): void {
+  if (value !== undefined) {
+    setClauses.push(`${field} = :${field}`);
+    values[`:${field}`] = value;
+  } else {
+    remove.push(field);
+  }
+}
+
+function applyOptionalNumber(
+  field: string,
+  value: number | undefined,
+  setClauses: string[],
+  remove: string[],
+  values: Record<string, string | number>,
+): void {
+  if (value !== undefined) {
+    setClauses.push(`${field} = :${field}`);
+    values[`:${field}`] = value;
+  } else {
+    remove.push(field);
+  }
+}
 
 function tableName(): string {
   const name = process.env.EXTERNAL_EVENTS_TABLE_NAME;
@@ -36,12 +73,70 @@ function tableName(): string {
   return name;
 }
 
+/** Atomic upsert: update mutable fields, set ingestedAt only on first write. */
+export function buildExternalEventUpdate(record: ExternalEventRecord): ExternalEventUpdate {
+  const setClauses = [
+    "title = :title",
+    "startsAt = :startsAt",
+    "updatedAt = :updatedAt",
+    "expiresAt = :expiresAt",
+    "ingestedAt = if_not_exists(ingestedAt, :ingestedAt)",
+  ];
+  const remove: string[] = [];
+  const values: Record<string, string | number> = {
+    ":title": record.title,
+    ":startsAt": record.startsAt,
+    ":updatedAt": record.updatedAt,
+    ":expiresAt": record.expiresAt,
+    ":ingestedAt": record.ingestedAt,
+  };
+
+  if (record.city) {
+    setClauses.push("city = :city");
+    values[":city"] = record.city;
+  } else {
+    remove.push("city");
+  }
+  if (record.state) {
+    setClauses.push("#state = :state");
+    values[":state"] = record.state;
+  } else {
+    remove.push("#state");
+  }
+  if (record.sourceUrl) {
+    setClauses.push("sourceUrl = :sourceUrl");
+    values[":sourceUrl"] = record.sourceUrl;
+  } else {
+    remove.push("sourceUrl");
+  }
+
+  applyOptionalString("venueName", record.venueName, setClauses, remove, values);
+  applyOptionalString("imageUrl", record.imageUrl, setClauses, remove, values);
+  applyOptionalString("category", record.category, setClauses, remove, values);
+  applyOptionalString("genre", record.genre, setClauses, remove, values);
+  applyOptionalNumber("latitude", record.latitude, setClauses, remove, values);
+  applyOptionalNumber("longitude", record.longitude, setClauses, remove, values);
+
+  const parts = [`SET ${setClauses.join(", ")}`];
+  if (remove.length > 0) {
+    parts.push(`REMOVE ${remove.join(", ")}`);
+  }
+
+  return {
+    Key: { provider: record.provider, externalId: record.externalId },
+    UpdateExpression: parts.join(" "),
+    ExpressionAttributeNames: { "#state": "state" },
+    ExpressionAttributeValues: values,
+  };
+}
+
 export const dynamoWriter: IngestionWriter = {
-  async put(record) {
+  async upsert(record) {
+    const update = buildExternalEventUpdate(record);
     await documentClient.send(
-      new PutCommand({
+      new UpdateCommand({
         TableName: tableName(),
-        Item: record,
+        ...update,
       }),
     );
   },
@@ -70,7 +165,7 @@ export async function processSqsBatch(
     try {
       const parsed = parseJsonBody(record.body);
       const item = normalizeExternalEvent(parsed, now);
-      await writer.put(item);
+      await writer.upsert(item);
       console.log(
         JSON.stringify({
           msg: "ingested",

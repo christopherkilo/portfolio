@@ -25,6 +25,12 @@ export interface ExternalEventInput {
   state?: unknown;
   startsAt?: unknown;
   sourceUrl?: unknown;
+  venueName?: unknown;
+  imageUrl?: unknown;
+  category?: unknown;
+  genre?: unknown;
+  latitude?: unknown;
+  longitude?: unknown;
 }
 
 export interface ExternalEventRecord {
@@ -35,6 +41,12 @@ export interface ExternalEventRecord {
   state?: string;
   startsAt: string;
   sourceUrl?: string;
+  venueName?: string;
+  imageUrl?: string;
+  category?: string;
+  genre?: string;
+  latitude?: number;
+  longitude?: number;
   ingestedAt: string;
   updatedAt: string;
   /** DynamoDB TTL attribute: Unix epoch seconds. */
@@ -81,9 +93,21 @@ export function normalizeExternalEvent(
   const city = normalizeOptionalString(raw.city);
   const state = normalizeOptionalString(raw.state);
   const sourceUrl = normalizeOptionalString(raw.sourceUrl);
+  const venueName = normalizeOptionalString(raw.venueName);
+  const imageUrl = normalizeOptionalString(raw.imageUrl);
+  const category = normalizeOptionalString(raw.category);
+  const genre = normalizeOptionalString(raw.genre);
+  const latitude = normalizeOptionalNumber(raw.latitude);
+  const longitude = normalizeOptionalNumber(raw.longitude);
   if (city) record.city = city;
   if (state) record.state = state;
   if (sourceUrl) record.sourceUrl = sourceUrl;
+  if (venueName) record.venueName = venueName;
+  if (imageUrl) record.imageUrl = imageUrl;
+  if (category) record.category = category;
+  if (genre) record.genre = genre;
+  if (latitude !== undefined) record.latitude = latitude;
+  if (longitude !== undefined) record.longitude = longitude;
 
   return record;
 }
@@ -112,6 +136,17 @@ function normalizeOptionalString(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const normalized = collapseWhitespace(value);
   return normalized || undefined;
+}
+
+function normalizeOptionalNumber(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return undefined;
 }
 
 function collapseWhitespace(value: string): string {

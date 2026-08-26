@@ -1,0 +1,21 @@
+{
+  "name": "event-horizon-provider",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Event Horizon Phase 3 Ticketmaster ingestion worker. Fetches Discovery API events and sends normalized messages to SQS only.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.1117.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "~5.9.0"
+  }
+}

@@ -1,27 +1,37 @@
 import * as path from "node:path";
 import * as cdk from "aws-cdk-lib/core";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import { Platform } from "aws-cdk-lib/aws-ecr-assets";
+import * as ecs from "aws-cdk-lib/aws-ecs";
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as sqs from "aws-cdk-lib/aws-sqs";
+import * as ssm from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
 import { getCdkEnv } from "./config";
 import { resourceName } from "./naming";
 import { applyStandardTags, stackTags } from "./tags";
 
+/** Existing SecureString. Imported by name so stack deletion does not delete it. */
+export const TICKETMASTER_API_KEY_PARAMETER_NAME =
+  "/portfolio/dev/event-horizon/ticketmaster-api-key";
+
 const LAMBDA_TIMEOUT = cdk.Duration.seconds(20);
 const QUEUE_VISIBILITY = cdk.Duration.seconds(60);
 
 /**
- * Event Horizon Phase 1: external-event ingestion backbone.
- * SQS → Lambda → DynamoDB. PostgreSQL/Prisma remains the transactional source of truth.
+ * Event Horizon Phase 3: Ticketmaster → Fargate → SQS → Lambda → DynamoDB.
+ * PostgreSQL/Prisma remains the transactional source of truth.
  */
 export class EventHorizonDevStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, {
-      description: "Event Horizon Phase 1: SQS to Lambda to DynamoDB external-event ingestion.",
+      description:
+        "Event Horizon Phase 3: Ticketmaster Discovery ingestion through Fargate, SQS, Lambda, and DynamoDB.",
       ...props,
       env: props?.env ?? getCdkEnv(),
       tags: {
@@ -88,11 +98,99 @@ export class EventHorizonDevStack extends cdk.Stack {
       },
     });
 
-    table.grant(ingestionHandler, "dynamodb:PutItem");
+    table.grant(ingestionHandler, "dynamodb:UpdateItem");
     ingestionHandler.addEventSource(
       new SqsEventSource(ingestionQueue, {
         batchSize: 10,
         reportBatchItemFailures: true,
+      }),
+    );
+
+    // Fargate requires VPC networking. Public subnets + no NAT keeps this cheap:
+    // the short-lived task can use a public IP to reach SQS (and later provider APIs).
+    const vpc = new ec2.Vpc(this, "EventHorizonVpc", {
+      vpcName: resourceName("event-horizon", "vpc"),
+      maxAzs: 2,
+      natGateways: 0,
+      subnetConfiguration: [
+        {
+          name: "public",
+          subnetType: ec2.SubnetType.PUBLIC,
+          cidrMask: 24,
+        },
+      ],
+    });
+
+    const workerSecurityGroup = new ec2.SecurityGroup(this, "IngestionWorkerSecurityGroup", {
+      vpc,
+      allowAllOutbound: true,
+      description: "Egress for the Event Horizon ingestion worker to reach SQS.",
+    });
+
+    const cluster = new ecs.Cluster(this, "EventHorizonCluster", {
+      clusterName: resourceName("event-horizon", "cluster"),
+      vpc,
+      containerInsightsV2: ecs.ContainerInsights.DISABLED,
+    });
+
+    const workerLogGroup = new logs.LogGroup(this, "IngestionWorkerLogs", {
+      logGroupName: `/ecs/${resourceName("event-horizon", "ingestion-worker")}`,
+      retention: logs.RetentionDays.ONE_WEEK,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const workerTask = new ecs.FargateTaskDefinition(this, "IngestionWorkerTask", {
+      family: resourceName("event-horizon", "ingestion-worker-task"),
+      cpu: 256,
+      memoryLimitMiB: 512,
+      runtimePlatform: {
+        cpuArchitecture: ecs.CpuArchitecture.ARM64,
+        operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
+      },
+    });
+
+    // Import the existing SecureString. Do not create or own the parameter.
+    const ticketmasterApiKey = ssm.StringParameter.fromSecureStringParameterAttributes(
+      this,
+      "TicketmasterApiKey",
+      {
+        parameterName: TICKETMASTER_API_KEY_PARAMETER_NAME,
+      },
+    );
+
+    workerTask.addContainer("ingestion-worker", {
+      containerName: "ingestion-worker",
+      image: ecs.ContainerImage.fromAsset(
+        path.join(__dirname, "../workers/event-horizon-provider"),
+        {
+          platform: Platform.LINUX_ARM64,
+          file: "Dockerfile",
+        },
+      ),
+      essential: true,
+      logging: ecs.LogDrivers.awsLogs({
+        streamPrefix: "ingestion-worker",
+        logGroup: workerLogGroup,
+      }),
+      environment: {
+        INGESTION_QUEUE_URL: ingestionQueue.queueUrl,
+        EVENT_PROVIDER: "ticketmaster",
+        EVENT_CITY: "Dallas",
+        EVENT_STATE_CODE: "TX",
+        EVENT_COUNTRY_CODE: "US",
+        EVENT_PAGE_SIZE: "20",
+      },
+      // ECS injects this at runtime via the execution role, not the task role.
+      secrets: {
+        TICKETMASTER_API_KEY: new TicketmasterApiKeySecret(ticketmasterApiKey),
+      },
+    });
+
+    workerTask.taskRole.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        sid: "SendIngestionMessages",
+        actions: ["sqs:SendMessage"],
+        resources: [ingestionQueue.queueArn],
       }),
     );
 
@@ -107,6 +205,42 @@ export class EventHorizonDevStack extends cdk.Stack {
     new cdk.CfnOutput(this, "IngestionFunctionName", {
       description: "Event Horizon ingestion Lambda function name",
       value: ingestionHandler.functionName,
+    });
+    new cdk.CfnOutput(this, "EventHorizonClusterName", {
+      description: "Event Horizon ECS cluster name",
+      value: cluster.clusterName,
+    });
+    new cdk.CfnOutput(this, "IngestionWorkerTaskDefinitionFamily", {
+      description: "Event Horizon ingestion worker Fargate task family",
+      value: workerTask.family,
+    });
+    new cdk.CfnOutput(this, "IngestionWorkerSecurityGroupId", {
+      description: "Security group for a manual Fargate run-task",
+      value: workerSecurityGroup.securityGroupId,
+    });
+  }
+}
+
+/**
+ * ECS secret injection only needs ssm:GetParameters on the existing parameter.
+ * Avoid parameter.grantRead(), which also adds DescribeParameters / history.
+ */
+class TicketmasterApiKeySecret extends ecs.Secret {
+  readonly hasField = false;
+
+  constructor(private readonly parameter: ssm.IParameter) {
+    super();
+  }
+
+  get arn(): string {
+    return this.parameter.parameterArn;
+  }
+
+  grantRead(grantee: iam.IGrantable): iam.Grant {
+    return iam.Grant.addToPrincipal({
+      grantee,
+      actions: ["ssm:GetParameters"],
+      resourceArns: [this.parameter.parameterArn],
     });
   }
 }

@@ -62,7 +62,7 @@ export default function AboutPage() {
             <p>
               Throughout these projects I&apos;ve worked with technologies
               including React, Next.js, TypeScript, PostgreSQL, Supabase, Prisma,
-              Auth.js, HubSpot, TanStack Query, and modern backend patterns
+              Auth.js, AWS, HubSpot, TanStack Query, and modern backend patterns
               centered around security, validation, and collaboration.
             </p>
             <p>

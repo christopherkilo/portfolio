@@ -77,6 +77,7 @@ export const CITIES = [
   "Denver",
   "Miami",
   "Brooklyn",
+  "Dallas",
 ] as const;
 
 const IMG = "/demos/event-horizon/events";
@@ -866,6 +867,8 @@ export type EventFilters = {
   sort: SortOption;
   /** When true, only featured events. When false/undefined, no featured constraint. */
   featured: boolean;
+  /** Catalog source. Ticketmaster rows are discovery-only. */
+  source: "all" | "event-horizon" | "ticketmaster";
 };
 
 export const DEFAULT_EVENT_FILTERS: EventFilters = {
@@ -875,6 +878,7 @@ export const DEFAULT_EVENT_FILTERS: EventFilters = {
   date: "",
   sort: "date-asc",
   featured: false,
+  source: "all",
 };
 
 export function filterEvents(

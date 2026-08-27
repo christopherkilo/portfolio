@@ -9,6 +9,8 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import * as logs from "aws-cdk-lib/aws-logs";
+import * as scheduler from "aws-cdk-lib/aws-scheduler";
+import { EcsRunFargateTask } from "aws-cdk-lib/aws-scheduler-targets";
 import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as ssm from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
@@ -24,14 +26,14 @@ const LAMBDA_TIMEOUT = cdk.Duration.seconds(20);
 const QUEUE_VISIBILITY = cdk.Duration.seconds(60);
 
 /**
- * Event Horizon Phase 3: Ticketmaster → Fargate → SQS → Lambda → DynamoDB.
- * PostgreSQL/Prisma remains the transactional source of truth.
+ * Event Horizon Phase 5: EventBridge Scheduler starts the existing
+ * Fargate worker twice daily. PostgreSQL/Prisma remains transactional SoT.
  */
 export class EventHorizonDevStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, {
       description:
-        "Event Horizon Phase 3: Ticketmaster Discovery ingestion through Fargate, SQS, Lambda, and DynamoDB.",
+        "Event Horizon Phase 5: twice-daily EventBridge Scheduler refresh of the existing Ticketmaster Fargate worker.",
       ...props,
       env: props?.env ?? getCdkEnv(),
       tags: {
@@ -105,6 +107,50 @@ export class EventHorizonDevStack extends cdk.Stack {
         reportBatchItemFailures: true,
       }),
     );
+
+    const readerName = resourceName("event-horizon", "external-events-reader");
+    const externalEventsReader = new NodejsFunction(this, "ExternalEventsReader", {
+      functionName: readerName,
+      description: "Public read-only listing of Event Horizon external discovery events.",
+      entry: path.join(__dirname, "../lambda/event-horizon-external-events-reader/handler.ts"),
+      handler: "handler",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      architecture: lambda.Architecture.ARM_64,
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(10),
+      logGroup: new logs.LogGroup(this, "ExternalEventsReaderLogs", {
+        logGroupName: `/aws/lambda/${readerName}`,
+        retention: logs.RetentionDays.ONE_WEEK,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }),
+      environment: {
+        EXTERNAL_EVENTS_TABLE_NAME: resourceName("event-horizon", "external-events"),
+      },
+      bundling: {
+        minify: true,
+        sourceMap: false,
+        target: "node22",
+        externalModules: ["@aws-sdk/*"],
+      },
+    });
+
+    // Query the provider partition only. No Scan, and no write actions.
+    table.grant(externalEventsReader, "dynamodb:Query");
+
+    const readerUrl = externalEventsReader.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: [
+          "http://localhost:3000",
+          "http://127.0.0.1:3000",
+          "https://www.christopherkilo.com",
+          "https://christopherkilo.com",
+        ],
+        allowedMethods: [lambda.HttpMethod.GET],
+        allowedHeaders: ["content-type"],
+        maxAge: cdk.Duration.hours(1),
+      },
+    });
 
     // Fargate requires VPC networking. Public subnets + no NAT keeps this cheap:
     // the short-lived task can use a public IP to reach SQS (and later provider APIs).
@@ -194,6 +240,30 @@ export class EventHorizonDevStack extends cdk.Stack {
       }),
     );
 
+    // EventBridge Scheduler invokes ecs:RunTask on this same short-lived
+    // Fargate task. There is still no ECS Service and no extra Lambda.
+    const refreshScheduleName = resourceName("event-horizon", "ingestion-refresh");
+    const refreshTarget = new EcsRunFargateTask(cluster, {
+      taskDefinition: workerTask,
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      securityGroups: [workerSecurityGroup],
+      assignPublicIp: true,
+      retryAttempts: 2,
+      maxEventAge: cdk.Duration.hours(1),
+    });
+    const refreshSchedule = new scheduler.Schedule(this, "IngestionRefreshSchedule", {
+      scheduleName: refreshScheduleName,
+      description:
+        "Starts the existing Event Horizon Ticketmaster Fargate worker at 8:00 AM and 8:00 PM America/Chicago.",
+      schedule: scheduler.ScheduleExpression.cron({
+        minute: "0",
+        hour: "8,20",
+        timeZone: cdk.TimeZone.AMERICA_CHICAGO,
+      }),
+      target: refreshTarget,
+      enabled: true,
+    });
+
     new cdk.CfnOutput(this, "IngestionQueueUrl", {
       description: "Event Horizon ingestion queue URL",
       value: ingestionQueue.queueUrl,
@@ -217,6 +287,22 @@ export class EventHorizonDevStack extends cdk.Stack {
     new cdk.CfnOutput(this, "IngestionWorkerSecurityGroupId", {
       description: "Security group for a manual Fargate run-task",
       value: workerSecurityGroup.securityGroupId,
+    });
+    new cdk.CfnOutput(this, "ExternalEventsReaderUrl", {
+      description: "Public HTTPS Function URL for read-only external events",
+      value: readerUrl.url,
+    });
+    new cdk.CfnOutput(this, "ExternalEventsReaderFunctionName", {
+      description: "Event Horizon external-events reader Lambda name",
+      value: externalEventsReader.functionName,
+    });
+    new cdk.CfnOutput(this, "IngestionRefreshScheduleName", {
+      description: "EventBridge Scheduler name for twice-daily Ticketmaster refresh",
+      value: refreshSchedule.scheduleName,
+    });
+    new cdk.CfnOutput(this, "IngestionRefreshScheduleArn", {
+      description: "EventBridge Scheduler ARN for twice-daily Ticketmaster refresh",
+      value: refreshSchedule.scheduleArn,
     });
   }
 }

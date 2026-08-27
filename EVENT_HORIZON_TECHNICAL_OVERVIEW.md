@@ -16,9 +16,19 @@ Route Handlers (/api/*)
 Zod → auth session → services → repositories → PostgreSQL
 ```
 
+External discovery is a separate path:
+
+```
+Ticketmaster → EventBridge → Fargate → SQS → Lambda → DynamoDB
+                                                      ↓
+                                      Read-only Function URL → UI
+```
+
 - UI keeps accessible browse/detail/tickets flows.
-- Backend is authoritative for prices, inventory, ownership, and confirmation numbers.
-- `eventData.ts` remains seed input / offline fallback — not a second production catalog.
+- PostgreSQL is authoritative for prices, inventory, ownership, and confirmation numbers.
+- DynamoDB caches provider listings for discovery only. Ticketmaster cards cannot be reserved in Event Horizon.
+- `eventData.ts` remains seed input / SSG catalog for native events — not a second production booking store.
+- `NEXT_PUBLIC_EVENT_HORIZON_EXTERNAL_EVENTS_API` is optional. Missing or failed AWS reads leave the native catalog intact.
 
 ## Major components
 
@@ -74,4 +84,4 @@ Stripe + webhooks, refunds, Redis rate limits, email receipts, organizer admin, 
 
 ## 30-second pitch
 
-> “Event Horizon is a Next.js event marketplace demo with Auth.js, Prisma/Postgres, and REST APIs. Browse stays public and URL-synced; favorites and tickets require sign-in. The server owns pricing and inventory with transactional decrements and idempotent reservations, and the UI consumes confirmed totals rather than trusting the browser.”
+> “Event Horizon is a Next.js event marketplace demo with Auth.js, Prisma/Postgres, and an AWS discovery pipeline. Native browse stays public and URL-synced; favorites and tickets require sign-in. The server owns pricing and inventory. Ticketmaster listings are ingested twice daily into DynamoDB and shown as outbound cards—they never share the reservation path.”

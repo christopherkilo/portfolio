@@ -6,7 +6,7 @@ import "../demos.css";
 export const metadata: Metadata = {
   title: "Event Horizon Demo",
   description:
-    "Interactive Event Horizon demo — search, filter, and explore fictional events.",
+    "Interactive Event Horizon demo — browse native events and Ticketmaster discovery listings.",
   robots: { index: false, follow: false },
 };
 
@@ -19,7 +19,7 @@ export default function EventHorizonDemoLayout({
     <DemoShell
       projectTitle="Event Horizon"
       caseStudyHref="/projects/event-horizon"
-      notice="Full-stack demo: Auth.js, PostgreSQL, and fictional event listings."
+      notice="Full-stack demo: Auth.js, PostgreSQL reservations, and Ticketmaster discovery listings."
     >
       <div data-demo="event-horizon" className="flex min-h-full flex-col">
         <Providers>{children}</Providers>

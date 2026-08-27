@@ -30,12 +30,12 @@ export const projects: Project[] = [
     title: "Event Horizon",
     category: "web",
     description:
-      "Consumer event platform with authentication, reservations, and PostgreSQL-backed persistence.",
-    technologies: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Auth.js"],
+      "Full-stack event discovery with PostgreSQL reservations and an AWS pipeline that ingests real Ticketmaster listings.",
+    technologies: ["Next.js", "TypeScript", "PostgreSQL", "AWS"],
     image: "/projects/event-horizon-logo.svg",
     imageAlt:
       "Event Horizon portfolio cover with a supporting black-hole mark above a fully readable title",
-    github: "https://github.com/christopherkilo/event-horizon",
+    github: "https://github.com/christopherkilo/portfolio",
     liveDemo: "/demos/event-horizon",
     featured: true,
     href: "/projects/event-horizon",

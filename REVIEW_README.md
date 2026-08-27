@@ -21,6 +21,7 @@ A personal professional portfolio showcasing work across three disciplines:
 - Lucide React
 - Prisma + PostgreSQL (Event Horizon)
 - Auth.js (Event Horizon)
+- AWS CDK (Event Horizon discovery pipeline: Fargate, SQS, Lambda, DynamoDB)
 - Supabase (TaskFlow)
 - Vitest
 
@@ -68,6 +69,7 @@ lib/
   demos/             # Demo catalogs, discovery, TaskFlow/NovaTech clients
 server/              # Event Horizon Prisma repositories + services
 prisma/              # Schema, migrations, seed
+infrastructure/      # AWS CDK (Event Horizon ingestion; optional for UI)
 public/              # SVG covers, logos, resume PDF
 ```
 
@@ -108,6 +110,8 @@ The traveling yellow shimmer and KILO’s permanent electric-yellow end state ar
 
 ## 13. Environment variables
 See `.env.example`. Copy to `.env.local` and fill real values there only.
+
+Event Horizon native browse/reservations need PostgreSQL + Auth.js. Ticketmaster discovery cards need `NEXT_PUBLIC_EVENT_HORIZON_EXTERNAL_EVENTS_API` (public reader Function URL). Leave it empty and the curated catalog still works. Do not commit the deployed URL. Vercel Production/Preview need that variable if live external listings should appear.
 
 Demos are embedded in this Next.js app. They do not require `localhost:3001`, `localhost:3002`, or `localhost:3003`.
 

@@ -4,6 +4,11 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { GithubIcon } from "@/components/ui/BrandIcons";
+import {
+  ArchitectureHighlightCard,
+  ArchitectureLanes,
+  PipelineSteps,
+} from "@/components/projects/ArchitectureDiagram";
 import { CaseStudyChartView } from "@/components/projects/CaseStudyChart";
 import { CaseStudyHeroCover } from "@/components/projects/CaseStudyHeroCover";
 import {
@@ -68,11 +73,28 @@ export default async function CaseStudyPage({ params }: PageProps) {
           {study.overview}
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.technologies.map((tech) => (
-            <Badge key={tech}>{tech}</Badge>
-          ))}
-        </div>
+        {study.techGroups?.length ? (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {study.techGroups.map((group) => (
+              <div key={group.label}>
+                <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                  {group.label}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((tech) => (
+                    <Badge key={tech}>{tech}</Badge>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {project.technologies.map((tech) => (
+              <Badge key={tech}>{tech}</Badge>
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 flex flex-wrap gap-3">
           {hasLiveDemo(project.liveDemo) ? (
@@ -106,7 +128,13 @@ export default async function CaseStudyPage({ params }: PageProps) {
         image={project.image}
       />
 
-      <div className="mb-12 grid gap-4 md:grid-cols-3">
+      <div
+        className={
+          study.metrics.length > 3
+            ? "mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            : "mb-12 grid gap-4 md:grid-cols-3"
+        }
+      >
         {study.metrics.map((m) => (
           <div
             key={m.label}
@@ -147,21 +175,49 @@ export default async function CaseStudyPage({ params }: PageProps) {
             </p>
           ) : null}
           {study.architecture?.length ? (
-            <ol className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-3">
-              {study.architecture.map((step, index) => (
-                <li key={step} className="flex items-center gap-2 text-sm text-secondary">
-                  <span className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-xs text-text">
-                    {step}
-                  </span>
-                  {index < (study.architecture?.length ?? 0) - 1 ? (
-                    <span className="hidden text-muted sm:inline" aria-hidden>
-                      →
-                    </span>
-                  ) : null}
-                </li>
-              ))}
-            </ol>
+            <PipelineSteps steps={study.architecture} className="mt-6" />
           ) : null}
+        </section>
+      ) : null}
+
+      {study.architectureHighlight ? (
+        <ArchitectureHighlightCard highlight={study.architectureHighlight} />
+      ) : null}
+
+      {study.architectureLanes?.length ? (
+        <ArchitectureLanes
+          title="Two persistence paths"
+          description="Users hit one Next.js app. Native booking and external discovery do not share a database on purpose."
+          entry={study.architectureEntry}
+          lanes={study.architectureLanes}
+        />
+      ) : null}
+
+      {study.deepDives?.length ? (
+        <section className="mb-12">
+          <div className="mb-6 max-w-2xl">
+            <h2 className="font-display text-2xl font-semibold text-text">
+              Why these pieces
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-secondary">
+              Service choices for this workload—not a claim that the same stack is right everywhere.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {study.deepDives.map((dive) => (
+              <section
+                key={dive.title}
+                className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl"
+              >
+                <h3 className="font-display text-lg font-semibold text-text">
+                  {dive.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-secondary">
+                  {dive.explanation}
+                </p>
+              </section>
+            ))}
+          </div>
         </section>
       ) : null}
 
@@ -239,7 +295,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
         <section className="mb-12">
           <div className="mb-6 max-w-2xl">
             <h2 className="font-display text-2xl font-semibold text-text">
-              Key decisions and why
+              {study.decisionsHeading ?? "Key decisions and why"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-secondary">
               The reasoning and tradeoffs behind the current implementation.

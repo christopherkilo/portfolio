@@ -79,8 +79,11 @@ describe("infrastructure foundation", () => {
     expect(resourceName("event-horizon", "external-events")).toBe(
       "portfolio-dev-event-horizon-external-events",
     );
-    expect(resourceName("event-horizon", "ingestion-worker-task")).toBe(
-      "portfolio-dev-event-horizon-ingestion-worker-task",
+    expect(resourceName("event-horizon", "external-events-reader")).toBe(
+      "portfolio-dev-event-horizon-external-events-reader",
+    );
+    expect(resourceName("event-horizon", "ingestion-refresh")).toBe(
+      "portfolio-dev-event-horizon-ingestion-refresh",
     );
     expect(resourceName("novatech", "inquiry-workflow")).toBe(
       "portfolio-dev-novatech-inquiry-workflow",
@@ -187,13 +190,62 @@ describe("EventHorizonDevStack Phase 1 ingestion", () => {
     });
   });
 
-  it("grants the Lambda DynamoDB UpdateItem and not a wildcard table policy", () => {
-    const policies = template.findResources("AWS::IAM::Policy");
+  it("grants the ingestion Lambda DynamoDB UpdateItem only", () => {
+    const policies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id]) =>
+        id.includes("IngestionHandler"),
+      ),
+    );
     const blob = JSON.stringify(policies);
     expect(blob).toContain("dynamodb:UpdateItem");
+    expect(blob).not.toContain("dynamodb:Query");
     expect(blob).not.toContain("dynamodb:PutItem");
+    expect(blob).not.toContain("dynamodb:Scan");
     expect(blob).not.toContain("dynamodb:*");
     expect(blob).not.toContain("Action\":\"*\"");
+  });
+
+  it("creates a read-only external-events reader Lambda with a public Function URL", () => {
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "portfolio-dev-event-horizon-external-events-reader",
+      Runtime: "nodejs22.x",
+      MemorySize: 256,
+      Timeout: 10,
+      Environment: {
+        Variables: {
+          EXTERNAL_EVENTS_TABLE_NAME: "portfolio-dev-event-horizon-external-events",
+        },
+      },
+    });
+    template.hasResourceProperties("AWS::Lambda::Url", {
+      AuthType: "NONE",
+      Cors: {
+        AllowMethods: ["GET"],
+        AllowOrigins: Match.arrayWith([
+          "http://localhost:3000",
+          "https://www.christopherkilo.com",
+        ]),
+      },
+    });
+    template.resourceCountIs("AWS::Lambda::Url", 1);
+  });
+
+  it("grants the reader Lambda DynamoDB Query only", () => {
+    const policies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id]) =>
+        id.includes("ExternalEventsReader"),
+      ),
+    );
+    const blob = JSON.stringify(policies);
+    expect(blob).toContain("dynamodb:Query");
+    expect(blob).not.toContain("dynamodb:UpdateItem");
+    expect(blob).not.toContain("dynamodb:PutItem");
+    expect(blob).not.toContain("dynamodb:DeleteItem");
+    expect(blob).not.toContain("dynamodb:Scan");
+    expect(blob).not.toContain("dynamodb:*");
+    expect(blob).not.toContain("sqs:");
+    expect(blob).not.toContain("ssm:");
+    expect(blob).not.toContain("ecs:");
   });
 
   it("does not add out-of-scope expensive Event Horizon resources", () => {
@@ -298,6 +350,107 @@ describe("EventHorizonDevStack Phase 1 ingestion", () => {
     for (const subnet of Object.values(subnets)) {
       expect(subnet.Properties?.MapPublicIpOnLaunch).toBe(true);
     }
+  });
+});
+
+describe("EventHorizonDevStack Phase 5 scheduler", () => {
+  const template = Template.fromStack(synthesizeDevStacks().eventHorizon);
+
+  it("schedules the existing Fargate worker twice daily in America/Chicago", () => {
+    template.hasResourceProperties("AWS::Scheduler::Schedule", {
+      Name: "portfolio-dev-event-horizon-ingestion-refresh",
+      State: "ENABLED",
+      ScheduleExpression: "cron(0 8,20 * * ? *)",
+      ScheduleExpressionTimezone: "America/Chicago",
+      FlexibleTimeWindow: { Mode: "OFF" },
+    });
+    template.resourceCountIs("AWS::Scheduler::Schedule", 1);
+  });
+
+  it("targets the existing ECS cluster and worker task with public IP networking", () => {
+    const schedules = template.findResources("AWS::Scheduler::Schedule");
+    const schedule = Object.values(schedules)[0];
+    const target = schedule?.Properties?.Target as {
+      Arn?: unknown;
+      EcsParameters?: {
+        TaskDefinitionArn?: unknown;
+        LaunchType?: string;
+        NetworkConfiguration?: {
+          AwsvpcConfiguration?: {
+            AssignPublicIp?: string;
+            Subnets?: unknown;
+            SecurityGroups?: unknown;
+          };
+        };
+      };
+      RetryPolicy?: {
+        MaximumRetryAttempts?: number;
+        MaximumEventAgeInSeconds?: number;
+      };
+    };
+    expect(target?.EcsParameters?.LaunchType).toBe("FARGATE");
+    expect(target?.EcsParameters?.NetworkConfiguration?.AwsvpcConfiguration?.AssignPublicIp).toBe(
+      "ENABLED",
+    );
+    expect(JSON.stringify(target?.Arn)).toContain("EventHorizonCluster");
+    expect(JSON.stringify(target?.EcsParameters?.TaskDefinitionArn)).toContain(
+      "IngestionWorkerTask",
+    );
+    expect(JSON.stringify(target?.EcsParameters?.NetworkConfiguration)).toContain("Subnet");
+    expect(JSON.stringify(target?.EcsParameters?.NetworkConfiguration)).toContain(
+      "IngestionWorkerSecurityGroup",
+    );
+    expect(target?.RetryPolicy?.MaximumRetryAttempts).toBe(2);
+    expect(target?.RetryPolicy?.MaximumEventAgeInSeconds).toBe(3600);
+  });
+
+  it("grants the scheduler ecs:RunTask and narrowly scoped iam:PassRole only", () => {
+    const policies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id, policy]) => {
+        const blob = JSON.stringify(policy);
+        return (
+          id.includes("IngestionRefresh") ||
+          blob.includes("ecs:RunTask")
+        );
+      }),
+    );
+    const blob = JSON.stringify(policies);
+    expect(blob).toContain("ecs:RunTask");
+    expect(blob).toContain("iam:PassRole");
+    expect(blob).not.toContain("ecs:*");
+    expect(blob).not.toContain("iam:*");
+    expect(blob).not.toContain("AdministratorAccess");
+    expect(blob).not.toContain("dynamodb");
+    expect(blob).not.toContain("sqs:");
+    expect(blob).not.toContain("lambda:");
+    expect(blob).not.toContain("ssm:");
+    expect(blob).not.toContain("Action\":\"*\"");
+
+    const statements = Object.values(policies).flatMap((policy) => {
+      const doc = (policy as { Properties?: { PolicyDocument?: { Statement?: unknown[] } } })
+        .Properties?.PolicyDocument?.Statement;
+      return Array.isArray(doc) ? doc : [];
+    }) as Array<{ Action?: string | string[]; Resource?: unknown }>;
+    const passRole = statements.find((statement) => {
+      const action = statement.Action;
+      return action === "iam:PassRole" || (Array.isArray(action) && action.includes("iam:PassRole"));
+    });
+    expect(passRole).toBeDefined();
+    const resources = JSON.stringify(passRole?.Resource ?? []);
+    expect(resources).toContain("IngestionWorkerTask");
+    expect(resources.toLowerCase()).toMatch(/taskrole|executionrole/i);
+  });
+
+  it("does not create an ECS Service, NAT Gateway, scheduler DLQ, or extra Lambda", () => {
+    const types = resourceTypes(template);
+    expect(types).not.toContain("AWS::ECS::Service");
+    expect(types).not.toContain("AWS::EC2::NatGateway");
+    expect(types).not.toContain("AWS::StepFunctions::StateMachine");
+    template.resourceCountIs("AWS::SQS::Queue", 2);
+    template.resourceCountIs("AWS::Lambda::Function", 2);
+    template.resourceCountIs("AWS::DynamoDB::Table", 1);
+    template.resourceCountIs("AWS::ECS::Cluster", 1);
+    template.resourceCountIs("AWS::ECS::TaskDefinition", 1);
   });
 });
 

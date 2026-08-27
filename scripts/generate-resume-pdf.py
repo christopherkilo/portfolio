@@ -30,7 +30,7 @@ LINKEDIN = "linkedin.com/in/christopher-kilo-312467425"
 
 PROFILE = (
     "I build responsive web apps that pair clean interfaces with practical backend "
-    "architecture - Next.js, React, TypeScript, PostgreSQL, Prisma, and Supabase. "
+    "architecture - Next.js, React, TypeScript, PostgreSQL, Prisma, Supabase, and AWS. "
     "CompTIA A+ certified, with an IT and design background that keeps troubleshooting "
     "and UX in the same toolkit."
 )
@@ -38,6 +38,7 @@ PROFILE = (
 SKILLS = [
     ("Frontend", "React | Next.js | TypeScript | JavaScript | Tailwind CSS | Framer Motion"),
     ("Backend / Data", "PostgreSQL | Prisma | Supabase | Auth.js | REST APIs | Zod"),
+    ("Cloud / AWS", "CDK | ECS/Fargate | Lambda | SQS | DynamoDB | EventBridge"),
     ("Design & Tools", "UI/UX | Figma | Git | GitHub | VS Code"),
     (
         "IT",
@@ -48,9 +49,10 @@ SKILLS = [
 PROJECTS = [
     (
         "Event Horizon",
-        "Next.js | TypeScript | PostgreSQL | Prisma | Auth.js",
-        "Event discovery with Auth.js, PostgreSQL, and transactional ticket holds - "
-        "idempotent reservations and inventory that cannot go negative.",
+        "Next.js | TypeScript | PostgreSQL | AWS",
+        "Built an AWS ingestion pipeline (Docker, Fargate, SQS, Lambda, DynamoDB) that "
+        "refreshes real Ticketmaster events while PostgreSQL stays the source of truth "
+        "for reservations.",
     ),
     (
         "NovaTech Solutions",

@@ -1,6 +1,7 @@
 import { Hero } from "@/components/demos/event-horizon/home/Hero";
 import { FeaturedCarousel } from "@/components/demos/event-horizon/events/FeaturedCarousel";
 import { DiscoveryRail } from "@/components/demos/event-horizon/home/DiscoveryRail";
+import { ExternalEventsRail } from "@/components/demos/event-horizon/home/ExternalEventsRail";
 import { EmptyState } from "@/components/demos/event-horizon/ui/EmptyState";
 import { events } from "@/lib/demos/event-horizon/eventData";
 import {
@@ -21,6 +22,10 @@ export default function EventHorizonDemoHome() {
       <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 lg:px-8">
         <FeaturedCarousel events={featured} />
       </section>
+
+      <div className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 lg:px-8">
+        <ExternalEventsRail />
+      </div>
 
       <div className="mx-auto max-w-6xl space-y-4 px-4 pb-20 sm:px-6 lg:px-8">
         {sections.length ? (

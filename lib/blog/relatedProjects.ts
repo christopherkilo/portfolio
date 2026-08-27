@@ -15,6 +15,10 @@ const RELATED_PROJECTS: Record<string, RelatedProjectLink> = {
     href: "/projects/starlenz",
     inDevelopment: true,
   },
+  "event-horizon": {
+    label: "Event Horizon",
+    href: "/projects/event-horizon",
+  },
 };
 
 export function getRelatedProject(project?: string): RelatedProjectLink | null {

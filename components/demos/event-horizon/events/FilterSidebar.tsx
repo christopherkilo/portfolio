@@ -161,6 +161,42 @@ export function FilterSidebar({
         </p>
       </div>
 
+      <fieldset className="mt-5 space-y-2">
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+          Source
+        </legend>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Event source">
+          {(
+            [
+              ["all", "All sources"],
+              ["event-horizon", "Event Horizon"],
+              ["ticketmaster", "Ticketmaster"],
+            ] as const
+          ).map(([value, label]) => {
+            const active = filters.source === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => update("source", value)}
+                className={cn(
+                  "rounded-lg border px-2.5 py-1.5 text-xs font-semibold tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                  active
+                    ? "border-accent/40 bg-accent/15 text-accent"
+                    : "border-border text-muted hover:border-accent/30 hover:text-ink",
+                )}
+                aria-pressed={active}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-xs text-muted">
+          Ticketmaster listings are discovery links, not Event Horizon reservations.
+        </p>
+      </fieldset>
+
       <div className="mt-5">
         <label
           htmlFor="eh-filter-sort"

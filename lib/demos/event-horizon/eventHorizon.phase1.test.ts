@@ -30,6 +30,7 @@ describe("event filter URL sync", () => {
       date: "2026-08-01",
       sort: "popular",
       featured: true,
+      source: "all",
     });
   });
 
@@ -59,6 +60,16 @@ describe("event filter URL sync", () => {
       "/demos/event-horizon/browse",
     );
     expect(
+      serializeEventFilters({
+        ...DEFAULT_EVENT_FILTERS,
+        source: "ticketmaster",
+      }),
+    ).toBe("source=ticketmaster");
+    expect(parseEventFilters(new URLSearchParams("source=ticketmaster")).source).toBe(
+      "ticketmaster",
+    );
+    expect(parseEventFilters(new URLSearchParams("source=nope")).source).toBe("all");
+    expect(
       buildBrowseHref({
         ...DEFAULT_EVENT_FILTERS,
         query: "music",
@@ -76,6 +87,7 @@ describe("event filtering and sorting", () => {
       date: "2026-08-01",
       sort: "date-asc",
       featured: true,
+      source: "all",
     });
     expect(result.map((event) => event.id)).toEqual(["aurora-synth-night"]);
   });

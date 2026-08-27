@@ -38,7 +38,7 @@ All three software applications live in this repo under `/demos/*`. They do **no
 
 | Application | Route | Persistence / services |
 | --- | --- | --- |
-| Event Horizon | `/demos/event-horizon` | PostgreSQL + Prisma + Auth.js |
+| Event Horizon | `/demos/event-horizon` | PostgreSQL + Prisma + Auth.js; optional AWS Function URL for Ticketmaster discovery |
 | NovaTech Solutions | `/demos/novatech-solutions` | HubSpot, Resend, Cloudflare Turnstile |
 | TaskFlow | `/demos/taskflow` | Supabase (Auth, Postgres/RLS, Realtime, Storage) |
 | Kilo Toolkit | `/toolkit` | Client-side simulated diagnostics |
@@ -54,6 +54,12 @@ Requires PostgreSQL for browse, favorites, and reservations:
 - Google and/or GitHub OAuth credentials (`AUTH_GOOGLE_*`, optional `AUTH_GITHUB_*`)
 - `NEXT_PUBLIC_APP_URL=http://localhost:3000`
 
+Optional Ticketmaster discovery listings (public HTTPS reader only—no AWS keys in the app):
+
+- `NEXT_PUBLIC_EVENT_HORIZON_EXTERNAL_EVENTS_API`
+
+Leave that variable empty and the curated catalog still works. Set it in Vercel Production/Preview if the live site should show external events. Do not hardcode the Function URL in source.
+
 Then:
 
 ```bash
@@ -63,6 +69,8 @@ npm run prisma:seed
 ```
 
 See `app/demos/event-horizon/README.md`.
+
+AWS infrastructure (CDK, EventBridge, Fargate, SQS, Lambda, DynamoDB) lives under `/infrastructure`. It is **not** required to run the basic portfolio UI. The Ticketmaster Consumer Key is stored in SSM Parameter Store, not in this repository.
 
 ### NovaTech Solutions
 
@@ -114,6 +122,31 @@ See `TASKFLOW_INTEGRATION_SETUP.md`.
 - `/toolkit` — Kilo Toolkit diagnostics suite
 - `/about`, `/resume`, `/contact`
 - `/demos/event-horizon`, `/demos/novatech-solutions`, `/demos/taskflow` — Embedded apps (noindex)
+
+## Event Horizon AWS (optional)
+
+Infrastructure lives in `/infrastructure` and is managed with AWS CDK (CloudFormation). The default CLI profile for this account is `portfolio` in `us-east-2`. Reviewers do **not** need AWS credentials to run the portfolio UI.
+
+```
+Ticketmaster Discovery
+        ↓
+EventBridge Scheduler  (8 AM / 8 PM America/Chicago)
+        ↓
+Fargate worker (Docker, short-lived, no ECS Service)
+        ↓
+SQS  →  Lambda (UpdateItem)  →  DynamoDB
+        ↓
+Read-only Lambda Function URL
+        ↓
+Event Horizon UI
+```
+
+- **PostgreSQL / Prisma** — native events, reservations, inventory, users, favorites
+- **DynamoDB** — external discovery events only (`provider` + `externalId`)
+- **SSM SecureString** — Ticketmaster Consumer Key, injected into ECS at runtime
+- **Scheduler** — starts the existing Fargate task; it does not replace the worker
+
+See `infrastructure/README.md` for schedule inspection, IAM, and manual `run-task` notes.
 
 ## Features
 

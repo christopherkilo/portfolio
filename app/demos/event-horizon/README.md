@@ -1,10 +1,12 @@
 # Event Horizon — developer guide
 
-Demo at `/demos/event-horizon`. Full-stack event discovery + reservations inside the portfolio app.
+Demo at `/demos/event-horizon`. Full-stack event discovery + reservations inside the portfolio app, with optional real Ticketmaster discovery listings.
 
 ## Purpose
 
 Browse/filter events, favorite listings, and reserve demo tickets with **Auth.js sessions**, **PostgreSQL**, and **REST Route Handlers**. Local Storage is no longer authoritative for favorites or tickets.
+
+External Ticketmaster cards are discovery links. They do not use Event Horizon inventory or reservation APIs.
 
 ## Local backend setup
 
@@ -29,6 +31,14 @@ npm run dev
 ```
 
 Without a database, the Next.js **build** still succeeds, but Browse/API features need PostgreSQL at runtime.
+
+## External events (optional)
+
+Set `NEXT_PUBLIC_EVENT_HORIZON_EXTERNAL_EVENTS_API` to the public reader Function URL if you want live Ticketmaster cards. Leave it empty and the curated catalog still works. The browser never uses AWS keys.
+
+Vercel Production and Preview must define the same variable for those environments to show external listings. Do not commit the deployed URL into components.
+
+AWS CDK sources live in `/infrastructure`. The scheduled Fargate worker refreshes DynamoDB twice daily; this app only reads the public JSON API.
 
 ## Folder structure
 

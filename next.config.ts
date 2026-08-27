@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
+      { protocol: "https", hostname: "s1.ticketm.net" },
+      { protocol: "https", hostname: "*.ticketm.net" },
+      { protocol: "https", hostname: "i.ticketweb.com" },
     ],
   },
 };

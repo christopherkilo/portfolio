@@ -6,6 +6,7 @@ import { ArticleBody } from "@/components/blog/ArticleBody";
 import { ArticleFooter } from "@/components/blog/ArticleFooter";
 import { ArticleToc } from "@/components/blog/ArticleToc";
 import { InDevBadge } from "@/components/blog/InDevBadge";
+import { EventHorizonBlogCover } from "@/components/blog/EventHorizonBlogCover";
 import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
 import { Badge } from "@/components/ui/Badge";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -66,9 +67,12 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
   const related = getRelatedProject(post.project);
   const { previous, next } = getAdjacentPosts(post.slug);
-  const showGeneratedCover =
+  const showStarLenzCover =
     post.coverImage === "generated:starlenz" ||
     (!post.coverImage && post.project === "StarLenz");
+  const showEventHorizonCover =
+    post.coverImage === "generated:event-horizon" ||
+    (!post.coverImage && post.project === "Event Horizon");
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -153,9 +157,14 @@ export default async function BlogArticlePage({ params }: PageProps) {
               </div>
             ) : null}
 
-            {showGeneratedCover ? (
+            {showStarLenzCover ? (
               <div className="blog-shot relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
                 <StarLenzBlogCover className="absolute inset-0" />
+              </div>
+            ) : null}
+            {showEventHorizonCover ? (
+              <div className="blog-shot relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
+                <EventHorizonBlogCover className="absolute inset-0" />
               </div>
             ) : null}
           </header>

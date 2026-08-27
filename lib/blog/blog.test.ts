@@ -43,6 +43,25 @@ describe("blog content source", () => {
     expect(related?.inDevelopment).toBe(true);
   });
 
+  it("links Event Horizon writing to the case study", () => {
+    const related = getRelatedProject("Event Horizon");
+    expect(related?.href).toBe("/projects/event-horizon");
+    expect(related?.inDevelopment).toBeUndefined();
+  });
+
+  it("loads the Event Horizon AWS development update", () => {
+    const post = getPostBySlug("taking-event-horizon-to-aws");
+    expect(post).not.toBeNull();
+    expect(post?.title).toContain("Taking Event Horizon to AWS");
+    expect(post?.project).toBe("Event Horizon");
+    expect(post?.featured).toBe(false);
+    expect(post?.content).toContain("PostgreSQL");
+    expect(post?.content).toContain("DynamoDB");
+    expect(post?.content).not.toMatch(/868150783834/);
+    expect(post?.content).not.toMatch(/lambda-url/);
+    expect(post?.headings.length).toBeGreaterThan(5);
+  });
+
   it("estimates reading time from copy, not frontmatter", () => {
     const minutes = readingMinutesFromText("word ".repeat(440));
     expect(minutes).toBe(2);

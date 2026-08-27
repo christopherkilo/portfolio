@@ -8,7 +8,7 @@ export const resumeMeta = {
   headline: "Full-Stack Developer",
   location: "DeSoto, TX",
   summary:
-    "I build responsive web apps that pair clean interfaces with practical backend architecture—Next.js, React, TypeScript, PostgreSQL, Prisma, and Supabase. CompTIA A+ certified, with an IT and design background that keeps troubleshooting and UX in the same toolkit.",
+    "I build responsive web apps that pair clean interfaces with practical backend architecture—Next.js, React, TypeScript, PostgreSQL, Prisma, Supabase, and AWS. CompTIA A+ certified, with an IT and design background that keeps troubleshooting and UX in the same toolkit.",
 } as const;
 
 export const resumeSkillGroups = [
@@ -19,6 +19,10 @@ export const resumeSkillGroups = [
   {
     label: "Backend / Data",
     skills: ["PostgreSQL", "Prisma", "Supabase", "Auth.js", "REST APIs", "Zod"],
+  },
+  {
+    label: "Cloud / AWS",
+    skills: ["CDK", "ECS/Fargate", "Lambda", "SQS", "DynamoDB", "EventBridge"],
   },
   {
     label: "Design & Tools",
@@ -43,8 +47,8 @@ export const resumeProjects = [
     title: "Event Horizon",
     href: "/projects/event-horizon",
     summary:
-      "Event discovery with Auth.js, PostgreSQL, and transactional ticket holds—idempotent reservations and inventory that cannot go negative.",
-    technologies: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Auth.js"],
+      "Built an AWS ingestion pipeline (Docker, Fargate, SQS, Lambda, DynamoDB) that refreshes real Ticketmaster events while PostgreSQL stays the source of truth for reservations.",
+    technologies: ["Next.js", "TypeScript", "PostgreSQL", "AWS"],
   },
   {
     id: "novatech-solutions",

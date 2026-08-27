@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { formatBlogDate } from "@/lib/blog/dates";
 import type { BlogPostMeta } from "@/lib/blog/types";
+import { EventHorizonBlogCover } from "@/components/blog/EventHorizonBlogCover";
 import { InDevBadge } from "@/components/blog/InDevBadge";
 import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
 import { Badge } from "@/components/ui/Badge";
@@ -14,12 +15,18 @@ import { springHover } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 
 function Cover({ post, featured }: { post: BlogPostMeta; featured?: boolean }) {
-  const generated =
+  const generatedStarLenz =
     post.coverImage === "generated:starlenz" ||
     (!post.coverImage && post.project === "StarLenz");
+  const generatedEventHorizon =
+    post.coverImage === "generated:event-horizon" ||
+    (!post.coverImage && post.project === "Event Horizon");
 
-  if (generated) {
+  if (generatedStarLenz) {
     return <StarLenzBlogCover className="absolute inset-0" />;
+  }
+  if (generatedEventHorizon) {
+    return <EventHorizonBlogCover className="absolute inset-0" />;
   }
 
   return (

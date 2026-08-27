@@ -192,6 +192,15 @@ describe("web project routing metadata", () => {
       expect(project.github).toMatch(/^https:\/\/github\.com\//);
       expect(isExternalHref(project.github)).toBe(true);
     }
+    expect(getProjectById("event-horizon")?.github).toBe(
+      "https://github.com/christopherkilo/portfolio",
+    );
+    expect(getProjectById("novatech-solutions")?.github).toBe(
+      "https://github.com/christopherkilo/novatech-solutions",
+    );
+    expect(getProjectById("taskflow")?.github).toBe(
+      "https://github.com/christopherkilo/taskflow",
+    );
   });
 
   it("never stores localhost liveDemo anywhere in project metadata", () => {

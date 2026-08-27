@@ -6,9 +6,12 @@ import { taskflowStudy } from "@/lib/case-studies/taskflow";
 import type { CaseStudy } from "@/lib/case-studies/types";
 
 export type {
+  ArchitectureHighlight,
+  ArchitectureLane,
   CaseStudy,
   CaseStudyChart,
   ChartPoint,
+  TechGroup,
 } from "@/lib/case-studies/types";
 
 /** Active portfolio case studies only — no legacy placeholder entries. */

@@ -50,6 +50,6 @@ export {
   CONTACT_METHOD_LABELS,
   INQUIRY_SERVICE_LABELS,
   URGENCY_LABELS,
-  consultationContextTitle,
   inquiryServiceLabel,
 } from "@/lib/demos/novatech/inquiry/labels";
+export { consultationContextTitle } from "@/lib/demos/novatech/inquiry/consultationTitle";

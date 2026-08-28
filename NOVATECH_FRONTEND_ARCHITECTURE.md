@@ -129,12 +129,11 @@ NovaTech is a portfolio demonstration. The inquiry UI is intentionally productio
 | Variable | Purpose | Source |
 |----------|---------|--------|
 | `NEXT_PUBLIC_APP_URL` | Public app origin | Local or deployed site URL |
-| `HUBSPOT_ACCESS_TOKEN` | HubSpot Private App token | HubSpot Private Apps |
-| `HUBSPOT_PIPELINE_ID` / `HUBSPOT_DEAL_STAGE_ID` | Deal placement | HubSpot pipelines |
-| `RESEND_API_KEY` | Resend email API | Resend dashboard |
-| `NOVATECH_FROM_EMAIL` / `NOVATECH_STAFF_EMAIL` | From + staff inbox | Resend + your email |
 | `TURNSTILE_SECRET_KEY` | Turnstile server verify | Cloudflare Turnstile |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Turnstile client widget | Cloudflare Turnstile (public) |
+| `NOVATECH_STATE_MACHINE_ARN` | StartExecution target | AWS (server-only) |
+| `NOVATECH_AWS_REGION` | SFN client region | `us-east-2` |
+| `AWS_ROLE_ARN` | Vercel OIDC ingress role | Production/Preview only |
 
 API: `POST /api/novatech/inquiries`. Architecture: `NOVATECH_BACKEND_ARCHITECTURE.md`.
 

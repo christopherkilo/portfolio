@@ -3,7 +3,7 @@ import { assertInquiryRateLimit } from "@/server/novatech/rateLimit";
 import { processInquiry } from "@/server/novatech/services/inquiryService";
 import {
   clientIpFromRequest,
-  jsonInquiryCreated,
+  jsonInquiryAccepted,
   jsonInquiryError,
   readInquiryJson,
   toNovatechError,
@@ -95,10 +95,10 @@ export async function POST(request: Request) {
       requestId,
     });
 
-    return jsonInquiryCreated(
+    return jsonInquiryAccepted(
       {
         inquiryId: result.inquiryId,
-        emailSent: result.emailSent,
+        accepted: result.accepted,
         selectedService: result.selectedService,
       },
       requestId,

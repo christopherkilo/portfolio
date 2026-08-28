@@ -8,6 +8,7 @@ export type NovatechErrorCode =
   | "RATE_LIMITED"
   | "CRM_UNAVAILABLE"
   | "EMAIL_UNAVAILABLE"
+  | "WORKFLOW_UNAVAILABLE"
   | "INQUIRY_FAILED"
   | "CONFIGURATION_ERROR"
   | "DUPLICATE_SUBMISSION";
@@ -124,7 +125,7 @@ export class EmailError extends NovatechError {
 export class ConfigurationError extends NovatechError {
   constructor(
     message?: string,
-    options: { alreadyLogged?: boolean } = {},
+    options: { alreadyLogged?: boolean; cause?: unknown } = {},
   ) {
     super(
       "CONFIGURATION_ERROR",
@@ -134,9 +135,30 @@ export class ConfigurationError extends NovatechError {
         status: 503,
         expose: true,
         alreadyLogged: options.alreadyLogged,
+        cause: options.cause,
       },
     );
     this.name = "ConfigurationError";
+  }
+}
+
+export class WorkflowUnavailableError extends NovatechError {
+  constructor(
+    message?: string,
+    options: { cause?: unknown; alreadyLogged?: boolean } = {},
+  ) {
+    super(
+      "WORKFLOW_UNAVAILABLE",
+      message ??
+        "We couldn’t submit your inquiry right now. Your entries have been preserved.",
+      {
+        status: 503,
+        expose: true,
+        cause: options.cause,
+        alreadyLogged: options.alreadyLogged,
+      },
+    );
+    this.name = "WorkflowUnavailableError";
   }
 }
 

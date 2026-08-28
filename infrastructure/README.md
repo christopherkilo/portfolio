@@ -2,7 +2,7 @@
 
 CDK TypeScript app for the Christopher Kilo portfolio. This is a small **dev / learning** AWS account, not a production environment.
 
-Event Horizon Phase 5 schedules the existing Fargate Ticketmaster worker twice daily with EventBridge Scheduler. Phase 3–4 ingestion, DynamoDB, and the public reader Function URL are unchanged. NovaTech still has no workload resources.
+Event Horizon Phase 5 schedules the existing Fargate Ticketmaster worker twice daily with EventBridge Scheduler. NovaTech Phase 4 connects the public contact form to the existing Step Functions workflow. The browser talks only to Next.js. Turnstile stays on that ingress. AWS identity for Vercel is a StartExecution-only OIDC role.
 
 ## Local setup
 
@@ -66,7 +66,9 @@ Examples:
 - `portfolio-dev-event-horizon-ingestion-worker-task`
 - `portfolio-dev-event-horizon-cluster`
 - `portfolio-dev-event-horizon-ingestion-refresh`
-- `portfolio-dev-novatech-inquiry-workflow` (not created yet)
+- `portfolio-dev-novatech-inquiry-workflows`
+- `portfolio-dev-novatech-inquiry-workflow`
+- `portfolio-dev-novatech-hubspot-crm`
 
 ## Tags
 
@@ -258,27 +260,185 @@ aws logs tail /ecs/portfolio-dev-event-horizon-ingestion-worker --since 12h --fo
 
 Fargate remains short-lived. There is still no continuously running ECS service.
 
-### NovaTech
+### NovaTech Phase 4
 
-Will later demonstrate Lambda, Step Functions, DynamoDB, and SQS:
+The public contact form starts the existing workflow. It does not call HubSpot or Resend from Next.js.
 
 ```
-Inquiry
+Visitor
    ↓
-Lambda
+NovaTech form
    ↓
-Step Functions
-   ├── validate request
-   ├── check idempotency
-   ├── HubSpot integration
-   ├── create CRM note
-   └── queue notification
-                    ↓
-                   SQS
-                    ↓
-                  Lambda
-                    ↓
-                  Resend
+POST /api/novatech/inquiries  (Next.js Route Handler)
+   ↓
+Zod validation
+   ↓
+Cloudflare Turnstile
+   ↓
+states:StartExecution
+   ↓
+Step Functions → DynamoDB → HubSpot Lambda → HubSpot → SQS → Notification Lambda → Resend
 ```
 
-DynamoDB will later provide durable idempotency / deduplication instead of an in-memory guard. Do not implement this workflow until the next approved phase.
+The browser never receives AWS credentials. Turnstile tokens are verified at ingress and are not sent to Step Functions, DynamoDB, SQS, or logs.
+
+**AWS identity**
+
+- Local Next.js: default credential chain (`AWS_PROFILE=portfolio`). No access keys in the repo.
+- Vercel Production and Preview: OIDC assume-role. Role `portfolio-dev-novatech-vercel-ingress` may call **only** `states:StartExecution` on `portfolio-dev-novatech-inquiry-workflow`.
+- The role trust is limited to `owner:christopherkilos-projects:project:portfolio:environment:production` and `...:preview`.
+- Do not add DynamoDB, SQS, Lambda invoke, SSM, or Event Horizon permissions to that role.
+
+Vercel project settings still need (server-only, no `NEXT_PUBLIC_`):
+
+| Variable | Purpose |
+| --- | --- |
+| `NOVATECH_STATE_MACHINE_ARN` | Inquiry state machine ARN |
+| `NOVATECH_AWS_REGION` | `us-east-2` |
+| `AWS_ROLE_ARN` | `portfolio-dev-novatech-vercel-ingress` role ARN |
+| `TURNSTILE_SECRET_KEY` | Existing Cloudflare secret |
+
+Enable Vercel OIDC on the project. Do not store long-lived AWS access keys in Vercel.
+
+**Duplicate submits**
+
+`StartExecution` uses a deterministic name `nt-<submissionId>`. `ExecutionAlreadyExists` is treated as “already received” (HTTP 202). DynamoDB `attribute_not_exists(submissionId)` remains the canonical business idempotency lock inside the workflow.
+
+**Rate limit**
+
+The Next.js IP limiter is still instance-local and best-effort only. Turnstile plus DynamoDB are the real controls. This stack does not add Redis, WAF, or API Gateway for that.
+
+The workflow internals below are unchanged from Phase 3.
+
+### NovaTech workflow (Phases 1–3)
+
+Public form **and** synthetic/manual StartExecution share this path after execution starts:
+
+```
+Step Functions  (Standard: portfolio-dev-novatech-inquiry-workflow)
+        ↓
+AcquireSubmission  (native DynamoDB PutItem, attribute_not_exists(submissionId))
+        ↓
+new submission?
+   ├─ yes → HubSpotCRM Lambda → QueueNotifications (native SQS SendMessage × 2)
+   │         → MarkCompleted → Succeed
+   │         SQS enqueue failure after bounded retry → MarkQueueFailed (CRM still COMPLETED) → PartialSuccess
+   └─ no  → DuplicateResult → Succeed  (HubSpot and SQS do not run)
+```
+
+Notifications (asynchronous; Step Functions does not wait for Resend):
+
+```
+SQS portfolio-dev-novatech-notifications
+        ↓
+Notification Lambda  (portfolio-dev-novatech-notification-handler)
+        ↓
+Resend
+   ├─ customer confirmation
+   └─ staff notification
+```
+
+**Why email is asynchronous:** HubSpot success is the business capture. Resend is a side effect. A flaky mailbox must not recreate a contact, deal, or note, and must not require the visitor to resubmit.
+
+**Turnstile** is not part of manual AWS executions. There is no browser challenge. Do not fake a Turnstile token. Turnstile stays on the public Next.js ingress.
+
+**Workflow table** (`portfolio-dev-novatech-inquiry-workflows`)
+
+PK `submissionId`. On-demand, AWS-managed encryption, 14-day TTL on `expiresAt`.
+
+Safe operational fields:
+
+- `status`: `IN_PROGRESS` | `COMPLETED` | `FAILED`
+- `crmStatus`: `PENDING` | `CRM_COMPLETED` | `FAILED`
+- `contactId`, `dealId` (HubSpot object IDs only)
+- `notificationStatus`: `QUEUED` | `SENT` | `FAILED` | `QUEUE_FAILED`
+- `customerEmailStatus` / `staffEmailStatus`: `SENT` | `FAILED` | `FAILED_PERMANENT`
+
+Do not store inquiry messages, email, phone, secrets, or email bodies. DynamoDB is workflow metadata. **HubSpot remains the CRM system of record.**
+
+**Durable idempotency**
+
+1. Step Functions: the same `submissionId` cannot claim a new execution. Duplicates return `DuplicateResult` and never invoke HubSpot or enqueue SQS jobs.
+2. HubSpot: deals are tagged with `novatech_submission_id`. Lambda retries search before creating a deal.
+3. Email: SQS is at-least-once. The notification Lambda sends Resend with `Idempotency-Key` = `{submissionId}:customer` or `{submissionId}:staff` (Resend stores keys for 24 hours). This is not exactly-once delivery.
+
+**HubSpot Lambda** (`portfolio-dev-novatech-hubspot-crm`) — unchanged from Phase 2.
+
+**Notification queues**
+
+- `portfolio-dev-novatech-notifications` — standard queue, SQS-managed encryption, 4-day retention, visibility 45s (Lambda timeout 15s), `maxReceiveCount` 3
+- `portfolio-dev-novatech-notifications-dlq` — 14-day retention
+
+Two jobs per new submission: customer confirmation and staff notification. Messages include the minimum fields needed to render that email. They omit Turnstile tokens, secrets, the full inquiry message, and raw provider payloads.
+
+**Notification Lambda** (`portfolio-dev-novatech-notification-handler`)
+
+- Reuses shared NovaTech Resend templates and HTTP client
+- Reads `/portfolio/dev/novatech/resend-api-key` (SSM SecureString, created manually)
+- From/staff addresses and app URL are ordinary Lambda environment values (`onboarding@resend.dev` / `https://www.christopherkilo.com`), matching the Next.js non-secret local defaults. They are not credentials.
+- Partial batch failure reporting. Batch size 5.
+- Timeout 15s. UpdateItem only on the NovaTech workflow table. No HubSpot SSM or invoke.
+
+**Retry categories (notifications)**
+
+| Failure | Behavior |
+| --- | --- |
+| HTTP 429 / 5xx / timeout / network | Fail the SQS record so the queue retries. After 3 receives → DLQ |
+| HTTP 400 / 401 / 403 | Mark `FAILED_PERMANENT` on that email field and **acknowledge** (do not burn retries on a known-bad provider/config) |
+| Malformed / unsupported SQS body | Fail the record (no Resend call) so it retries and then lands on the DLQ |
+
+**HubSpot retry categories** are unchanged:
+
+| Failure | Behavior |
+| --- | --- |
+| HTTP 429 / 5xx / timeout / network | `TransientFailure`; Step Functions retries twice (1s, backoff 2), then `MarkFailed` |
+| HTTP 400 / 401 / 403 / invalid workflow input | `PermanentFailure`; no TransientFailure retry; `MarkFailed` |
+
+In-Lambda HubSpot retries stay disabled (`maxRetries: 0`).
+
+**Secrets**
+
+Do not put HubSpot or Resend credentials in source, `.env` for AWS, CDK context, CloudFormation outputs, or Lambda plaintext environment variables. Each Lambda calls `ssm:GetParameter` on **its** parameter only.
+
+**Observability / PII**
+
+Notification logs allowlist `submissionId`, `requestId`, `notificationId`, `notificationType`, provider status, duration, SQS receive count. No recipient address, email HTML, or API key.
+
+Standard Step Functions **execution history** stores the `StartExecution` input (synthetic inquiry). CloudWatch execution-data logging is **not** enabled. Use synthetic data only.
+
+**Manual start (synthetic payload only)**
+
+```bash
+export AWS_PROFILE=portfolio
+export AWS_REGION=us-east-2
+
+ARN=$(aws stepfunctions list-state-machines \
+  --query "stateMachines[?name=='portfolio-dev-novatech-inquiry-workflow'].stateMachineArn" \
+  --output text)
+
+aws stepfunctions start-execution \
+  --state-machine-arn "$ARN" \
+  --input "$(jq -nc \
+    --arg s "$(uuidgen | tr '[:upper:]' '[:lower:]')" \
+    --arg r "$(uuidgen | tr '[:upper:]' '[:lower:]')" \
+    '{submissionId:$s,requestId:$r,inquiry:{
+      name:"Phase Three",
+      businessEmail:"onboarding@resend.dev",
+      phone:"",
+      company:"NovaTech Phase Three Test",
+      jobTitle:"",
+      selectedService:"managed-it",
+      companySize:"1-10",
+      currentEnvironment:"Synthetic AWS verification",
+      urgency:"planning",
+      preferredContactMethod:"email",
+      message:"Synthetic Phase 3 notification verification.",
+      consent:true
+    }}')"
+```
+
+`onboarding@resend.dev` is Resend’s documented test sender/recipient, not a customer address. Do not start executions with a real customer’s information.
+
+**Out of scope**
+
+Event Horizon changes, Redis/WAF/API Gateway for rate limits, long-lived AWS access keys, another Lambda in front of StartExecution.

@@ -2,21 +2,14 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 import type { InquiryApiRequest } from "@/lib/demos/novatech/inquiry/schema";
-import {
-  assertFreshSubmissionId,
-  releaseSubmissionId,
-} from "@/server/novatech/duplicateGuard";
+import type { InquirySchemaInput } from "@/lib/demos/novatech/inquiry/schema";
+import { startNovaTechInquiryWorkflow } from "@/server/novatech/aws/startInquiryWorkflow";
 import { EnvMissingError } from "@/server/novatech/env";
 import {
   ConfigurationError,
-  DuplicateSubmissionError,
-  EmailError,
-  HubSpotError,
   NovatechError,
   UnexpectedInquiryError,
 } from "@/server/novatech/errors";
-import { upsertInquiryInHubSpot } from "@/server/novatech/integrations/hubspot";
-import { sendInquiryEmails } from "@/server/novatech/integrations/resend";
 import { verifyTurnstileToken } from "@/server/novatech/integrations/turnstile";
 import {
   elapsedMs,
@@ -24,7 +17,6 @@ import {
   logger,
   nowMs,
 } from "@/server/novatech/logger";
-import { mapInquiryForBackend } from "@/server/novatech/mappers/inquiryMapper";
 
 export type ProcessInquiryInput = {
   request: InquiryApiRequest;
@@ -35,17 +27,15 @@ export type ProcessInquiryInput = {
 
 export type ProcessInquiryResult = {
   inquiryId: string;
-  emailSent: boolean;
+  accepted: true;
   selectedService: InquiryApiRequest["selectedService"];
 };
 
 /**
- * Orchestrates Turnstile → HubSpot → Resend.
+ * Public ingress orchestration: Turnstile, then StartExecution.
  *
- * Logging strategy:
- * - Integrations emit integration-specific events and mark typed errors as alreadyLogged.
- * - This service emits workflow events (completed / partial_success / failed).
- * - Route Handler logs only unexpected errors that have not already been logged.
+ * HubSpot, SQS, and Resend run asynchronously in AWS. DynamoDB is the
+ * durable idempotency authority. This service does not wait for CRM or email.
  */
 export async function processInquiry(
   input: ProcessInquiryInput,
@@ -64,8 +54,6 @@ export async function processInquiry(
     emailDomain: emailDomainOnly(input.request.businessEmail),
   };
 
-  assertFreshSubmissionId(submissionId);
-
   try {
     await verifyTurnstileToken({
       token: input.request.turnstileToken,
@@ -73,16 +61,30 @@ export async function processInquiry(
       context: { requestId, submissionId },
     });
 
-    const inquiry = mapInquiryForBackend(input.request);
+    const inquiry = toWorkflowInquiry(input.request);
 
-    let crm;
+    let start;
     try {
-      crm = await upsertInquiryInHubSpot(inquiry, {
-        requestId,
+      start = await startNovaTechInquiryWorkflow({
         submissionId,
+        requestId,
+        inquiry,
       });
     } catch (error) {
-      if (error instanceof NovatechError) throw error;
+      if (error instanceof NovatechError) {
+        if (!error.alreadyLogged) {
+          logger.error("inquiry.workflow.start.failed", {
+            ...base,
+            integration: "stepfunctions",
+            errorCode: error.code,
+            status: "rejected",
+            result: error.code === "CONFIGURATION_ERROR" ? "config" : "unavailable",
+            durationMs: elapsedMs(workflowStarted),
+          });
+          error.alreadyLogged = true;
+        }
+        throw error;
+      }
       if (error instanceof EnvMissingError) {
         logger.error("inquiry.failed", {
           ...base,
@@ -95,78 +97,29 @@ export async function processInquiry(
       }
       logger.error("inquiry.failed", {
         ...base,
-        integration: "hubspot",
-        errorCode: "CRM_UNAVAILABLE",
+        integration: "stepfunctions",
+        errorCode: "INQUIRY_FAILED",
         status: "unexpected",
         failureType: error instanceof Error ? error.name : "unknown",
         durationMs: elapsedMs(workflowStarted),
       });
-      throw new HubSpotError(undefined, {
-        cause: error,
-        alreadyLogged: true,
-      });
+      throw new UnexpectedInquiryError(undefined, { alreadyLogged: true });
     }
 
-    let emailSent = false;
-    try {
-      const emails = await sendInquiryEmails(inquiry, crm, {
-        requestId,
-        submissionId,
-      });
-      emailSent = emails.visitorSent || emails.staffSent;
-      if (!emails.visitorSent || !emails.staffSent) {
-        logger.warn("inquiry.partial_success", {
-          ...base,
-          integration: "resend",
-          status: "partial_email",
-          visitorSent: emails.visitorSent,
-          staffSent: emails.staffSent,
-          dealId: crm.dealId,
-          contactId: crm.contactId,
-          durationMs: elapsedMs(workflowStarted),
-        });
-      }
-    } catch (error) {
-      logger.warn("inquiry.partial_success", {
-        ...base,
-        integration: "resend",
-        status: "email_failed_after_crm",
-        errorCode: "EMAIL_UNAVAILABLE",
-        failureType:
-          error instanceof EmailError
-            ? "email_error"
-            : error instanceof Error
-              ? error.name
-              : "unknown",
-        dealId: crm.dealId,
-        contactId: crm.contactId,
-        durationMs: elapsedMs(workflowStarted),
-      });
-      emailSent = false;
-    }
-
-    logger.info(
-      emailSent ? "inquiry.completed" : "inquiry.partial_success",
-      {
-        ...base,
-        status: emailSent ? "ok" : "crm_ok_email_partial",
-        dealId: crm.dealId,
-        contactId: crm.contactId,
-        contactCreated: crm.contactCreated,
-        durationMs: elapsedMs(workflowStarted),
-      },
-    );
+    logger.info("inquiry.accepted", {
+      ...base,
+      integration: "stepfunctions",
+      status: "accepted",
+      result: start.outcome,
+      durationMs: elapsedMs(workflowStarted),
+    });
 
     return {
-      inquiryId: crm.dealId,
-      emailSent,
+      inquiryId: submissionId,
+      accepted: true,
       selectedService: inquiry.selectedService,
     };
   } catch (error) {
-    if (!(error instanceof DuplicateSubmissionError)) {
-      releaseSubmissionId(submissionId);
-    }
-
     if (error instanceof NovatechError) {
       if (!error.alreadyLogged) {
         logger.error("inquiry.failed", {
@@ -204,4 +157,21 @@ export async function processInquiry(
     });
     throw new UnexpectedInquiryError(undefined, { alreadyLogged: true });
   }
+}
+
+function toWorkflowInquiry(request: InquiryApiRequest): InquirySchemaInput {
+  return {
+    name: request.name,
+    businessEmail: request.businessEmail,
+    phone: request.phone,
+    company: request.company,
+    jobTitle: request.jobTitle,
+    selectedService: request.selectedService,
+    companySize: request.companySize,
+    currentEnvironment: request.currentEnvironment,
+    urgency: request.urgency,
+    preferredContactMethod: request.preferredContactMethod,
+    message: request.message,
+    consent: request.consent,
+  };
 }

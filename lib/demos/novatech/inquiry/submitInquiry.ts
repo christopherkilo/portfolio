@@ -93,7 +93,7 @@ export async function submitInquiry(
         ok: true,
         selectedService,
         inquiryId: payload.data.inquiryId,
-        emailSent: payload.data.emailSent,
+        accepted: true,
       };
     }
 

@@ -31,12 +31,13 @@ const ALLOWED_KEYS = new Set([
   "hostname",
   "errorCodes",
   "failureType",
+  "result",
   "stack",
   "logged",
 ]);
 
 const FORBIDDEN_VALUE_PATTERN =
-  /(bearer\s+[a-z0-9._-]+|sk_live|re_[a-z0-9]+|turnstile|password=)/i;
+  /(bearer\s+[a-z0-9._-]+|sk_live|re_[a-z0-9]+|password=)/i;
 
 export type LogLevel = "info" | "warn" | "error";
 
@@ -49,6 +50,7 @@ export type InquiryLogContext = {
     | "resend"
     | "route"
     | "service"
+    | "stepfunctions"
     | "config";
   status?: string;
   durationMs?: number;
@@ -69,6 +71,7 @@ export type InquiryLogContext = {
   hostname?: string;
   errorCodes?: string;
   failureType?: string;
+  result?: string;
   stack?: string;
   logged?: boolean;
 };

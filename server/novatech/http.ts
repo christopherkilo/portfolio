@@ -27,13 +27,13 @@ function responseHeaders(requestId: string): HeadersInit {
   };
 }
 
-export function jsonInquiryCreated(
+export function jsonInquiryAccepted(
   data: InquiryApiSuccessData,
   requestId: string,
 ) {
   return NextResponse.json(
     { success: true as const, data },
-    { status: 201, headers: responseHeaders(requestId) },
+    { status: 202, headers: responseHeaders(requestId) },
   );
 }
 

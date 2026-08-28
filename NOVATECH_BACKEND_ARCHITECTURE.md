@@ -4,101 +4,148 @@ Interview-oriented notes for the inquiry backend behind `/demos/novatech-solutio
 
 ## ELI15
 
-The form asks, Next.js receives, Zod checks, Turnstile guards, HubSpot remembers, Resend emails, and React confirms.
+The form asks, Next.js receives, Zod checks, Turnstile guards, then AWS takes the lead: Step Functions claims the submission, HubSpot stores the CRM record, and email goes out later through a queue.
 
-## Why Next.js Route Handlers
+## Final public request path
 
-NovaTech already lives in the App Router portfolio. A Route Handler keeps the mutation on the same origin, hides provider secrets on the server, and reuses the shared TypeScript/Zod contract without introducing a separate backend service for this demo.
+```
+Visitor
+   ↓
+NovaTech form
+   ↓
+Next.js Route Handler  (POST /api/novatech/inquiries)
+   ↓
+parse + Zod validation
+   ↓
+Cloudflare Turnstile
+   ↓
+requestId + submissionId
+   ↓
+AWS Step Functions StartExecution
+   ↓
+DynamoDB
+   ↓
+HubSpot CRM Lambda
+   ↓
+HubSpot
+   ↓
+SQS
+   ↓
+Notification Lambda
+   ↓
+Resend
+```
 
-## Why HubSpot instead of PostgreSQL
+The browser does not talk to AWS and does not receive AWS credentials.
 
-The product goal is a **CRM-shaped lead workflow**, not a custom database. HubSpot stores contacts and deals the way an MSP sales process would. Adding Postgres/Prisma here would duplicate Event Horizon’s data layer without teaching CRM integration skills.
+## Why the Route Handler remains
 
-## Why Turnstile must be verified on the server
+NovaTech already lives in the App Router portfolio. The Route Handler is the **thin public ingress**:
 
-The browser widget alone is not a security control. Tokens must be checked with Cloudflare’s Siteverify endpoint using `TURNSTILE_SECRET_KEY`. Failed verification blocks HubSpot and Resend entirely.
+1. Accept the HTTP request
+2. Validate the body
+3. Validate/normalize `requestId`
+4. Validate/normalize `submissionId`
+5. Verify Cloudflare Turnstile
+6. Start the Step Functions execution
+7. Return a safe HTTP response (202 Accepted)
 
-## Why Zod even with TypeScript
+It does **not** create HubSpot contacts, deals, or notes, and it does not send Resend email. Those run in AWS after the HTTP response.
 
-TypeScript disappears at runtime. Zod validates JSON from the network, normalizes email casing, enforces enums/message limits, and rejects unknown authoritative CRM fields the browser must never set.
+Keeping Next.js at the edge means Turnstile’s secret and AWS identity stay server-side, the form stays same-origin, and visitors never see ARNs or provider errors.
 
-## Contact vs deal
+## Why Turnstile is before AWS execution
+
+The widget in the browser is not a security control. A bot that posts JSON directly would otherwise create Step Functions executions, DynamoDB rows, HubSpot records, and email jobs.
+
+Order:
+
+```
+HTTP request → body validation → Turnstile verification → StartExecution
+```
+
+The Turnstile token is verified and then discarded. It is not sent to Step Functions, DynamoDB, SQS, or logs.
+
+## Why DynamoDB owns durable idempotency
+
+`requestId` is one HTTP request / log trace. `submissionId` is the logical form submit and the idempotency key.
+
+The workflow table (`portfolio-dev-novatech-inquiry-workflows`) claims `submissionId` with `attribute_not_exists`. A second execution for the same id skips HubSpot and SQS.
+
+StartExecution also uses a deterministic name `nt-<submissionId>`. `ExecutionAlreadyExists` is mapped to a safe “already received” HTTP 202. That is a convenience, not the business lock. DynamoDB remains canonical.
+
+The old in-memory duplicate map was instance-local and is gone. Do not describe it as durable protection.
+
+## Why Step Functions orchestrates
+
+A Standard Workflow can claim the row, call HubSpot, enqueue notifications, and record failure without a long-running Next.js request. The visitor is not held open while CRM and email run.
+
+HubSpot failure fails the workflow. SQS enqueue failure after HubSpot success is a partial success: CRM stays completed, email can be retried independently.
+
+## Why HubSpot is the CRM system of record
+
+The product goal is a CRM-shaped lead, not a custom inquiry database. Contacts and deals match an MSP sales process. Postgres would duplicate Event Horizon’s data layer without teaching CRM integration.
 
 - **Contact** = the person (upserted by email).
-- **Deal** = this consultation opportunity (always created for a new submission).
-- Associations link the deal to the contact.
+- **Deal** = this consultation opportunity, tagged with `novatech_submission_id`.
+- **Note** = inquiry details that are not standard deal properties.
 
-## Company-handling decision
+Company objects are not created. The submitted company name is stored on the contact.
 
-Company **objects are not created** in v1. The submitted company name is stored on the contact’s standard `company` property to avoid reckless duplicates from spelling variants.
+## Why SQS isolates email
 
-## CRM notes
+HubSpot success is the business capture. Resend is a side effect. A flaky mailbox must not recreate a contact, deal, or note, and must not require the visitor to resubmit.
 
-Inquiry details that are not standard deal properties are written into an associated HubSpot note (service, size, urgency, environment, message, submission id, timestamp). Turnstile tokens and internal request metadata are omitted.
+Step Functions finishes after SQS **accepts** the two jobs. The notification Lambda calls Resend later. SQS retries and the DLQ cannot re-run HubSpot.
 
-## Why Resend is separate from HubSpot
+## Why notifications are at-least-once
 
-HubSpot is the system of record for the lead. Resend owns transactional email delivery and templates. Separating them keeps CRM success authoritative when email delivery is flaky.
+SQS may deliver a job more than once. The notification Lambda sends Resend with `Idempotency-Key` = `{submissionId}:customer` or `{submissionId}:staff` (Resend stores keys for 24 hours). That reduces duplicate mail. It is **not** exactly-once delivery. Do not claim exactly-once.
 
-## Service-layer responsibilities
+## Why CRM success is authoritative
 
-`server/novatech/services/inquiryService.ts` coordinates:
+If HubSpot succeeds and email later fails, the lead still exists. The public API does not wait for Resend and does not pretend the email already went out. The UI says the consultation request was **received**.
 
-1. Duplicate-submission guard  
-2. Turnstile verification  
-3. Mapping / normalization  
-4. HubSpot upsert + deal + note  
-5. Resend emails  
-6. Partial-success result  
+## Why no long-running server is needed
 
-The Route Handler stays thin: Content-Type, JSON parse, Zod, rate limit, HTTP mapping.
+There is no ECS service, API Gateway, or always-on worker for NovaTech inquiries. Next.js accepts the HTTP request. Step Functions and Lambda run the work. SQS buffers email. Fargate is Event Horizon’s concern, not NovaTech’s.
 
-## Partial-success policy
+## AWS authentication from hosting
 
-- HubSpot failure → overall failure (no emails).  
-- HubSpot success + email failure → HTTP 201 with `emailSent: false`.  
-- Never create another CRM record just because email failed.
+- **Local:** AWS SDK default credential chain (`AWS_PROFILE=portfolio`). No access keys in git.
+- **Vercel Production/Preview:** OIDC assume-role. Role `portfolio-dev-novatech-vercel-ingress` may call only `states:StartExecution` on the NovaTech state machine.
+- No `states:*`, DynamoDB, SQS, Lambda invoke, SSM, HubSpot, or Event Horizon on that role.
+- No long-lived AWS keys in source, GitHub, `NEXT_PUBLIC_*`, or committed `.env` files.
 
-## Rate-limit limitation
+## HTTP contract
 
-In-memory limiter (5 submissions / 15 minutes / IP). **Instance-local only** — not sufficient as the sole control for multi-instance production. Designed to be replaced by Upstash Redis, Cloudflare, or another distributed limiter later.
+| Status | Meaning |
+|--------|---------|
+| 202 | Valid body, Turnstile passed, workflow accepted (including deterministic-name duplicates) |
+| 400 | Invalid JSON / content type |
+| 403 | Turnstile failed |
+| 422 | Inquiry / `submissionId` validation |
+| 429 | Best-effort instance-local IP limiter |
+| 503 | Workflow could not be accepted, or server AWS config/identity is missing |
+| 500 | Unexpected failure |
 
-## Duplicate-submission limitation
+Responses never include ARNs, stack traces, HubSpot/Resend bodies, secret names, or Turnstile tokens. Success body: `{ inquiryId, accepted, selectedService }` where `inquiryId` is the `submissionId`.
 
-Client `crypto.randomUUID()` + server in-memory TTL map + CRM note tagging. This is **best-effort**, not exact-once across instances or restarts. Do not claim durable idempotency without shared storage.
+## Rate-limit decision
+
+The in-memory IP limiter (5 / 15 minutes / instance) stays as a cheap extra guard. It is **not** distributed protection. Turnstile plus DynamoDB idempotency are the real controls. Phase 4 does not add Redis, ElastiCache, WAF, or API Gateway for this.
 
 ## Privacy and secrets
 
-Server-only: `HUBSPOT_ACCESS_TOKEN`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`, `NOVATECH_STAFF_EMAIL`, pipeline/stage IDs.  
-Client-visible: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `NEXT_PUBLIC_APP_URL`.  
-Logs never include tokens, API keys, full inquiry bodies, or visitor messages.
+**Next.js server-only:** `TURNSTILE_SECRET_KEY`, `NOVATECH_STATE_MACHINE_ARN`, `NOVATECH_AWS_REGION`, `AWS_ROLE_ARN`.
 
-## Request correlation IDs
+**AWS workloads:** HubSpot and Resend live in SSM SecureStrings. Lambdas read only their own parameter.
 
-**ELI15:** A request ID is like a tracking number attached to one inquiry trip. Every backend service writes that same number in its notes, so a developer can follow what happened without exposing the visitor’s private information.
+**Client-visible:** `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `NEXT_PUBLIC_APP_URL`.
 
-| ID | Purpose |
-|----|---------|
-| `requestId` | One HTTP request; returned as `x-request-id`; used to correlate logs |
-| `submissionId` | One user submit attempt; prevents duplicate CRM writes |
+Logs allowlist `requestId`, `submissionId`, event, result, duration, validation category, Turnstile result category, workflow-start result. Never log business email, phone, message, Turnstile token, cookies, Authorization, raw bodies, AWS credentials, or provider secrets.
 
-Incoming `x-request-id` is accepted only if it is a strict UUID; otherwise the server generates a new one. It is **not** a security token.
-
-Error JSON may include `requestId` for support. Responses always set `x-request-id` and `Cache-Control: no-store`.
-
-## Structured logging
-
-`server/novatech/logger.ts` emits JSON lines with allowlisted fields (`event`, `level`, `requestId`, `submissionId`, `integration`, `durationMs`, …).
-
-Named events include `inquiry.request.received`, `turnstile.verification.*`, `hubspot.contact.upsert.*`, `hubspot.deal.create.succeeded`, `resend.*.succeeded`, `inquiry.completed`, `inquiry.partial_success`, `inquiry.failed`.
-
-**Never logged:** tokens, API keys, Turnstile responses, full emails/phones, visitor messages, raw provider bodies, cookies, Authorization headers.
-
-**Timing:** total workflow, Turnstile, HubSpot, and Resend durations via `durationMs`.
-
-**Error logging strategy:** integrations/service log once and set `alreadyLogged` on typed errors; the Route Handler logs only unexpected failures that were not already recorded. Stack traces appear in development only.
-
-**Limitation:** this is console JSON logging for a portfolio demo — not Sentry/Datadog/OpenTelemetry. Search logs by `requestId` when debugging.
+Incoming `x-request-id` is accepted only as a strict UUID; otherwise the server generates one.
 
 ## Structure
 
@@ -111,11 +158,15 @@ server/novatech/
   logger.ts
   requestId.ts
   rateLimit.ts
-  duplicateGuard.ts
+  aws/startInquiryWorkflow.ts
   services/inquiryService.ts
-  integrations/{turnstile,hubspot,resend}.ts
+  integrations/{turnstile,hubspot,hubspotClient,resend,resendClient,resendTemplates}.ts
   mappers/inquiryMapper.ts
 lib/demos/novatech/inquiry/   # shared schema + client adapter
+infrastructure/lambda/novatech-hubspot-crm/
+infrastructure/lambda/novatech-notification-handler/
 ```
 
-See also: `NOVATECH_INTEGRATION_SETUP.md`, `NOVATECH_TECHNICAL_OVERVIEW.md`.
+Shared HubSpot/Resend modules remain because Lambdas import them. Next.js wrappers around those clients are not on the public request path.
+
+See also: `NOVATECH_INTEGRATION_SETUP.md`, `NOVATECH_TECHNICAL_OVERVIEW.md`, `infrastructure/README.md`.

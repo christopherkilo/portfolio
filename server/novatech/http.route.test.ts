@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { __resetInquiryRateLimitForTests } from "@/server/novatech/rateLimit";
-import { __resetDuplicateGuardForTests } from "@/server/novatech/duplicateGuard";
 
 vi.mock("@/server/novatech/services/inquiryService", () => ({
   processInquiry: vi.fn(),
@@ -45,13 +44,11 @@ function request(
 describe("POST /api/novatech/inquiries", () => {
   beforeEach(() => {
     __resetInquiryRateLimitForTests();
-    __resetDuplicateGuardForTests();
     vi.mocked(processInquiry).mockReset();
   });
 
   afterEach(() => {
     __resetInquiryRateLimitForTests();
-    __resetDuplicateGuardForTests();
   });
 
   it("rejects unsupported Content-Type", async () => {
@@ -98,7 +95,7 @@ describe("POST /api/novatech/inquiries", () => {
     for (let i = 0; i < 5; i += 1) {
       vi.mocked(processInquiry).mockResolvedValue({
         inquiryId: `d-${i}`,
-        emailSent: true,
+        accepted: true,
         selectedService: "cybersecurity",
       });
       const ok = await POST(
@@ -110,7 +107,7 @@ describe("POST /api/novatech/inquiries", () => {
           { ip: "9.9.9.9" },
         ),
       );
-      expect(ok.status).toBe(201);
+      expect(ok.status).toBe(202);
     }
 
     const limited = await POST(
@@ -125,25 +122,40 @@ describe("POST /api/novatech/inquiries", () => {
     expect(limited.status).toBe(429);
   });
 
-  it("returns 201 success with no-store", async () => {
+  it("returns 422 for an invalid submissionId", async () => {
+    const response = await POST(
+      request({ ...validBody, submissionId: "not-a-uuid" }),
+    );
+    expect(response.status).toBe(422);
+    const json = await response.json();
+    expect(json.success).toBe(false);
+    expect(json.error.code).toBe("VALIDATION_ERROR");
+    expect(json.error.fieldErrors.submissionId).toBeTruthy();
+    expect(processInquiry).not.toHaveBeenCalled();
+  });
+
+  it("returns 202 when the workflow is accepted", async () => {
     vi.mocked(processInquiry).mockResolvedValue({
-      inquiryId: "deal-1",
-      emailSent: true,
+      inquiryId: validBody.submissionId,
+      accepted: true,
       selectedService: "cybersecurity",
     });
     const response = await POST(request(validBody, { ip: "1.1.1.1" }));
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(202);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("x-request-id")).toBeTruthy();
     const json = await response.json();
     expect(json).toEqual({
       success: true,
       data: {
-        inquiryId: "deal-1",
-        emailSent: true,
+        inquiryId: validBody.submissionId,
+        accepted: true,
         selectedService: "cybersecurity",
       },
     });
+    expect(JSON.stringify(json)).not.toMatch(/arn:aws/i);
+    expect(JSON.stringify(json)).not.toMatch(/hubspot/i);
+    expect(JSON.stringify(json)).not.toMatch(/resend/i);
   });
 
   it("returns a safe 5xx for unexpected service failures", async () => {
@@ -155,5 +167,26 @@ describe("POST /api/novatech/inquiries", () => {
     expect(json.success).toBe(false);
     expect(json.error.message).not.toContain("boom");
     expect(json.error.requestId).toBe(response.headers.get("x-request-id"));
+    expect(JSON.stringify(json)).not.toMatch(/arn:aws/i);
+  });
+
+  it("returns 503 when the workflow cannot be accepted", async () => {
+    const { WorkflowUnavailableError } = await import("@/server/novatech/errors");
+    vi.mocked(processInquiry).mockRejectedValue(new WorkflowUnavailableError());
+    const response = await POST(request(validBody, { ip: "3.3.3.3" }));
+    expect(response.status).toBe(503);
+    const json = await response.json();
+    expect(json.error.code).toBe("WORKFLOW_UNAVAILABLE");
+    expect(JSON.stringify(json)).not.toMatch(/step functions/i);
+    expect(JSON.stringify(json)).not.toMatch(/arn:aws/i);
+  });
+
+  it("returns 503 when AWS identity/config is missing", async () => {
+    const { ConfigurationError } = await import("@/server/novatech/errors");
+    vi.mocked(processInquiry).mockRejectedValue(new ConfigurationError());
+    const response = await POST(request(validBody, { ip: "4.4.4.4" }));
+    expect(response.status).toBe(503);
+    const json = await response.json();
+    expect(json.error.code).toBe("CONFIGURATION_ERROR");
   });
 });

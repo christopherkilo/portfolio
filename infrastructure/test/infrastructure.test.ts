@@ -5,16 +5,18 @@ import {
   TICKETMASTER_API_KEY_PARAMETER_NAME,
 } from "../lib/event-horizon-dev-stack";
 import { NovaTechDevStack } from "../lib/novatech-dev-stack";
+import {
+  HUBSPOT_ACCESS_TOKEN_PARAMETER_NAME,
+  RESEND_API_KEY_PARAMETER_NAME,
+  VERCEL_PROJECT_NAME,
+  VERCEL_TEAM_SLUG,
+} from "../lib/novatech-constants";
 import { DEFAULT_REGION, infraConfig } from "../lib/config";
 import { resourceName } from "../lib/naming";
 
 jest.setTimeout(120_000);
 
 const NOVATECH_FORBIDDEN_RESOURCE_TYPES = [
-  "AWS::Lambda::Function",
-  "AWS::DynamoDB::Table",
-  "AWS::SQS::Queue",
-  "AWS::StepFunctions::StateMachine",
   "AWS::ECS::Cluster",
   "AWS::ECS::Service",
   "AWS::ECS::TaskDefinition",
@@ -27,6 +29,9 @@ const NOVATECH_FORBIDDEN_RESOURCE_TYPES = [
   "AWS::RDS::DBInstance",
   "AWS::RDS::DBCluster",
   "AWS::SecretsManager::Secret",
+  "AWS::SSM::Parameter",
+  "AWS::Events::Rule",
+  "AWS::Scheduler::Schedule",
   "AWS::CloudWatch::Alarm",
 ] as const;
 
@@ -87,6 +92,21 @@ describe("infrastructure foundation", () => {
     );
     expect(resourceName("novatech", "inquiry-workflow")).toBe(
       "portfolio-dev-novatech-inquiry-workflow",
+    );
+    expect(resourceName("novatech", "inquiry-workflows")).toBe(
+      "portfolio-dev-novatech-inquiry-workflows",
+    );
+    expect(resourceName("novatech", "hubspot-crm")).toBe(
+      "portfolio-dev-novatech-hubspot-crm",
+    );
+    expect(resourceName("novatech", "notifications")).toBe(
+      "portfolio-dev-novatech-notifications",
+    );
+    expect(resourceName("novatech", "notifications-dlq")).toBe(
+      "portfolio-dev-novatech-notifications-dlq",
+    );
+    expect(resourceName("novatech", "notification-handler")).toBe(
+      "portfolio-dev-novatech-notification-handler",
     );
   });
 
@@ -454,12 +474,314 @@ describe("EventHorizonDevStack Phase 5 scheduler", () => {
   });
 });
 
-describe("NovaTechDevStack", () => {
-  it("still has no workload AWS resources", () => {
-    const template = Template.fromStack(synthesizeDevStacks().novatech);
+describe("NovaTechDevStack Phase 2 HubSpot CRM", () => {
+  const template = Template.fromStack(synthesizeDevStacks().novatech);
+
+  function stateMachineDefinition(): string {
+    const machines = template.findResources("AWS::StepFunctions::StateMachine");
+    const machine = Object.values(machines)[0] as {
+      Properties?: { DefinitionString?: unknown };
+    };
+    const definition = machine?.Properties?.DefinitionString;
+    return typeof definition === "string" ? definition : JSON.stringify(definition ?? {});
+  }
+
+  it("creates an on-demand workflow table keyed by submissionId with TTL", () => {
+    template.hasResourceProperties("AWS::DynamoDB::Table", {
+      TableName: "portfolio-dev-novatech-inquiry-workflows",
+      BillingMode: "PAY_PER_REQUEST",
+      KeySchema: [{ AttributeName: "submissionId", KeyType: "HASH" }],
+      AttributeDefinitions: [{ AttributeName: "submissionId", AttributeType: "S" }],
+      TimeToLiveSpecification: {
+        AttributeName: "expiresAt",
+        Enabled: true,
+      },
+      SSESpecification: { SSEEnabled: true },
+    });
+    template.hasResource("AWS::DynamoDB::Table", {
+      DeletionPolicy: "Delete",
+      UpdateReplacePolicy: "Delete",
+    });
+    template.resourceCountIs("AWS::DynamoDB::Table", 1);
+
+    const tables = template.findResources("AWS::DynamoDB::Table");
+    const table = Object.values(tables)[0] as {
+      Properties?: { GlobalSecondaryIndexes?: unknown; LocalSecondaryIndexes?: unknown };
+    };
+    expect(table.Properties?.GlobalSecondaryIndexes).toBeUndefined();
+    expect(table.Properties?.LocalSecondaryIndexes).toBeUndefined();
+  });
+
+  it("creates a Standard inquiry workflow with HubSpot CRM, duplicate, and bounded retry paths", () => {
+    template.hasResourceProperties("AWS::StepFunctions::StateMachine", {
+      StateMachineName: "portfolio-dev-novatech-inquiry-workflow",
+      StateMachineType: "STANDARD",
+    });
+    template.resourceCountIs("AWS::StepFunctions::StateMachine", 1);
+
+    const definition = stateMachineDefinition();
+    expect(definition).toContain("AcquireSubmission");
+    expect(definition).toContain("attribute_not_exists(submissionId)");
+    expect(definition).toContain("InquiryWorkflows");
+    expect(definition).toContain("DuplicateResult");
+    expect(definition).toContain("DynamoDB.ConditionalCheckFailedException");
+    expect(definition).toContain("HubSpotCRM");
+    expect(definition).toContain("QueueNotifications");
+    expect(definition).toContain("QueueCustomerNotification");
+    expect(definition).toContain("QueueStaffNotification");
+    expect(definition).toContain("MarkCompleted");
+    expect(definition).toContain("COMPLETED");
+    expect(definition).toContain("CRM_COMPLETED");
+    expect(definition).toContain("QUEUED");
+    expect(definition).toContain("QUEUE_FAILED");
+    expect(definition).toContain("PartialSuccess");
+    expect(definition).toContain("MarkFailed");
+    expect(definition).toContain("FAILED");
+    expect(definition).toContain("TransientFailure");
+    expect(definition).toMatch(/MaxAttempts\\":2/);
+    expect(definition).toContain("states:::dynamodb:putItem");
+    expect(definition).toContain("states:::dynamodb:updateItem");
+    expect(definition).toContain("states:::sqs:sendMessage");
+    expect(definition).not.toContain("MockBusinessStep");
+    expect(definition).not.toMatch(/turnstile/i);
+    expect(definition).not.toContain("api.resend.com");
+  });
+
+  it("creates the HubSpot CRM Lambda and does not keep the Phase 1 mock task", () => {
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "portfolio-dev-novatech-hubspot-crm",
+      Runtime: "nodejs22.x",
+      MemorySize: 256,
+      Timeout: 20,
+      Environment: {
+        Variables: {
+          HUBSPOT_ACCESS_TOKEN_PARAMETER_NAME,
+          HUBSPOT_PIPELINE_ID: "default",
+          HUBSPOT_DEAL_STAGE_ID: "appointmentscheduled",
+        },
+      },
+    });
+    template.resourceCountIs("AWS::Lambda::Function", 3);
+    const blob = JSON.stringify(template.toJSON());
+    expect(blob).not.toContain("portfolio-dev-novatech-workflow-demo-step");
+  });
+
+  it("imports the HubSpot SSM parameter instead of creating one", () => {
+    expect(resourceTypes(template)).not.toContain("AWS::SSM::Parameter");
+    const policies = JSON.stringify(template.findResources("AWS::IAM::Policy"));
+    expect(policies).toContain(HUBSPOT_ACCESS_TOKEN_PARAMETER_NAME.replace(/^\//, ""));
+    expect(policies).toContain("ssm:GetParameter");
+    expect(policies).not.toContain("ssm:GetParameters");
+    expect(policies).not.toContain("ssm:DescribeParameters");
+    expect(policies).not.toContain("ssm:GetParameterHistory");
+    expect(policies).not.toContain("ssm:*");
+  });
+
+  it("scopes HubSpot Lambda IAM to that SSM parameter and not DynamoDB", () => {
+    const lambdaPolicies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id]) =>
+        id.includes("HubSpotCrm"),
+      ),
+    );
+    const lambdaBlob = JSON.stringify(lambdaPolicies);
+    expect(lambdaBlob).toContain("ssm:GetParameter");
+    expect(lambdaBlob).toContain("hubspot-access-token");
+    expect(lambdaBlob).not.toContain("dynamodb");
+    expect(lambdaBlob).not.toContain("sqs:");
+    expect(lambdaBlob).not.toContain("ecs:");
+    expect(lambdaBlob).not.toContain("event-horizon");
+  });
+
+  it("scopes the state machine to the workflow table, HubSpot invoke, and notification queue send", () => {
+    const sfnPolicies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id]) =>
+        id.includes("InquiryWorkflow"),
+      ),
+    );
+    const blob = JSON.stringify(sfnPolicies);
+    expect(blob).toContain("dynamodb:PutItem");
+    expect(blob).toContain("dynamodb:UpdateItem");
+    expect(blob).toContain("lambda:InvokeFunction");
+    expect(blob).toContain("sqs:SendMessage");
+    expect(blob).toContain("NotificationQueue");
+    expect(blob).not.toContain("sqs:*");
+    expect(blob).not.toContain("event-horizon");
+    expect(blob).not.toContain("dynamodb:*");
+    expect(blob).not.toContain("lambda:*");
+    expect(blob).not.toContain("states:*");
+    expect(blob).not.toContain("ecs:");
+    expect(blob).not.toContain("ssm:");
+    expect(blob).not.toContain("AdministratorAccess");
+    expect(blob).not.toMatch(/Action":"\*"/);
+
+    const statements = Object.values(sfnPolicies).flatMap((policy) => {
+      const doc = (policy as { Properties?: { PolicyDocument?: { Statement?: unknown[] } } })
+        .Properties?.PolicyDocument?.Statement;
+      return Array.isArray(doc) ? doc : [];
+    }) as Array<{ Action?: string | string[] }>;
+    const dynamoActions = statements.flatMap((statement) => {
+      const action = statement.Action;
+      const actions = Array.isArray(action) ? action : action ? [action] : [];
+      return actions.filter((item) => item.startsWith("dynamodb:"));
+    });
+    expect(new Set(dynamoActions)).toEqual(new Set(["dynamodb:PutItem", "dynamodb:UpdateItem"]));
+    const sqsActions = statements.flatMap((statement) => {
+      const action = statement.Action;
+      const actions = Array.isArray(action) ? action : action ? [action] : [];
+      return actions.filter((item) => item.startsWith("sqs:"));
+    });
+    expect(sqsActions.every((action) => action === "sqs:SendMessage")).toBe(true);
+  });
+
+  it("does not add ECS, EventBridge, API Gateway, RDS, or VPC resources", () => {
     const types = resourceTypes(template);
     for (const type of NOVATECH_FORBIDDEN_RESOURCE_TYPES) {
       expect(types).not.toContain(type);
     }
+    expect(types).not.toContain("AWS::StepFunctions::Activity");
+    expect(types).not.toContain("AWS::SNS::Topic");
+  });
+});
+
+describe("NovaTechDevStack Phase 3 notifications", () => {
+  const template = Template.fromStack(synthesizeDevStacks().novatech);
+
+  it("creates an encrypted notification queue and DLQ with redrive", () => {
+    template.hasResourceProperties("AWS::SQS::Queue", {
+      QueueName: "portfolio-dev-novatech-notifications",
+      MessageRetentionPeriod: 4 * 24 * 60 * 60,
+      VisibilityTimeout: 45,
+      RedrivePolicy: { maxReceiveCount: 3 },
+      SqsManagedSseEnabled: true,
+    });
+    template.hasResourceProperties("AWS::SQS::Queue", {
+      QueueName: "portfolio-dev-novatech-notifications-dlq",
+      MessageRetentionPeriod: 14 * 24 * 60 * 60,
+      SqsManagedSseEnabled: true,
+    });
+    template.resourceCountIs("AWS::SQS::Queue", 2);
+  });
+
+  it("creates the notification Lambda with Resend config and no HubSpot token env", () => {
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "portfolio-dev-novatech-notification-handler",
+      Runtime: "nodejs22.x",
+      MemorySize: 256,
+      Timeout: 15,
+      Environment: {
+        Variables: {
+          RESEND_API_KEY_PARAMETER_NAME,
+          INQUIRY_WORKFLOWS_TABLE_NAME: "portfolio-dev-novatech-inquiry-workflows",
+          NOVATECH_FROM_EMAIL: "onboarding@resend.dev",
+          NOVATECH_STAFF_EMAIL: "onboarding@resend.dev",
+          NOVATECH_APP_URL: "https://www.christopherkilo.com",
+        },
+      },
+    });
+    const notification = JSON.stringify(
+      Object.fromEntries(
+        Object.entries(template.findResources("AWS::Lambda::Function")).filter(([, resource]) =>
+          JSON.stringify(resource).includes("portfolio-dev-novatech-notification-handler"),
+        ),
+      ),
+    );
+    expect(notification).not.toContain("HUBSPOT");
+    expect(notification).not.toContain("re_");
+  });
+
+  it("maps SQS to the notification Lambda with partial batch failure reporting", () => {
+    template.hasResourceProperties("AWS::Lambda::EventSourceMapping", {
+      BatchSize: 5,
+      FunctionResponseTypes: ["ReportBatchItemFailures"],
+    });
+  });
+
+  it("scopes notification Lambda IAM to Resend SSM GetParameter and DynamoDB UpdateItem", () => {
+    const policies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id]) =>
+        id.includes("NotificationHandler"),
+      ),
+    );
+    const blob = JSON.stringify(policies);
+    expect(blob).toContain("ssm:GetParameter");
+    expect(blob).toContain("resend-api-key");
+    expect(blob).not.toContain("hubspot-access-token");
+    expect(blob).toContain("dynamodb:UpdateItem");
+    expect(blob).not.toContain("dynamodb:PutItem");
+    expect(blob).not.toContain("dynamodb:Query");
+    expect(blob).not.toContain("dynamodb:Scan");
+    expect(blob).not.toContain("dynamodb:*");
+    expect(blob).not.toContain("ssm:*");
+    expect(blob).not.toContain("lambda:InvokeFunction");
+    expect(blob).not.toContain("states:StartExecution");
+    expect(blob).not.toContain("event-horizon");
+    expect(blob).not.toContain("ecs:");
+  });
+});
+
+describe("NovaTechDevStack Phase 4 Vercel ingress identity", () => {
+  const template = Template.fromStack(synthesizeDevStacks().novatech);
+
+  it("creates a Vercel OIDC provider and StartExecution-only ingress role", () => {
+    template.hasResourceProperties("Custom::AWSCDKOpenIdConnectProvider", {
+      Url: `https://oidc.vercel.com/${VERCEL_TEAM_SLUG}`,
+      ClientIDList: [`https://vercel.com/${VERCEL_TEAM_SLUG}`],
+    });
+    template.hasResourceProperties("AWS::IAM::Role", {
+      RoleName: "portfolio-dev-novatech-vercel-ingress",
+    });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "portfolio-dev-novatech-hubspot-crm",
+    });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "portfolio-dev-novatech-notification-handler",
+    });
+    template.resourceCountIs("AWS::Lambda::Function", 3);
+  });
+
+  it("trusts only Vercel Production and Preview for the portfolio project", () => {
+    const roles = template.findResources("AWS::IAM::Role");
+    const ingress = Object.values(roles).find((resource) =>
+      JSON.stringify(resource).includes("portfolio-dev-novatech-vercel-ingress"),
+    ) as { Properties?: { AssumeRolePolicyDocument?: unknown } } | undefined;
+    const trust = JSON.stringify(ingress?.Properties?.AssumeRolePolicyDocument ?? {});
+    expect(trust).toContain("sts:AssumeRoleWithWebIdentity");
+    expect(trust).toContain(
+      `owner:${VERCEL_TEAM_SLUG}:project:${VERCEL_PROJECT_NAME}:environment:production`,
+    );
+    expect(trust).toContain(
+      `owner:${VERCEL_TEAM_SLUG}:project:${VERCEL_PROJECT_NAME}:environment:preview`,
+    );
+    expect(trust).not.toContain("environment:development");
+    expect(trust).not.toContain("event-horizon");
+  });
+
+  it("grants the ingress role only states:StartExecution on the inquiry state machine", () => {
+    const policies = Object.fromEntries(
+      Object.entries(template.findResources("AWS::IAM::Policy")).filter(([id]) =>
+        id.includes("VercelIngress"),
+      ),
+    );
+    const blob = JSON.stringify(policies);
+    expect(blob).toContain("states:StartExecution");
+    expect(blob).not.toContain("states:*");
+    expect(blob).not.toContain("states:DescribeExecution");
+    expect(blob).not.toContain("dynamodb:");
+    expect(blob).not.toContain("sqs:");
+    expect(blob).not.toContain("lambda:");
+    expect(blob).not.toContain("ssm:");
+    expect(blob).not.toContain("event-horizon");
+    expect(blob).not.toContain("AdministratorAccess");
+
+    const statements = Object.values(policies).flatMap((policy) => {
+      const doc = (policy as { Properties?: { PolicyDocument?: { Statement?: unknown[] } } })
+        .Properties?.PolicyDocument?.Statement;
+      return Array.isArray(doc) ? doc : [];
+    }) as Array<{ Action?: string | string[] }>;
+    const actions = statements.flatMap((statement) => {
+      const action = statement.Action;
+      return Array.isArray(action) ? action : action ? [action] : [];
+    });
+    expect(actions).toEqual(["states:StartExecution"]);
   });
 });

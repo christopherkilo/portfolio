@@ -78,7 +78,7 @@ export type InquirySubmitSuccess = {
   ok: true;
   selectedService: InquiryServiceOption;
   inquiryId: string;
-  emailSent: boolean;
+  accepted: true;
 };
 
 export type InquirySubmitFailure = {

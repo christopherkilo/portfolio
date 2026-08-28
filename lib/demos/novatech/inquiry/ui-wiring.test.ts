@@ -42,8 +42,9 @@ describe("NovaTech consultation form wiring", () => {
   it("renders a polished success state for real submissions", () => {
     const status = read("components/demos/novatech/contact/FormStatus.tsx");
     expect(status).toContain("Inquiry received");
-    expect(status).toContain("emailSent");
-    expect(status).toContain("confirmation email could not be");
+    expect(status).toContain("consultation request has been received");
+    expect(status).not.toContain("emailSent");
+    expect(status).not.toContain("confirmation email could not be");
     expect(status).toContain("Start another inquiry");
     expect(status).not.toContain("Demo inquiry validated");
     expect(status).not.toContain("not sent or stored");

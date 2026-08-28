@@ -110,3 +110,26 @@ export function getNovatechServerEnv(): NovatechServerEnv {
 export function isTurnstileSiteKeyConfigured(): boolean {
   return Boolean(read("NEXT_PUBLIC_TURNSTILE_SITE_KEY"));
 }
+
+export type NovaTechWorkflowConfig = {
+  stateMachineArn: string;
+  region: string;
+  roleArn?: string;
+};
+
+/**
+ * Server-only AWS workflow config for StartExecution.
+ * Never expose these values through NEXT_PUBLIC_* or the browser.
+ */
+export function getNovaTechWorkflowConfig(): NovaTechWorkflowConfig {
+  const stateMachineArn = read("NOVATECH_STATE_MACHINE_ARN");
+  const region =
+    read("NOVATECH_AWS_REGION") || read("AWS_REGION") || "us-east-2";
+  const roleArn = read("AWS_ROLE_ARN") || undefined;
+
+  if (!stateMachineArn || !stateMachineArn.startsWith("arn:aws:states:")) {
+    throw new EnvMissingError(["NOVATECH_STATE_MACHINE_ARN"]);
+  }
+
+  return { stateMachineArn, region, roleArn };
+}

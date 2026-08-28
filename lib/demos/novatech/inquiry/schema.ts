@@ -7,7 +7,7 @@ import {
   type InquiryFieldErrors,
   type InquiryInput,
   type InquiryValidationResult,
-} from "@/lib/demos/novatech/inquiry/types";
+} from "./types";
 
 const MESSAGE_MIN = 20;
 const MESSAGE_MAX = 1200;

@@ -5,7 +5,7 @@
 
 export type InquiryApiSuccessData = {
   inquiryId: string;
-  emailSent: boolean;
+  accepted: true;
   selectedService: string;
 };
 

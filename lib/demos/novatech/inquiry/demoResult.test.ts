@@ -110,11 +110,11 @@ describe("demo failure path integration", () => {
           success: true,
           data: {
             inquiryId: "deal-9",
-            emailSent: true,
+            accepted: true,
             selectedService: "cybersecurity",
           },
         }),
-        { status: 201 },
+        { status: 202 },
       ),
     );
 
@@ -128,7 +128,7 @@ describe("demo failure path integration", () => {
       ok: true,
       selectedService: "cybersecurity",
       inquiryId: "deal-9",
-      emailSent: true,
+      accepted: true,
     });
 
     fetchSpy.mockRestore();

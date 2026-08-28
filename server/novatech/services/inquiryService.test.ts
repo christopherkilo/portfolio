@@ -1,10 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { __resetDuplicateGuardForTests } from "@/server/novatech/duplicateGuard";
 import { processInquiry } from "@/server/novatech/services/inquiryService";
-import { TurnstileError, HubSpotError } from "@/server/novatech/errors";
+import {
+  ConfigurationError,
+  TurnstileError,
+  WorkflowUnavailableError,
+} from "@/server/novatech/errors";
 
 vi.mock("@/server/novatech/integrations/turnstile", () => ({
   verifyTurnstileToken: vi.fn(),
+}));
+
+vi.mock("@/server/novatech/aws/startInquiryWorkflow", () => ({
+  startNovaTechInquiryWorkflow: vi.fn(),
 }));
 
 vi.mock("@/server/novatech/integrations/hubspot", () => ({
@@ -16,6 +23,7 @@ vi.mock("@/server/novatech/integrations/resend", () => ({
 }));
 
 import { verifyTurnstileToken } from "@/server/novatech/integrations/turnstile";
+import { startNovaTechInquiryWorkflow } from "@/server/novatech/aws/startInquiryWorkflow";
 import { upsertInquiryInHubSpot } from "@/server/novatech/integrations/hubspot";
 import { sendInquiryEmails } from "@/server/novatech/integrations/resend";
 
@@ -38,26 +46,21 @@ const baseRequest = {
 
 describe("NovaTech inquiry service orchestration", () => {
   beforeEach(() => {
-    __resetDuplicateGuardForTests();
     vi.mocked(verifyTurnstileToken).mockReset();
+    vi.mocked(startNovaTechInquiryWorkflow).mockReset();
     vi.mocked(upsertInquiryInHubSpot).mockReset();
     vi.mocked(sendInquiryEmails).mockReset();
   });
 
   afterEach(() => {
-    __resetDuplicateGuardForTests();
+    vi.mocked(verifyTurnstileToken).mockReset();
+    vi.mocked(startNovaTechInquiryWorkflow).mockReset();
   });
 
-  it("returns success when CRM and email succeed", async () => {
+  it("accepts a valid request after Turnstile and StartExecution", async () => {
     vi.mocked(verifyTurnstileToken).mockResolvedValue(undefined);
-    vi.mocked(upsertInquiryInHubSpot).mockResolvedValue({
-      contactId: "c1",
-      dealId: "d1",
-      contactCreated: true,
-    });
-    vi.mocked(sendInquiryEmails).mockResolvedValue({
-      visitorSent: true,
-      staffSent: true,
+    vi.mocked(startNovaTechInquiryWorkflow).mockResolvedValue({
+      outcome: "started",
     });
 
     const result = await processInquiry({
@@ -65,8 +68,8 @@ describe("NovaTech inquiry service orchestration", () => {
       requestId: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
     });
     expect(result).toEqual({
-      inquiryId: "d1",
-      emailSent: true,
+      inquiryId: baseRequest.submissionId,
+      accepted: true,
       selectedService: "cybersecurity",
     });
     expect(verifyTurnstileToken).toHaveBeenCalledWith(
@@ -77,24 +80,23 @@ describe("NovaTech inquiry service orchestration", () => {
         }),
       }),
     );
-    expect(upsertInquiryInHubSpot).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(startNovaTechInquiryWorkflow).toHaveBeenCalledWith(
       expect.objectContaining({
-        requestId: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
         submissionId: baseRequest.submissionId,
+        requestId: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+        inquiry: expect.not.objectContaining({
+          turnstileToken: expect.anything(),
+        }),
       }),
     );
-    expect(sendInquiryEmails).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.objectContaining({
-        requestId: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
-        submissionId: baseRequest.submissionId,
-      }),
-    );
+    const workflowInput = vi.mocked(startNovaTechInquiryWorkflow).mock.calls[0][0];
+    expect(workflowInput.inquiry).not.toHaveProperty("turnstileToken");
+    expect(JSON.stringify(workflowInput)).not.toMatch(/turnstile/i);
+    expect(upsertInquiryInHubSpot).not.toHaveBeenCalled();
+    expect(sendInquiryEmails).not.toHaveBeenCalled();
   });
 
-  it("stops before CRM when Turnstile fails", async () => {
+  it("stops before AWS when Turnstile fails", async () => {
     vi.mocked(verifyTurnstileToken).mockRejectedValue(
       new TurnstileError("TURNSTILE_FAILED"),
     );
@@ -102,54 +104,60 @@ describe("NovaTech inquiry service orchestration", () => {
     await expect(
       processInquiry({ request: baseRequest }),
     ).rejects.toBeInstanceOf(TurnstileError);
+    expect(startNovaTechInquiryWorkflow).not.toHaveBeenCalled();
     expect(upsertInquiryInHubSpot).not.toHaveBeenCalled();
     expect(sendInquiryEmails).not.toHaveBeenCalled();
   });
 
-  it("fails when CRM fails and never sends email", async () => {
-    vi.mocked(verifyTurnstileToken).mockResolvedValue(undefined);
-    vi.mocked(upsertInquiryInHubSpot).mockRejectedValue(new HubSpotError());
+  it("stops before AWS when Turnstile’s provider is unavailable", async () => {
+    vi.mocked(verifyTurnstileToken).mockRejectedValue(
+      new TurnstileError("TURNSTILE_FAILED"),
+    );
 
     await expect(
-      processInquiry({ request: baseRequest }),
-    ).rejects.toBeInstanceOf(HubSpotError);
+      processInquiry({
+        request: { ...baseRequest, turnstileToken: "provider-down" },
+      }),
+    ).rejects.toBeInstanceOf(TurnstileError);
+    expect(startNovaTechInquiryWorkflow).not.toHaveBeenCalled();
+  });
+
+  it("returns a safe accepted result for duplicate StartExecution", async () => {
+    vi.mocked(verifyTurnstileToken).mockResolvedValue(undefined);
+    vi.mocked(startNovaTechInquiryWorkflow).mockResolvedValue({
+      outcome: "already_exists",
+    });
+
+    const result = await processInquiry({ request: baseRequest });
+    expect(result.accepted).toBe(true);
+    expect(result.inquiryId).toBe(baseRequest.submissionId);
+    expect(upsertInquiryInHubSpot).not.toHaveBeenCalled();
     expect(sendInquiryEmails).not.toHaveBeenCalled();
   });
 
-  it("keeps CRM success when email fails (partial success)", async () => {
+  it("does not wait for HubSpot or Resend when AWS is unavailable", async () => {
     vi.mocked(verifyTurnstileToken).mockResolvedValue(undefined);
-    vi.mocked(upsertInquiryInHubSpot).mockResolvedValue({
-      contactId: "c1",
-      dealId: "d1",
-      contactCreated: true,
-    });
-    vi.mocked(sendInquiryEmails).mockRejectedValue(new Error("email down"));
+    vi.mocked(startNovaTechInquiryWorkflow).mockRejectedValue(
+      new WorkflowUnavailableError(),
+    );
 
-    const result = await processInquiry({
-      request: {
-        ...baseRequest,
-        submissionId: "22222222-2222-4222-8222-222222222222",
-      },
-    });
-    expect(result.inquiryId).toBe("d1");
-    expect(result.emailSent).toBe(false);
-  });
-
-  it("rejects duplicate pending submission ids", async () => {
-    vi.mocked(verifyTurnstileToken).mockResolvedValue(undefined);
-    vi.mocked(upsertInquiryInHubSpot).mockResolvedValue({
-      contactId: "c1",
-      dealId: "d1",
-      contactCreated: true,
-    });
-    vi.mocked(sendInquiryEmails).mockResolvedValue({
-      visitorSent: true,
-      staffSent: true,
-    });
-
-    await processInquiry({ request: baseRequest });
     await expect(
       processInquiry({ request: baseRequest }),
-    ).rejects.toMatchObject({ code: "DUPLICATE_SUBMISSION" });
+    ).rejects.toBeInstanceOf(WorkflowUnavailableError);
+    expect(upsertInquiryInHubSpot).not.toHaveBeenCalled();
+    expect(sendInquiryEmails).not.toHaveBeenCalled();
+  });
+
+  it("surfaces AWS permission/config failure without calling providers", async () => {
+    vi.mocked(verifyTurnstileToken).mockResolvedValue(undefined);
+    vi.mocked(startNovaTechInquiryWorkflow).mockRejectedValue(
+      new ConfigurationError(),
+    );
+
+    await expect(
+      processInquiry({ request: baseRequest }),
+    ).rejects.toBeInstanceOf(ConfigurationError);
+    expect(upsertInquiryInHubSpot).not.toHaveBeenCalled();
+    expect(sendInquiryEmails).not.toHaveBeenCalled();
   });
 });

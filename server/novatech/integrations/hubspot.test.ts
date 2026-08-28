@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { upsertInquiryInHubSpot } from "@/server/novatech/integrations/hubspot";
+import { DEAL_SUBMISSION_PROPERTY } from "@/server/novatech/integrations/hubspotClient";
 import { HubSpotError } from "@/server/novatech/errors";
 import type { NormalizedInquiry } from "@/server/novatech/mappers/inquiryMapper";
 
@@ -23,7 +24,6 @@ const inquiry: NormalizedInquiry = {
   message: "Need a security baseline for the team this quarter.",
   consent: true,
   submissionId: "11111111-1111-4111-8111-111111111111",
-  turnstileToken: "token",
   submittedAt: "2026-07-31T00:00:00.000Z",
 };
 
@@ -32,6 +32,49 @@ function json(data: unknown, status = 200) {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+function crmFetch(options?: {
+  contactSearch?: { total: number; results: Array<{ id: string }> };
+  dealSearch?: { total: number; results: Array<{ id: string }> };
+  notes?: Array<{ toObjectId: string }>;
+  onDealCreate?: () => void;
+}) {
+  let dealCreates = 0;
+  return async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? "GET";
+    if (url.includes(`/properties/deals/${DEAL_SUBMISSION_PROPERTY}`) && method === "GET") {
+      return json({ name: DEAL_SUBMISSION_PROPERTY });
+    }
+    if (url.includes("/contacts/search")) {
+      return json(options?.contactSearch ?? { total: 0, results: [] });
+    }
+    if (url.endsWith("/contacts") && method === "POST") {
+      return json({ id: "contact-1" });
+    }
+    if (url.includes("/contacts/") && method === "PATCH") {
+      return json({ id: "contact-9" });
+    }
+    if (url.includes("/deals/search")) {
+      return json(options?.dealSearch ?? { total: 0, results: [] });
+    }
+    if (url.endsWith("/deals") && method === "POST") {
+      dealCreates += 1;
+      options?.onDealCreate?.();
+      return json({ id: "deal-1" });
+    }
+    if (url.includes("/associations/deals/")) {
+      return new Response(null, { status: 204 });
+    }
+    if (url.includes("/associations/notes")) {
+      return json({ results: options?.notes ?? [] });
+    }
+    if (url.endsWith("/notes") && method === "POST") {
+      return json({ id: "note-1" });
+    }
+    return json({ error: "unexpected" }, 500);
+  };
 }
 
 describe("NovaTech HubSpot integration", () => {
@@ -55,63 +98,34 @@ describe("NovaTech HubSpot integration", () => {
   });
 
   it("creates a contact, deal, association, and note for new emails", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(
-      async (input, init) => {
-        const url = String(input);
-        const method = init?.method ?? "GET";
-        if (url.includes("/contacts/search")) {
-          return json({ total: 0, results: [] });
-        }
-        if (url.endsWith("/contacts") && method === "POST") {
-          return json({ id: "contact-1" });
-        }
-        if (url.endsWith("/deals") && method === "POST") {
-          return json({ id: "deal-1" });
-        }
-        if (url.includes("/associations/deals/")) {
-          return new Response(null, { status: 204 });
-        }
-        if (url.endsWith("/notes") && method === "POST") {
-          return json({ id: "note-1" });
-        }
-        return json({ error: "unexpected" }, 500);
-      },
-    );
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(crmFetch());
 
     const result = await upsertInquiryInHubSpot(inquiry, {
       requestId: "11111111-1111-4111-8111-111111111111",
       submissionId: inquiry.submissionId,
     });
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       contactId: "contact-1",
       dealId: "deal-1",
       noteId: "note-1",
       contactCreated: true,
+      dealCreated: true,
+      noteCreated: true,
     });
     expect(fetchSpy).toHaveBeenCalled();
+    const dealCreate = fetchSpy.mock.calls.find(
+      ([url, init]) => String(url).endsWith("/deals") && (init as RequestInit | undefined)?.method === "POST",
+    );
+    expect(String(dealCreate?.[1]?.body)).toContain(DEAL_SUBMISSION_PROPERTY);
+    expect(String(dealCreate?.[1]?.body)).toContain(inquiry.submissionId);
   });
 
   it("updates an existing contact instead of creating a duplicate", async () => {
-    vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
-      const url = String(input);
-      const method = init?.method ?? "GET";
-      if (url.includes("/contacts/search")) {
-        return json({ total: 1, results: [{ id: "contact-9" }] });
-      }
-      if (url.includes("/contacts/contact-9") && method === "PATCH") {
-        return json({ id: "contact-9" });
-      }
-      if (url.endsWith("/deals") && method === "POST") {
-        return json({ id: "deal-2" });
-      }
-      if (url.includes("/associations/deals/")) {
-        return new Response(null, { status: 204 });
-      }
-      if (url.endsWith("/notes")) {
-        return json({ id: "note-2" });
-      }
-      return json({}, 500);
-    });
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      crmFetch({
+        contactSearch: { total: 1, results: [{ id: "contact-9" }] },
+      }),
+    );
 
     const result = await upsertInquiryInHubSpot(inquiry, {
       requestId: "11111111-1111-4111-8111-111111111111",
@@ -119,7 +133,29 @@ describe("NovaTech HubSpot integration", () => {
     });
     expect(result.contactId).toBe("contact-9");
     expect(result.contactCreated).toBe(false);
-    expect(result.dealId).toBe("deal-2");
+    expect(result.dealId).toBe("deal-1");
+  });
+
+  it("does not create a second deal when recovering the same submissionId", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(
+      crmFetch({
+        dealSearch: { total: 1, results: [{ id: "deal-existing" }] },
+        notes: [{ toObjectId: "note-existing" }],
+      }),
+    );
+
+    const result = await upsertInquiryInHubSpot(inquiry, {
+      requestId: "11111111-1111-4111-8111-111111111111",
+      submissionId: inquiry.submissionId,
+    });
+    expect(result.dealId).toBe("deal-existing");
+    expect(result.dealCreated).toBe(false);
+    expect(result.noteId).toBe("note-existing");
+    expect(result.noteCreated).toBe(false);
+    const dealCreates = fetchSpy.mock.calls.filter(
+      ([url, init]) => String(url).endsWith("/deals") && (init as RequestInit | undefined)?.method === "POST",
+    );
+    expect(dealCreates).toHaveLength(0);
   });
 
   it("maps auth failures to HubSpotError", async () => {

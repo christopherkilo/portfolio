@@ -1,12 +1,14 @@
-import "server-only";
-
-import type { InquiryApiRequest } from "@/lib/demos/novatech/inquiry/schema";
+import type { InquirySchemaInput } from "../../../lib/demos/novatech/inquiry/schema";
 import {
   COMPANY_SIZE_LABELS,
   CONTACT_METHOD_LABELS,
   INQUIRY_SERVICE_LABELS,
   URGENCY_LABELS,
-} from "@/lib/demos/novatech/inquiry/labels";
+} from "../../../lib/demos/novatech/inquiry/labels";
+
+export type InquiryForCrm = InquirySchemaInput & {
+  submissionId: string;
+};
 
 export type NormalizedInquiry = {
   name: string;
@@ -16,19 +18,18 @@ export type NormalizedInquiry = {
   phone?: string;
   company: string;
   jobTitle?: string;
-  selectedService: InquiryApiRequest["selectedService"];
+  selectedService: InquirySchemaInput["selectedService"];
   serviceLabel: string;
-  companySize: InquiryApiRequest["companySize"];
+  companySize: InquirySchemaInput["companySize"];
   companySizeLabel: string;
   currentEnvironment?: string;
-  urgency: InquiryApiRequest["urgency"];
+  urgency: InquirySchemaInput["urgency"];
   urgencyLabel: string;
-  preferredContactMethod: InquiryApiRequest["preferredContactMethod"];
+  preferredContactMethod: InquirySchemaInput["preferredContactMethod"];
   preferredContactLabel: string;
   message: string;
   consent: true;
   submissionId: string;
-  turnstileToken: string;
   submittedAt: string;
 };
 
@@ -47,9 +48,9 @@ function emptyToUndefined(value: string): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-/** Normalize validated API input for CRM + email (no provider IDs from client). */
+/** Normalize validated inquiry input for CRM + email (no provider IDs from the client). */
 export function mapInquiryForBackend(
-  input: InquiryApiRequest,
+  input: InquiryForCrm,
   submittedAt = new Date().toISOString(),
 ): NormalizedInquiry {
   const { firstName, lastName } = splitName(input.name);
@@ -73,7 +74,6 @@ export function mapInquiryForBackend(
     message: input.message.trim(),
     consent: true,
     submissionId: input.submissionId,
-    turnstileToken: input.turnstileToken,
     submittedAt,
   };
 }

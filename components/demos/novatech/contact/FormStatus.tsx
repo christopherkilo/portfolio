@@ -101,13 +101,11 @@ export function SubmitFailureBanner({ message, onRetry }: SubmitFailureProps) {
 
 type InquirySuccessProps = {
   selectedService: InquiryServiceOption;
-  emailSent?: boolean;
   onReset: () => void;
 };
 
 export function InquirySuccess({
   selectedService,
-  emailSent = true,
   onReset,
 }: InquirySuccessProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -138,16 +136,10 @@ export function InquirySuccess({
         Inquiry received
       </h2>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
-        Thanks — your consultation inquiry was submitted successfully.
+        Thanks — your consultation request has been received.
         NovaTech Solutions is a fictional portfolio demonstration; there is no
         guaranteed response time from a live MSP team.
       </p>
-      {!emailSent ? (
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
-          Your inquiry was received, but the confirmation email could not be
-          sent. Your details were still recorded.
-        </p>
-      ) : null}
 
       <div className="mt-6 rounded-xl border border-border bg-bg px-4 py-3">
         <p className="text-xs font-semibold uppercase tracking-wider text-accent">

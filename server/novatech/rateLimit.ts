@@ -8,11 +8,12 @@ type Bucket = {
 };
 
 /**
- * Best-effort in-memory rate limiter.
+ * Best-effort in-memory rate limiter at the public ingress.
  *
- * Limitation: instance-local only. Not suitable as the sole control for
- * multi-instance production. Replace later with Upstash Redis, Cloudflare,
- * or an edge limiter without changing call sites.
+ * Limitation: instance-local only. It is not distributed protection and must
+ * not be described as such. Cloudflare Turnstile and DynamoDB submission
+ * idempotency are the real controls. Kept as a cheap extra guard against
+ * noisy retries hitting this instance — not Redis, WAF, or API Gateway.
  */
 const buckets = new Map<string, Bucket>();
 

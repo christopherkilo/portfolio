@@ -3,8 +3,7 @@ import type {
   InquiryServiceOption,
   InquiryUrgency,
   PreferredContactMethod,
-} from "@/lib/demos/novatech/inquiry/types";
-import { getServiceById } from "@/lib/demos/novatech/paths";
+} from "./types";
 
 export const INQUIRY_SERVICE_LABELS: Record<InquiryServiceOption, string> = {
   "managed-it": "Managed IT",
@@ -39,12 +38,4 @@ export const CONTACT_METHOD_LABELS: Record<PreferredContactMethod, string> = {
 
 export function inquiryServiceLabel(service: InquiryServiceOption): string {
   return INQUIRY_SERVICE_LABELS[service];
-}
-
-export function consultationContextTitle(
-  service: InquiryServiceOption,
-): string {
-  if (service === "not-sure") return "General consultation";
-  const known = getServiceById(service);
-  return known ? `${known.title} consultation` : INQUIRY_SERVICE_LABELS[service];
 }

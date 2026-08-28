@@ -39,7 +39,7 @@ All three software applications live in this repo under `/demos/*`. They do **no
 | Application | Route | Persistence / services |
 | --- | --- | --- |
 | Event Horizon | `/demos/event-horizon` | PostgreSQL + Prisma + Auth.js; optional AWS Function URL for Ticketmaster discovery |
-| NovaTech Solutions | `/demos/novatech-solutions` | HubSpot, Resend, Cloudflare Turnstile |
+| NovaTech Solutions | `/demos/novatech-solutions` | Turnstile + AWS Step Functions (HubSpot, SQS, Resend) |
 | TaskFlow | `/demos/taskflow` | Supabase (Auth, Postgres/RLS, Realtime, Storage) |
 | Kilo Toolkit | `/toolkit` | Client-side simulated diagnostics |
 
@@ -74,16 +74,16 @@ AWS infrastructure (CDK, EventBridge, Fargate, SQS, Lambda, DynamoDB) lives unde
 
 ### NovaTech Solutions
 
-Optional live inquiry pipeline (values only in `.env.local`):
+Public form path: Next.js Route Handler → Turnstile → Step Functions. HubSpot and Resend run in AWS, not in the Route Handler.
 
 | Variable | Purpose |
 |----------|---------|
-| `NEXT_PUBLIC_APP_URL` | Public origin |
-| `HUBSPOT_ACCESS_TOKEN` | HubSpot Private App |
-| `HUBSPOT_PIPELINE_ID` / `HUBSPOT_DEAL_STAGE_ID` | Deal pipeline/stage |
-| `RESEND_API_KEY` | Transactional email |
-| `NOVATECH_FROM_EMAIL` / `NOVATECH_STAFF_EMAIL` | From + staff notify |
 | `TURNSTILE_SECRET_KEY` / `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Spam protection |
+| `NOVATECH_STATE_MACHINE_ARN` | Server-only state machine ARN |
+| `NOVATECH_AWS_REGION` | AWS region (`us-east-2`) |
+| `AWS_ROLE_ARN` | Vercel OIDC role (Production/Preview) |
+
+Local AWS auth uses `AWS_PROFILE=portfolio`. Do not put access keys in `.env.local`.
 
 See `NOVATECH_INTEGRATION_SETUP.md`.
 

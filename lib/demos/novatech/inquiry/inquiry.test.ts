@@ -178,11 +178,11 @@ describe("NovaTech submitInquiry client adapter", () => {
           success: true,
           data: {
             inquiryId: "deal-1",
-            emailSent: true,
+            accepted: true,
             selectedService: "cybersecurity",
           },
         }),
-        { status: 201, headers: { "Content-Type": "application/json" } },
+        { status: 202, headers: { "Content-Type": "application/json" } },
       ),
     );
 
@@ -195,7 +195,7 @@ describe("NovaTech submitInquiry client adapter", () => {
       ok: true,
       selectedService: "cybersecurity",
       inquiryId: "deal-1",
-      emailSent: true,
+      accepted: true,
     });
     expect(fetchSpy).toHaveBeenCalledOnce();
     const [, init] = fetchSpy.mock.calls[0];

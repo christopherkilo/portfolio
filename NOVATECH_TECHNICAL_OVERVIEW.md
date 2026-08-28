@@ -65,13 +65,13 @@ URL-synced category filters (`?category=`), result counts, accessible `aria-pres
 
 ## Inquiry submission boundary
 
-`submitInquiry()` posts to `POST /api/novatech/inquiries` with a Turnstile token and client `submissionId`. The server returns safe success/error payloads; personal data is not logged.
+`submitInquiry()` posts to `POST /api/novatech/inquiries` with a Turnstile token and client `submissionId`. The server returns a safe 202 payload; personal data is not logged. CRM and email run asynchronously in AWS after Turnstile.
 
 ### Observability
 
 - Every response includes `x-request-id` (generated or accepted UUID).
-- `requestId` traces one HTTP request across Turnstile → HubSpot → Resend logs.
-- `submissionId` remains separate for duplicate protection.
+- `requestId` traces one HTTP request across Turnstile → StartExecution logs.
+- `submissionId` remains separate for durable DynamoDB idempotency.
 - Structured JSON logs live in `server/novatech/logger.ts` (console only — not a full monitoring platform).
 
 ### Development-only failure path
@@ -84,14 +84,16 @@ URL-synced category filters (`?category=`), result counts, accessible `aria-pres
 
 Backdrop is a non-focusable overlay (`aria-hidden` + click handler). Focus trap, Escape, focus restoration, body scroll lock, and dialog labelling remain on the panel.
 
-## Future backend plan
+## Inquiry backend
 
 1. Keep `inquirySchema` / `inquiryApiRequestSchema` as the shared contract  
-2. Route Handler: `POST /api/novatech/inquiries`  
-3. Service layer: Turnstile → HubSpot → Resend  
+2. Route Handler: `POST /api/novatech/inquiries` — validate, Turnstile, StartExecution  
+3. AWS: Step Functions → DynamoDB → HubSpot Lambda → SQS → Notification Lambda → Resend  
 4. Preserve fictional-company disclosures in the UI  
 
-**Implemented:** HubSpot + Resend + Turnstile inquiry backend. See `NOVATECH_BACKEND_ARCHITECTURE.md` and `NOVATECH_INTEGRATION_SETUP.md`.
+**Implemented:** Public form ingress plus the durable AWS workflow. See `NOVATECH_BACKEND_ARCHITECTURE.md` and `NOVATECH_INTEGRATION_SETUP.md`.
+
+Event Horizon stays a separate stack. Do not treat NovaTech IAM as Event Horizon IAM.
 
 ## Environment configuration
 
@@ -99,14 +101,14 @@ Copy `.env.example` → `.env.local` and set real values **only** in `.env.local
 
 | Variable | Used for | Where it comes from |
 |----------|----------|---------------------|
-| `NEXT_PUBLIC_APP_URL` | Canonical public app URL (email links) | Local or deployed origin |
-| `HUBSPOT_ACCESS_TOKEN` | HubSpot Private App CRM writes | HubSpot Private Apps |
-| `HUBSPOT_PIPELINE_ID` / `HUBSPOT_DEAL_STAGE_ID` | Deal placement | HubSpot deal pipelines |
-| `RESEND_API_KEY` | Transactional email | Resend dashboard |
-| `NOVATECH_FROM_EMAIL` | From address | Verified Resend sender/domain |
-| `NOVATECH_STAFF_EMAIL` | Staff notification recipient | Your inbox |
+| `NEXT_PUBLIC_APP_URL` | Canonical public app URL | Local or deployed origin |
 | `TURNSTILE_SECRET_KEY` | Server-side Turnstile verification | Cloudflare Turnstile |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Client Turnstile widget | Cloudflare Turnstile (public) |
 | `NOVATECH_ALLOW_TURNSTILE_DEV_BYPASS` | Local mock token acceptance | Dev only — never in production |
+| `NOVATECH_STATE_MACHINE_ARN` | Step Functions StartExecution | CloudFormation / AWS CLI (server-only) |
+| `NOVATECH_AWS_REGION` | AWS region for the SFN client | `us-east-2` |
+| `AWS_ROLE_ARN` | Vercel OIDC role (Production/Preview) | `portfolio-dev-novatech-vercel-ingress` |
+
+HubSpot and Resend secrets for the live form live in SSM, not Next.js. `HUBSPOT_ACCESS_TOKEN` / `RESEND_API_KEY` in `.env.local` are only for local unit tests of the shared clients.
 
 See also: `NOVATECH_FRONTEND_ARCHITECTURE.md`, `NOVATECH_BACKEND_ARCHITECTURE.md`, `NOVATECH_INTEGRATION_SETUP.md`, `NOVATECH_INTERVIEW_GUIDE.md`, `NOVATECH_FRONTEND_REVIEW.md`.

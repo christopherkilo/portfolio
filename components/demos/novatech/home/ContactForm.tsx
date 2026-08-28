@@ -67,7 +67,6 @@ function ContactFormInner() {
   const [failureMessage, setFailureMessage] = useState<string | undefined>();
   const [confirmedService, setConfirmedService] =
     useState<InquiryServiceOption | null>(null);
-  const [emailSent, setEmailSent] = useState(true);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileReset, setTurnstileReset] = useState(0);
 
@@ -160,7 +159,6 @@ function ContactFormInner() {
     }
 
     setConfirmedService(result.selectedService);
-    setEmailSent(result.emailSent);
     setPhase("success");
     resetTurnstile();
   }
@@ -176,7 +174,6 @@ function ContactFormInner() {
     setFormError(undefined);
     setFailureMessage(undefined);
     setConfirmedService(null);
-    setEmailSent(true);
     setPhase("editing");
     resetTurnstile();
     router.replace(
@@ -202,7 +199,6 @@ function ContactFormInner() {
           {phase === "success" && confirmedService ? (
             <InquirySuccess
               selectedService={confirmedService}
-              emailSent={emailSent}
               onReset={resetForm}
             />
           ) : null}

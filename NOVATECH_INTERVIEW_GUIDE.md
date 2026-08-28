@@ -54,19 +54,31 @@ Short answers for discussing the fictional MSP demo. Pair with `NOVATECH_TECHNIC
 
 **ELI15:** The form handles the experience; a small helper talks to the server.
 
-**Technical:** `submitInquiry()` posts JSON to `POST /api/novatech/inquiries` with a Turnstile token and submission id. Validation UX stays in the client; secrets and providers stay on the server.
+**Technical:** `submitInquiry()` posts JSON to `POST /api/novatech/inquiries` with a Turnstile token and submission id. Validation UX stays in the client. Secrets stay on the server. AWS starts only after Turnstile.
 
 ## What happens on a real inquiry submission?
 
-**ELI15:** The form asks, Next.js receives, Zod checks, Turnstile guards, HubSpot remembers, Resend emails, and React confirms.
+**ELI15:** The form asks, Next.js receives, Zod checks, Turnstile guards, then AWS takes the lead — HubSpot stores the CRM record and email goes out later through a queue.
 
-**Technical:** Route Handler → Zod (`inquiryApiRequestSchema`) → Turnstile Siteverify → HubSpot contact upsert + deal + note → Resend visitor/staff emails → `{ success, data: { inquiryId, emailSent } }`. HubSpot is authoritative; email failure returns success with `emailSent: false`. Every hop shares one `requestId` in structured logs (`x-request-id` on the response); `submissionId` stays separate for duplicate protection.
+**Technical:** Route Handler → Zod (`inquiryApiRequestSchema`) → Turnstile Siteverify → `states:StartExecution` → Step Functions (DynamoDB claim → HubSpot Lambda → SQS → notification Lambda → Resend) → `{ success, data: { inquiryId, accepted, selectedService } }` with HTTP 202. The HTTP request does not wait for HubSpot or Resend. `requestId` is one HTTP trace; `submissionId` is the durable idempotency key.
 
 ## What is a request correlation ID?
 
 **ELI15:** A request ID is like a tracking number attached to one inquiry trip. Every backend service writes that same number in its notes, so a developer can follow what happened without exposing the visitor’s private information.
 
 **Technical:** Accepted only as a strict UUID via `x-request-id`, otherwise generated. Used in logs and optional error JSON — never as a security token. Distinct from `submissionId`.
+
+## Why is Turnstile in Next.js instead of inside Step Functions?
+
+**ELI15:** Prove a human submitted the form before AWS spends any work.
+
+**Technical:** A bot that skips the widget and POSTs JSON must not be able to StartExecution. The token is verified at ingress and never stored in DynamoDB, SQS, or execution input.
+
+## Why doesn’t the API wait for HubSpot and email?
+
+**ELI15:** The visitor should not sit on a spinner while CRM and mailboxes work.
+
+**Technical:** After Turnstile and StartExecution, HTTP 202 means the workflow was accepted. HubSpot is still the CRM system of record; Resend is at-least-once via SQS. The UI says the request was received, not that email already sent.
 
 ## Why HubSpot instead of a database?
 
@@ -81,7 +93,7 @@ Short answers for discussing the fictional MSP demo. Pair with `NOVATECH_TECHNIC
 | Domain | Fictional MSP marketing + inquiry | Event marketplace |
 | Data authority | Static content + HubSpot CRM for inquiries | Prisma/Postgres + Auth.js REST |
 | Auth | None | Google OAuth sessions |
-| Persistence | HubSpot contacts/deals (no local inquiry DB) | Favorites/reservations in DB |
+| Persistence | HubSpot contacts/deals + DynamoDB workflow metadata | Favorites/reservations in DB |
 | Primary teaching goal | B2B IA, lead-form + CRM/email integrations | Full-stack sessions, inventory, money-as-cents |
 
-NovaTech now includes a production-shaped inquiry backend (Turnstile, HubSpot, Resend) without auth or a local database.
+NovaTech includes a production-shaped inquiry backend: Next.js ingress, Turnstile, Step Functions, DynamoDB idempotency, HubSpot CRM, and asynchronous Resend via SQS. No end-user auth and no local inquiry database.

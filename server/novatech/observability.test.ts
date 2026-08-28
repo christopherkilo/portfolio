@@ -10,7 +10,6 @@ import {
   REQUEST_ID_HEADER,
 } from "@/server/novatech/requestId";
 import { __resetInquiryRateLimitForTests } from "@/server/novatech/rateLimit";
-import { __resetDuplicateGuardForTests } from "@/server/novatech/duplicateGuard";
 
 vi.mock("@/server/novatech/services/inquiryService", () => ({
   processInquiry: vi.fn(),
@@ -157,19 +156,17 @@ describe("structured logger redaction", () => {
 describe("POST /api/novatech/inquiries observability", () => {
   beforeEach(() => {
     __resetInquiryRateLimitForTests();
-    __resetDuplicateGuardForTests();
     vi.mocked(processInquiry).mockReset();
   });
 
   afterEach(() => {
     __resetInquiryRateLimitForTests();
-    __resetDuplicateGuardForTests();
   });
 
   it("returns a generated x-request-id when the header is absent", async () => {
     vi.mocked(processInquiry).mockResolvedValue({
       inquiryId: "deal-1",
-      emailSent: true,
+      accepted: true,
       selectedService: "cybersecurity",
     });
     const response = await POST(request(validBody, { ip: "10.0.0.1" }));
@@ -183,7 +180,7 @@ describe("POST /api/novatech/inquiries observability", () => {
     const incoming = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
     vi.mocked(processInquiry).mockResolvedValue({
       inquiryId: "deal-1",
-      emailSent: true,
+      accepted: true,
       selectedService: "cybersecurity",
     });
     const response = await POST(
@@ -198,7 +195,7 @@ describe("POST /api/novatech/inquiries observability", () => {
   it("replaces a malformed x-request-id", async () => {
     vi.mocked(processInquiry).mockResolvedValue({
       inquiryId: "deal-1",
-      emailSent: true,
+      accepted: true,
       selectedService: "cybersecurity",
     });
     const response = await POST(
@@ -226,7 +223,7 @@ describe("POST /api/novatech/inquiries observability", () => {
     const requestId = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
     vi.mocked(processInquiry).mockResolvedValue({
       inquiryId: "deal-1",
-      emailSent: true,
+      accepted: true,
       selectedService: "cybersecurity",
     });
     await POST(request(validBody, { ip: "10.0.0.5", requestId }));

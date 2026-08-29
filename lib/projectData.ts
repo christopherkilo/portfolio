@@ -45,8 +45,8 @@ export const projects: Project[] = [
     title: "NovaTech Solutions",
     category: "web",
     description:
-      "Business website integrating HubSpot CRM, automated inquiries, email delivery, and spam protection.",
-    technologies: ["Next.js", "TypeScript", "HubSpot", "Resend"],
+      "Managed-IT marketing site with a real inquiry workflow: Turnstile, Step Functions, HubSpot, and asynchronous Resend.",
+    technologies: ["Next.js", "TypeScript", "HubSpot", "AWS"],
     image: "/projects/novatech-logo.svg",
     imageAlt:
       "NovaTech Solutions portfolio cover with indigo enterprise mark and wordmark",

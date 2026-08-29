@@ -56,9 +56,10 @@ PROJECTS = [
     ),
     (
         "NovaTech Solutions",
-        "Next.js | TypeScript | HubSpot | Resend",
-        "Managed-IT marketing site with a real lead path: validation, Turnstile, HubSpot, "
-        "and Resend - built for conversion, not just polish.",
+        "Next.js | TypeScript | HubSpot | AWS",
+        "Built a serverless AWS inquiry workflow using Step Functions, Lambda, DynamoDB, "
+        "SQS, and SSM, integrating HubSpot CRM and asynchronous Resend notifications "
+        "with durable idempotency and failure isolation.",
     ),
     (
         "TaskFlow",

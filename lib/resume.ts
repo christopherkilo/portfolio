@@ -55,8 +55,8 @@ export const resumeProjects = [
     title: "NovaTech Solutions",
     href: "/projects/novatech-solutions",
     summary:
-      "Managed-IT marketing site with a real lead path: validation, Turnstile, HubSpot, and Resend—built for conversion, not just polish.",
-    technologies: ["Next.js", "TypeScript", "HubSpot", "Resend"],
+      "Built a serverless AWS inquiry workflow using Step Functions, Lambda, DynamoDB, SQS, and SSM, integrating HubSpot CRM and asynchronous Resend notifications with durable idempotency and failure isolation.",
+    technologies: ["Next.js", "TypeScript", "HubSpot", "AWS"],
   },
   {
     id: "taskflow",

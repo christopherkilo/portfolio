@@ -96,4 +96,22 @@ Short answers for discussing the fictional MSP demo. Pair with `NOVATECH_TECHNIC
 | Persistence | HubSpot contacts/deals + DynamoDB workflow metadata | Favorites/reservations in DB |
 | Primary teaching goal | B2B IA, lead-form + CRM/email integrations | Full-stack sessions, inventory, money-as-cents |
 
-NovaTech includes a production-shaped inquiry backend: Next.js ingress, Turnstile, Step Functions, DynamoDB idempotency, HubSpot CRM, and asynchronous Resend via SQS. No end-user auth and no local inquiry database.
+NovaTech includes a production inquiry backend: Next.js ingress, Turnstile, Vercel OIDC, Step Functions, DynamoDB idempotency, HubSpot CRM, and asynchronous Resend via SQS. No end-user auth and no local inquiry database. NovaTech AWS is closed — do not start another cloud phase.
+
+## Why OIDC instead of access keys?
+
+**ELI15:** The website borrows a temporary AWS badge from Vercel instead of keeping a permanent password in hosting settings.
+
+**Technical:** In Production and Preview, `getVercelOidcToken()` plus `fromWebToken` assume `portfolio-dev-novatech-vercel-ingress`. CloudTrail shows `AssumeRoleWithWebIdentity` from `oidc.vercel.com/christopherkilos-projects` and `StartExecution` with a temporary `ASIA…` session, not a long-lived `AKIA…` key. The role may call only `states:StartExecution` on the NovaTech state machine. Local `next dev` uses the AWS CLI profile and must not assume that role.
+
+## What happens on a duplicate `submissionId`?
+
+**ELI15:** Sending the same form ticket twice does not open a second sales deal.
+
+**Technical:** Execution name is `nt-<submissionId>`. A second `StartExecution` becomes `ExecutionAlreadyExists`. The API still returns HTTP 202 with `{ accepted: true }`. DynamoDB `attribute_not_exists` is the business guard: HubSpot and SQS do not run again. Turnstile still has to succeed before AWS is called.
+
+## Why can visitor email fail after a successful inquiry?
+
+**ELI15:** The sales record can exist even if the thank-you email bounces.
+
+**Technical:** HubSpot is the system of record. SQS jobs are isolated. Resend 401/403 marks that email `FAILED_PERMANENT` and acknowledges the message so retries do not loop. A Resend test sender cannot deliver to arbitrary inboxes; staff mail to the configured test recipient can still succeed. The public UI says the request was received, not that email already sent.

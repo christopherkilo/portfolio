@@ -19,6 +19,14 @@ const RELATED_PROJECTS: Record<string, RelatedProjectLink> = {
     label: "Event Horizon",
     href: "/projects/event-horizon",
   },
+  novatech: {
+    label: "NovaTech",
+    href: "/projects/novatech-solutions",
+  },
+  "novatech-solutions": {
+    label: "NovaTech",
+    href: "/projects/novatech-solutions",
+  },
 };
 
 export function getRelatedProject(project?: string): RelatedProjectLink | null {

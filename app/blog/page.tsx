@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { TagFilter } from "@/components/blog/TagFilter";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { getAllPosts, getAllTags, getFeaturedPost } from "@/lib/blog";
+import { getAllPosts, getAllTags } from "@/lib/blog";
 import { SITE } from "@/lib/constants";
 import { pageMetadata } from "@/lib/seo";
 
@@ -26,14 +26,10 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
   const filtered = activeTag
     ? posts.filter((post) => post.tags.includes(activeTag))
     : posts;
-  const featured = activeTag ? null : getFeaturedPost();
-  const rest = featured
-    ? filtered.filter((post) => post.slug !== featured.slug)
-    : filtered;
-
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <SectionHeader
+        className="mb-6 sm:mb-8"
         eyebrow="Blog"
         title="Notes from the work in progress"
         description="Development notes, design decisions, experiments, and lessons from the projects I’m building."
@@ -41,25 +37,16 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
 
       <TagFilter tags={tags} active={activeTag} />
 
-      {featured ? (
-        <section className="mb-12" aria-labelledby="featured-writing">
-          <h2 id="featured-writing" className="sr-only">
-            Featured article
-          </h2>
-          <BlogCard post={featured} featured />
-        </section>
-      ) : null}
-
-      {rest.length ? (
+      {filtered.length ? (
         <section aria-labelledby="all-writing">
           <h2
             id="all-writing"
             className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-muted"
           >
-            {featured ? "More writing" : activeTag ? `Tagged ${activeTag}` : "Articles"}
+            {activeTag ? `Tagged ${activeTag}` : "Articles"}
           </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-7">
-            {rest.map((post) => (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((post) => (
               <BlogCard key={post.slug} post={post} />
             ))}
           </div>

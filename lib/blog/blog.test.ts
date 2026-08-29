@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { getGeneratedCoverKind } from "./covers";
 import { extractHeadings } from "./headings";
-import { getAllPosts, getFeaturedPost, getPostBySlug } from "./posts";
+import { getAllPosts, getFeaturedPost, getLatestPosts, getPostBySlug } from "./posts";
 import { getRelatedProject } from "./relatedProjects";
 import { readingMinutesFromText } from "./readingTime";
 
@@ -21,9 +22,18 @@ describe("blog content source", () => {
   it("does not hardcode cards — index is derived from content files", () => {
     const posts = getAllPosts();
     const featured = getFeaturedPost();
-    expect(posts.length).toBeGreaterThanOrEqual(1);
+    const latest = getLatestPosts(3);
+    expect(posts.length).toBeGreaterThanOrEqual(3);
     expect(featured?.slug).toBe("building-starlenz");
+    expect(latest.map((post) => post.slug)).toEqual([
+      "taking-novatech-to-aws",
+      "taking-event-horizon-to-aws",
+      "building-starlenz",
+    ]);
     expect(posts.every((post) => post.href.startsWith("/blog/"))).toBe(true);
+    expect(posts.every((post) => getGeneratedCoverKind(post) !== null)).toBe(
+      true,
+    );
   });
 
   it("extracts heading ids used by the table of contents", () => {
@@ -47,6 +57,31 @@ describe("blog content source", () => {
     const related = getRelatedProject("Event Horizon");
     expect(related?.href).toBe("/projects/event-horizon");
     expect(related?.inDevelopment).toBeUndefined();
+  });
+
+  it("links NovaTech writing to the case study", () => {
+    const related = getRelatedProject("NovaTech");
+    expect(related?.href).toBe("/projects/novatech-solutions");
+    expect(related?.inDevelopment).toBeUndefined();
+  });
+
+  it("loads the NovaTech AWS development update", () => {
+    const post = getPostBySlug("taking-novatech-to-aws");
+    expect(post).not.toBeNull();
+    expect(post?.title).toBe("Taking NovaTech to AWS");
+    expect(post?.project).toBe("NovaTech");
+    expect(post?.featured).toBe(false);
+    expect(post?.coverImage).toBe("generated:novatech");
+    expect(getGeneratedCoverKind(post!)).toBe("novatech");
+    expect(post?.content).toContain("Step Functions");
+    expect(post?.content).toContain("DynamoDB");
+    expect(post?.content).toContain("Turnstile");
+    expect(post?.content).toContain("OIDC");
+    expect(post?.content).toMatch(/at-least-once/);
+    expect(post?.content).toMatch(/instance-local/);
+    expect(post?.content).not.toMatch(/868150783834/);
+    expect(post?.content).not.toMatch(/lambda-url/);
+    expect(post?.headings.length).toBeGreaterThan(5);
   });
 
   it("loads the Event Horizon AWS development update", () => {

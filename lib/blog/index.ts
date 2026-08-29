@@ -1,3 +1,5 @@
+export { getGeneratedCoverKind } from "./covers";
+export type { GeneratedBlogCover } from "./covers";
 export { formatBlogDate } from "./dates";
 export { extractHeadings, slugifyHeading } from "./headings";
 export {

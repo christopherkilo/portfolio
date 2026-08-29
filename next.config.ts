@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  // Dev-only: Chrome opened at 127.0.0.1 while `next dev` advertises localhost.
+  // Without this, Next blocks /_next assets and Framer-hidden homepage content never appears.
+  allowedDevOrigins: ["127.0.0.1"],
   async redirects() {
     return [
       {

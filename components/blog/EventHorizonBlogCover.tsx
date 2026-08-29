@@ -17,7 +17,7 @@ export function EventHorizonBlogCover({
 
   return (
     <div
-      className={cn("isolate h-full w-full overflow-hidden bg-[#07060A]", className)}
+      className={cn("relative isolate h-full w-full overflow-hidden bg-[#07060A]", className)}
       aria-hidden
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(255,140,43,0.28),transparent_58%),radial-gradient(ellipse_at_12%_8%,rgba(250,204,21,0.12),transparent_40%),linear-gradient(165deg,#07060A_0%,#16110c_50%,#07060A_100%)]" />

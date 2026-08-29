@@ -4,47 +4,16 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { formatBlogDate } from "@/lib/blog/dates";
-import type { BlogPostMeta } from "@/lib/blog/types";
-import { EventHorizonBlogCover } from "@/components/blog/EventHorizonBlogCover";
+import { BlogGeneratedCover } from "@/components/blog/BlogGeneratedCover";
 import { InDevBadge } from "@/components/blog/InDevBadge";
-import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
 import { Badge } from "@/components/ui/Badge";
 import { Shimmer } from "@/components/ui/Shimmer";
+import { formatBlogDate } from "@/lib/blog/dates";
+import type { BlogPostMeta } from "@/lib/blog/types";
 import { springHover } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 
-function Cover({ post, featured }: { post: BlogPostMeta; featured?: boolean }) {
-  const generatedStarLenz =
-    post.coverImage === "generated:starlenz" ||
-    (!post.coverImage && post.project === "StarLenz");
-  const generatedEventHorizon =
-    post.coverImage === "generated:event-horizon" ||
-    (!post.coverImage && post.project === "Event Horizon");
-
-  if (generatedStarLenz) {
-    return <StarLenzBlogCover className="absolute inset-0" />;
-  }
-  if (generatedEventHorizon) {
-    return <EventHorizonBlogCover className="absolute inset-0" />;
-  }
-
-  return (
-    <div className="absolute inset-0 grid place-items-center bg-surface-elevated">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-        {featured ? "Featured" : "Article"}
-      </span>
-    </div>
-  );
-}
-
-export function BlogCard({
-  post,
-  featured = false,
-}: {
-  post: BlogPostMeta;
-  featured?: boolean;
-}) {
+export function BlogCard({ post }: { post: BlogPostMeta }) {
   const reducedMotion = useReducedMotion();
   const [hovered, setHovered] = useState(false);
 
@@ -65,10 +34,7 @@ export function BlogCard({
       <Shimmer className="h-full rounded-[var(--radius)]" onPress={false}>
         <article
           className={cn(
-            "gradient-border glass-panel group relative flex h-full overflow-hidden rounded-[var(--radius)]",
-            featured
-              ? "flex-col md:flex-row md:min-h-[20rem]"
-              : "flex-col",
+            "gradient-border glass-panel group relative flex h-full flex-col overflow-hidden rounded-[var(--radius)]",
             hovered &&
               "brightness-[1.04] shadow-[0_28px_60px_-28px_rgba(0,0,0,0.45),0_0_40px_-20px_var(--glow-yellow)]",
           )}
@@ -79,26 +45,14 @@ export function BlogCard({
           aria-label={`Read article: ${post.title}`}
         />
 
-        <div
-          className={cn(
-            "relative overflow-hidden bg-surface-elevated",
-            featured
-              ? "aspect-[16/10] md:aspect-auto md:w-[46%] md:min-h-[22rem]"
-              : "aspect-[16/10]",
-          )}
-        >
-          <Cover post={post} featured={featured} />
+        <div className="relative aspect-[16/9] overflow-hidden bg-surface-elevated">
+          <BlogGeneratedCover post={post} className="absolute inset-0" />
           <span className="absolute right-3 top-3 z-[2] inline-flex size-8 items-center justify-center rounded-full border border-white/10 bg-black/40 text-text opacity-0 backdrop-blur-md transition duration-[var(--duration-card)] group-hover:opacity-100 group-focus-within:opacity-100">
             <ArrowUpRight className="size-4" aria-hidden />
           </span>
         </div>
 
-        <div
-          className={cn(
-            "relative z-[2] flex flex-1 flex-col gap-4 p-6 sm:p-7",
-            featured && "md:justify-center md:p-8 lg:p-10",
-          )}
-        >
+        <div className="relative z-[2] flex flex-1 flex-col gap-4 p-6 sm:p-7">
           <div className="flex flex-wrap items-center gap-2">
             {post.project ? (
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
@@ -110,22 +64,10 @@ export function BlogCard({
           </div>
 
           <div>
-            <h2
-              className={cn(
-                "font-display font-semibold tracking-tight text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary",
-                featured
-                  ? "text-2xl sm:text-3xl md:text-[2.1rem] md:leading-tight"
-                  : "text-xl sm:text-2xl",
-              )}
-            >
+            <h2 className="line-clamp-2 font-display text-xl font-semibold tracking-tight text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary sm:text-2xl">
               {post.title}
             </h2>
-            <p
-              className={cn(
-                "mt-3 max-w-prose leading-relaxed text-secondary",
-                featured ? "text-base md:text-lg" : "line-clamp-3 text-sm md:text-[0.95rem]",
-              )}
-            >
+            <p className="mt-3 line-clamp-3 max-w-prose text-sm leading-relaxed text-secondary md:text-[0.95rem]">
               {post.description}
             </p>
           </div>
@@ -138,7 +80,7 @@ export function BlogCard({
 
           {post.tags.length ? (
             <div className="flex flex-wrap gap-2">
-              {post.tags.slice(0, featured ? 6 : 4).map((tag) => (
+              {post.tags.slice(0, 4).map((tag) => (
                 <Badge key={tag}>{tag}</Badge>
               ))}
             </div>

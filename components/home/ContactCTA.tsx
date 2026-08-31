@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, FileText, Loader2, Mail, Send } from "lucide-react";
+import { FileText, Loader2, Mail, Send } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/BrandIcons";
@@ -10,13 +10,17 @@ import { Reveal } from "@/components/shared/Reveal";
 import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-type FormStatus = "idle" | "submitting" | "sent" | "error";
+type FormStatus = "idle" | "submitting" | "handoff" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "message", string>>;
+
+const NAME_MAX = 100;
+const EMAIL_MAX = 254;
+const MESSAGE_MAX = 2000;
 
 const fieldClass =
   "w-full min-h-11 rounded-[var(--radius-sm)] border border-white/10 bg-white/[0.03] px-3 py-3 text-base text-text outline-none transition duration-[var(--duration-fast)] placeholder:text-tertiary focus:border-primary/40 focus:bg-white/[0.05] focus-visible:ring-2 focus-visible:ring-primary/50 aria-[invalid=true]:border-rose-400/50";
 
-export function ContactCTA() {
+export function ContactCTA({ headingAs = "h2" }: { headingAs?: "h1" | "h2" }) {
   const formId = useId();
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -56,15 +60,14 @@ export function ContactCTA() {
 
     setStatus("submitting");
     const data = new FormData(form);
-    const name = String(data.get("name") ?? "").trim();
-    const email = String(data.get("email") ?? "").trim();
-    const message = String(data.get("message") ?? "").trim();
+    const name = String(data.get("name") ?? "").trim().slice(0, NAME_MAX);
+    const email = String(data.get("email") ?? "").trim().slice(0, EMAIL_MAX);
+    const message = String(data.get("message") ?? "").trim().slice(0, MESSAGE_MAX);
     const subject = encodeURIComponent(`Portfolio contact from ${name}`);
     const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
-    // Intentional mailto handoff — no contact-form backend.
+    // Intentional mailto handoff — no contact-form backend. Not a delivery confirmation.
     window.location.href = `mailto:${SITE.email}?subject=${subject}&body=${body}`;
-    setStatus("sent");
-    form.reset();
+    setStatus("handoff");
   }
 
   return (
@@ -74,6 +77,7 @@ export function ContactCTA() {
       aria-labelledby={`${formId}-title`}
     >
       <SectionHeader
+        as={headingAs}
         id={`${formId}-title`}
         eyebrow="Contact"
         title="Let's build something deliberate"
@@ -134,8 +138,8 @@ export function ContactCTA() {
             className="glass rounded-[var(--radius)] p-4 sm:p-6"
             noValidate
             aria-describedby={
-              status === "sent"
-                ? `${formId}-success`
+              status === "handoff"
+                ? `${formId}-handoff`
                 : status === "error"
                   ? `${formId}-error`
                   : undefined
@@ -150,6 +154,7 @@ export function ContactCTA() {
                   name="name"
                   autoComplete="name"
                   required
+                  maxLength={NAME_MAX}
                   aria-invalid={Boolean(errors.name)}
                   aria-describedby={errors.name ? `${formId}-name-err` : undefined}
                   className={fieldClass}
@@ -175,6 +180,7 @@ export function ContactCTA() {
                   type="email"
                   autoComplete="email"
                   required
+                  maxLength={EMAIL_MAX}
                   aria-invalid={Boolean(errors.email)}
                   aria-describedby={errors.email ? `${formId}-email-err` : undefined}
                   className={fieldClass}
@@ -200,6 +206,7 @@ export function ContactCTA() {
                 name="message"
                 required
                 rows={5}
+                maxLength={MESSAGE_MAX}
                 aria-invalid={Boolean(errors.message)}
                 aria-describedby={
                   errors.message ? `${formId}-message-err` : undefined
@@ -228,16 +235,16 @@ export function ContactCTA() {
                 )}
                 {status === "submitting" ? "Opening…" : "Send via email"}
               </Button>
-              {status === "sent" ? (
+              {status === "handoff" ? (
                 <p
-                  id={`${formId}-success`}
+                  id={`${formId}-handoff`}
                   className="flex min-w-0 flex-wrap items-start gap-2 text-sm leading-relaxed text-secondary"
                   role="status"
                 >
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden />
+                  <Mail className="mt-0.5 size-4 shrink-0 text-muted" aria-hidden />
                   <span className="min-w-0">
-                    Your email app should open with this message. If it
-                    doesn&apos;t, write me at{" "}
+                    Your email app should now be open. Review and send the
+                    message from there. If it doesn&apos;t open, write me at{" "}
                     <a
                       href={`mailto:${SITE.email}`}
                       className="break-all underline decoration-white/20 underline-offset-2 transition hover:text-text hover:decoration-primary/50"

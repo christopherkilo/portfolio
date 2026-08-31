@@ -1,6 +1,7 @@
 /**
  * Resume page content — sourced from the current professional PDF.
- * Keep this aligned with `public/Christopher_Kilo_Resume.pdf`.
+ * Keep this aligned with `public/Christopher_Kilo_Resume.pdf`
+ * (regenerate via `python3 scripts/generate-resume-pdf.py`).
  */
 
 export const resumeMeta = {
@@ -8,7 +9,7 @@ export const resumeMeta = {
   headline: "Full-Stack Developer",
   location: "DeSoto, TX",
   summary:
-    "I build responsive web apps that pair clean interfaces with practical backend architecture—Next.js, React, TypeScript, PostgreSQL, Prisma, Supabase, and AWS. CompTIA A+ certified, with an IT and design background that keeps troubleshooting and UX in the same toolkit.",
+    "I build responsive web apps that pair clean interfaces with practical backend architecture—Next.js, React, TypeScript, PostgreSQL, Prisma, Supabase, and AWS. CompTIA A+ certified, with an IT and design background (Adobe Photoshop and Illustrator) that keeps troubleshooting and UX in the same toolkit.",
 } as const;
 
 export const resumeSkillGroups = [
@@ -22,11 +23,11 @@ export const resumeSkillGroups = [
   },
   {
     label: "Cloud / AWS",
-    skills: ["CDK", "ECS/Fargate", "Lambda", "SQS", "DynamoDB", "EventBridge"],
+    skills: ["CDK", "ECS/Fargate", "Lambda", "SQS", "DynamoDB", "EventBridge", "Step Functions"],
   },
   {
     label: "Design & Tools",
-    skills: ["UI/UX", "Figma", "Git", "GitHub", "VS Code"],
+    skills: ["UI/UX", "Figma", "Photoshop", "Illustrator", "Git", "GitHub", "VS Code"],
   },
   {
     label: "IT",
@@ -47,7 +48,7 @@ export const resumeProjects = [
     title: "Event Horizon",
     href: "/projects/event-horizon",
     summary:
-      "Built an AWS ingestion pipeline (Docker, Fargate, SQS, Lambda, DynamoDB) that refreshes real Ticketmaster events while PostgreSQL stays the source of truth for reservations.",
+      "Full-stack event product with Auth.js, Prisma, and PostgreSQL for users, favorites, inventory, and transactional ticket holds so reservations cannot go negative. A separate AWS path (Docker on Fargate, SQS, Lambda, DynamoDB, EventBridge) ingests real Ticketmaster listings twice a day; those cards are discovery-only and never enter checkout.",
     technologies: ["Next.js", "TypeScript", "PostgreSQL", "AWS"],
   },
   {
@@ -55,7 +56,7 @@ export const resumeProjects = [
     title: "NovaTech Solutions",
     href: "/projects/novatech-solutions",
     summary:
-      "Built a serverless AWS inquiry workflow using Step Functions, Lambda, DynamoDB, SQS, and SSM, integrating HubSpot CRM and asynchronous Resend notifications with durable idempotency and failure isolation.",
+      "Grew a same-origin contact form into a durable inquiry workflow: Cloudflare Turnstile and Zod at Next.js ingress, then Vercel OIDC with a StartExecution-only IAM role. Step Functions claims the submission in DynamoDB, a Lambda writes HubSpot (contact, deal, note), and SQS plus Resend send mail at-least-once so email failure cannot roll back the CRM lead.",
     technologies: ["Next.js", "TypeScript", "HubSpot", "AWS"],
   },
   {
@@ -63,7 +64,7 @@ export const resumeProjects = [
     title: "TaskFlow",
     href: "/projects/taskflow",
     summary:
-      "Collaborative workspace on Supabase with RLS, conflict detection, realtime invalidation, and an offline mutation outbox.",
+      "Collaborative workspace with Google OAuth, Postgres, and row-level security so workspaces stay isolated. Optimistic edits use an expectedVersion conflict check (409 + dialog), TanStack Query plus Supabase realtime for cache invalidation, and an IndexedDB outbox that replays mutations when the network returns.",
     technologies: ["Next.js", "TypeScript", "Supabase", "TanStack Query"],
   },
 ] as const;
@@ -88,7 +89,7 @@ export const resumeEducation = [
   },
   {
     school: "Clearfield Job Corps Center",
-    location: "Salt Lake City, UT",
+    location: "Clearfield, UT",
     credential: "Computer Technician Program",
     dates: "August 2024 – June 2025",
   },

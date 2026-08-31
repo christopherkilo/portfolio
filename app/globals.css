@@ -303,6 +303,14 @@ body {
   outline-offset: 3px;
 }
 
+.label-accent {
+  color: var(--primary);
+}
+
+:root[data-theme="light"] .label-accent {
+  color: var(--secondary);
+}
+
 .font-display {
   font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
   letter-spacing: -0.02em;
@@ -1143,5 +1151,49 @@ a:hover .icon-interactive {
   .blog-cover-drift {
     animation: none;
   }
+}
+
+/*
+  QA-L12 — short desktop/laptop viewports only.
+  Keep the full-height hero on normal desktop heights and on mobile/tablet.
+  Do not use this query to restyle 1024×768 / 1440×900 / 1920×1080.
+*/
+@media (min-width: 1024px) and (max-height: 700px) {
+  .hero-section {
+    min-height: 0;
+    align-items: center;
+    padding-top: calc(var(--nav-height) + 0.35rem);
+    padding-bottom: 0.75rem;
+  }
+
+  .hero-section .hero-grid {
+    gap: 1.25rem;
+  }
+
+  .hero-section .hero-kicker {
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-section .hero-role {
+    margin-top: 0.65rem;
+  }
+
+  .hero-section .hero-tagline {
+    margin-top: 0.65rem;
+  }
+
+  .hero-section .hero-cta {
+    margin-top: 1.15rem;
+  }
+
+  .hero-section .hero-illustration {
+    height: 320px;
+  }
+}
+
+/* QA-L01 — hide the OS cursor only after CustomCursor has armed itself. */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
 }
 

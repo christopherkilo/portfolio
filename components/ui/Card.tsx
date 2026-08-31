@@ -15,6 +15,7 @@ import { ArrowUpRight } from "lucide-react";
 import {
   getProjectCtaLabel,
   getProjectHref,
+  githubControlLabel,
   type Project,
 } from "@/lib/projectData";
 import { durations, springHover } from "@/lib/animation";
@@ -25,6 +26,8 @@ import { EventHorizonCardCover } from "@/components/ui/EventHorizonCardCover";
 import { KiloToolkitCardCover } from "@/components/ui/KiloToolkitCardCover";
 import { NovaTechCardCover } from "@/components/ui/NovaTechCardCover";
 import { TaskflowCardCover } from "@/components/ui/TaskflowCardCover";
+import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
+import { InDevBadge } from "@/components/blog/InDevBadge";
 import { cn, isSvgImageSrc } from "@/lib/utils";
 
 export type ProjectCardVariant = "carousel" | "grid";
@@ -41,6 +44,7 @@ const ANIMATED_COVER_IDS = new Set([
   "event-horizon",
   "novatech-solutions",
   "kilo-toolkit",
+  "starlenz",
 ]);
 
 function ProjectCardComponent({
@@ -135,18 +139,11 @@ function ProjectCardComponent({
         className,
       )}
     >
-      <Link
-        href={href}
-        className="absolute inset-0 z-[1] rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-        aria-label={`${ctaLabel}: ${project.title}`}
-      />
-
       <motion.div
         className="pointer-events-none absolute inset-0 z-[2] opacity-0 transition-opacity duration-[var(--duration-card)] group-hover:opacity-100"
         style={{ background: proximityGlow }}
         aria-hidden
       />
-
       {project.github ? (
         <div className="absolute left-3 top-3 z-[4]">
           <Shimmer className="inline-flex rounded-full" onPress={false}>
@@ -157,7 +154,7 @@ function ProjectCardComponent({
               data-no-drag
               onClick={(event) => event.stopPropagation()}
               onPointerDown={(event) => event.stopPropagation()}
-              aria-label={`${project.title} on GitHub`}
+              aria-label={githubControlLabel(project)}
               className="relative z-[4] inline-flex size-11 items-center justify-center rounded-full border border-white/12 bg-black/55 text-text backdrop-blur-md transition duration-[var(--duration-fast)] hover:border-primary/45 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <GithubIcon className="size-4" />
@@ -166,11 +163,16 @@ function ProjectCardComponent({
         </div>
       ) : null}
 
+      <Link
+        href={href}
+        className="relative z-[1] flex h-full flex-col rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+        aria-label={`${ctaLabel}: ${project.title}`}
+      >
       <div className="pointer-events-none relative aspect-[16/10] overflow-hidden bg-surface-elevated">
         <div
           className={cn(
             "absolute inset-0 bg-gradient-to-br from-white/[0.06] via-white/[0.02] to-transparent transition-opacity duration-[var(--duration-card)]",
-            imageLoaded && hasImage ? "opacity-0" : "opacity-100",
+            imageLoaded && (hasImage || hasAnimatedCover) ? "opacity-0" : "opacity-100",
           )}
           aria-hidden
         >
@@ -207,6 +209,9 @@ function ProjectCardComponent({
                 reducedMotion={reducedMotion}
                 active={coverActive}
               />
+            ) : null}
+            {project.id === "starlenz" ? (
+              <StarLenzBlogCover className="h-full w-full" />
             ) : null}
           </motion.div>
         ) : hasImage ? (
@@ -258,6 +263,11 @@ function ProjectCardComponent({
 
       <div className="pointer-events-none relative z-[3] flex flex-1 flex-col gap-4 p-[var(--pad-card)]">
         <div>
+          {project.inDevelopment ? (
+            <div className="mb-2">
+              <InDevBadge />
+            </div>
+          ) : null}
           <h3 className="font-display text-lg font-semibold text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary">
             {project.title}
           </h3>
@@ -276,6 +286,7 @@ function ProjectCardComponent({
           {ctaLabel} →
         </p>
       </div>
+      </Link>
     </motion.article>
   );
 }

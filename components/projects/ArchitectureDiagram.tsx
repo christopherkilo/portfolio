@@ -35,7 +35,7 @@ export function PipelineSteps({
         >
           <StepChip>{step}</StepChip>
           {index < steps.length - 1 ? (
-            <span className="px-1 font-mono text-xs text-primary/70 sm:px-0" aria-hidden>
+            <span className="px-1 font-mono text-xs text-muted sm:px-0" aria-hidden>
               <span className="sm:hidden">↓</span>
               <span className="hidden sm:inline">→</span>
             </span>
@@ -49,7 +49,7 @@ export function PipelineSteps({
 function PathBlock({ path }: { path: ArchitecturePath }) {
   return (
     <div>
-      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] label-accent">
         {path.label}
       </p>
       <PipelineSteps steps={path.steps} />
@@ -67,7 +67,7 @@ export function ArchitectureHighlightCard({
       className="mb-12 overflow-hidden rounded-2xl border border-primary/20 bg-white/[0.03] p-6 backdrop-blur-xl"
       aria-labelledby="cloud-event-pipeline"
     >
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] label-accent">
         Architecture highlight
       </p>
       <h2
@@ -113,7 +113,7 @@ export function ArchitectureLanes({
       ) : null}
       {entry?.length ? (
         <div className="mt-6">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] label-accent">
             Shared entry
           </p>
           <PipelineSteps steps={entry} />

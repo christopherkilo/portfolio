@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X, ImageIcon } from "lucide-react";
 import Image from "next/image";
+import { useDialogFocus } from "@/lib/useDialogFocus";
 
 function isPlaceholderSrc(src: string): boolean {
   return src.startsWith("placeholder:") || src.startsWith("generated:");
@@ -27,27 +28,18 @@ export function ScreenshotFrame({
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const placeholder = !src || isPlaceholderSrc(src) || failed;
   const captionText = caption ?? (alt || undefined);
   const expandable = !placeholder;
 
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.activeElement as HTMLElement | null;
-    document.body.style.overflow = "hidden";
-    const frame = window.requestAnimationFrame(() => closeRef.current?.focus());
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-      previous?.focus();
-    };
-  }, [open]);
+  useDialogFocus({
+    open: open && expandable,
+    containerRef: dialogRef,
+    initialFocusRef: closeRef,
+    onClose: () => setOpen(false),
+  });
 
   return (
     <>
@@ -107,13 +99,15 @@ export function ScreenshotFrame({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: reducedMotion ? 1 : 0 }}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
             onClick={() => setOpen(false)}
           >
             <motion.div
-              className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B12] p-3 sm:p-4"
+              ref={dialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+              tabIndex={-1}
+              className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B12] p-3 outline-none sm:p-4"
               onClick={(event) => event.stopPropagation()}
               initial={reducedMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}

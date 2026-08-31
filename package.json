@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:ci": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:a11y": "playwright test e2e/a11y.spec.ts",
+    "test:visual": "playwright test e2e/visual.spec.ts --project=visual",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "prisma:migrate": "prisma migrate dev",
@@ -16,7 +21,7 @@
     "prisma:studio": "prisma studio",
     "prisma:reset": "prisma migrate reset",
     "taskflow:seed": "tsx scripts/taskflow/seed-demo.ts",
-    "verify": "npm run lint && npx tsc --noEmit && npm test && npm run build"
+    "verify": "npm run lint && npx tsc --noEmit && npm test && npm run build && npm run test:e2e"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -48,6 +53,8 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/jsdom": "^28.0.3",
     "@types/node": "^20",

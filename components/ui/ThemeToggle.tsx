@@ -25,6 +25,7 @@ export function ThemeToggle({
         className,
       )}
       aria-label={label}
+      aria-pressed={theme === "dark"}
       title={label}
     >
       <Sun className="theme-icon-light size-4" aria-hidden />

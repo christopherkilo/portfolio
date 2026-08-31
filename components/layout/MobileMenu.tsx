@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useDialogFocus } from "@/lib/useDialogFocus";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+
+export const MOBILE_NAV_ID = "mobile-navigation";
 
 type MobileMenuProps = {
   open: boolean;
@@ -15,19 +18,15 @@ type MobileMenuProps = {
 
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const reducedMotion = useReducedMotion();
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [open, onClose]);
+  useDialogFocus({
+    open,
+    containerRef: panelRef,
+    initialFocusRef: closeRef,
+    onClose,
+  });
 
   return (
     <AnimatePresence>
@@ -43,11 +42,17 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             type="button"
             className="absolute inset-0 bg-bg/80 backdrop-blur-sm"
             aria-label="Close menu"
+            tabIndex={-1}
             onClick={onClose}
           />
           <motion.nav
+            ref={panelRef}
+            id={MOBILE_NAV_ID}
             aria-label="Mobile"
-            className="absolute inset-x-3 top-[calc(var(--nav-height)+0.5rem)] max-h-[calc(100dvh-var(--nav-height)-1.5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto rounded-2xl border border-white/10 bg-black/80 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl backdrop-blur-2xl"
+            aria-modal="true"
+            role="dialog"
+            tabIndex={-1}
+            className="absolute inset-x-3 top-[calc(var(--nav-height)+0.5rem)] max-h-[calc(100dvh-var(--nav-height)-1.5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto rounded-2xl border border-white/10 bg-black/80 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl backdrop-blur-2xl outline-none"
             initial={reducedMotion ? false : { y: -12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={reducedMotion ? undefined : { y: -8, opacity: 0 }}
@@ -58,6 +63,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                 CHRISTOPHER KILO
               </p>
               <button
+                ref={closeRef}
                 type="button"
                 onClick={onClose}
                 className="inline-flex size-11 items-center justify-center rounded-lg border border-border text-text hover:bg-white/5"

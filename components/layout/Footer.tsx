@@ -34,6 +34,24 @@ export function Footer() {
         <div className="flex flex-col gap-3 border-t border-border pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>{SITE.copyright}</p>
           <div className="flex flex-col gap-2 sm:items-end">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 sm:justify-end">
+              <a
+                href={SITE.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center text-secondary transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                GitHub
+              </a>
+              <a
+                href={SITE.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center text-secondary transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                LinkedIn
+              </a>
+            </div>
             <a
               href={`mailto:${SITE.email}`}
               className="inline-flex min-h-11 max-w-full items-center break-all text-secondary transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"

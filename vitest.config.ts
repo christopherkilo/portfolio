@@ -8,6 +8,9 @@ export default defineConfig({
       "**/node_modules/**",
       "**/dist/**",
       "**/infrastructure/**",
+      "**/e2e/**",
+      "**/playwright-report/**",
+      "**/test-results/**",
     ],
   },
   resolve: {

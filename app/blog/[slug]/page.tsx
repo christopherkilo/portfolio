@@ -33,14 +33,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const post = getPostBySlug(slug);
   if (!post) return { title: "Article" };
 
+  const base = pageMetadata({
+    title: post.title,
+    description: post.description,
+    path: post.href,
+    type: "article",
+  });
+
   return {
-    ...pageMetadata({
-      title: post.title,
-      description: post.description,
-      path: post.href,
-      type: "article",
-    }),
+    ...base,
     openGraph: {
+      ...base.openGraph,
       type: "article",
       url: `${SITE.url}${post.href}`,
       title: post.title,
@@ -53,6 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       tags: post.tags,
     },
     twitter: {
+      ...base.twitter,
       card: "summary_large_image",
       title: post.title,
       description: post.description,

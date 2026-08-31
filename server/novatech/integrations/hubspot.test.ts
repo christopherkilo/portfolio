@@ -40,7 +40,6 @@ function crmFetch(options?: {
   notes?: Array<{ toObjectId: string }>;
   onDealCreate?: () => void;
 }) {
-  let dealCreates = 0;
   return async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? "GET";
@@ -60,7 +59,6 @@ function crmFetch(options?: {
       return json(options?.dealSearch ?? { total: 0, results: [] });
     }
     if (url.endsWith("/deals") && method === "POST") {
-      dealCreates += 1;
       options?.onDealCreate?.();
       return json({ id: "deal-1" });
     }

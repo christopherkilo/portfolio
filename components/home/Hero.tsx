@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
 import {
   Activity,
   CheckCircle2,
@@ -127,11 +128,15 @@ const heroEntrance = {
 };
 
 /** Shared idle float for hero panels — gentle and continuous; hover does not lift. */
-function panelIdleMotion(reducedMotion: boolean | null, delay: number) {
-  if (reducedMotion) {
+function panelIdleMotion(
+  reducedMotion: boolean | null,
+  delay: number,
+  active: boolean,
+) {
+  if (reducedMotion || !active) {
     return {
       animate: { opacity: 1, y: 0 },
-      transition: { duration: 0 },
+      transition: { duration: reducedMotion ? 0 : 0.35 },
     };
   }
   return {
@@ -150,32 +155,38 @@ function panelIdleMotion(reducedMotion: boolean | null, delay: number) {
 
 export function Hero() {
   const reducedMotion = useReducedMotion();
-  const terminalMotion = panelIdleMotion(reducedMotion, 0.12);
-  const editorMotion = panelIdleMotion(reducedMotion, 0.22);
-  const diagnosticsMotion = panelIdleMotion(reducedMotion, 0.32);
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, { amount: 0.2 });
+  const idle = Boolean(inView);
+  const terminalMotion = panelIdleMotion(reducedMotion, 0.12, idle);
+  const editorMotion = panelIdleMotion(reducedMotion, 0.22, idle);
+  const diagnosticsMotion = panelIdleMotion(reducedMotion, 0.32, idle);
 
   return (
-    <section className="relative flex min-h-[100svh] items-center overflow-x-clip pb-12 pt-[calc(var(--nav-height)+0.75rem)] sm:pb-16 sm:pt-[calc(var(--nav-height)+1rem)]">
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8">
+    <section
+      ref={sectionRef}
+      className="hero-section relative flex min-h-[100svh] items-center overflow-x-clip pb-12 pt-[calc(var(--nav-height)+0.75rem)] sm:pb-16 sm:pt-[calc(var(--nav-height)+1rem)]"
+    >
+      <div className="hero-grid mx-auto grid w-full max-w-6xl items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8">
         <motion.div
-          className="relative z-10"
+          className="hero-copy relative z-10"
           initial={reducedMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reducedMotion ? { duration: 0 } : heroEntrance}
         >
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-muted">
+          <p className="hero-kicker mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-muted">
             Portfolio
           </p>
-          <h1 className="font-display text-[2.125rem] font-semibold leading-tight tracking-[0.06em] text-text min-[380px]:text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="hero-title font-display text-[2.125rem] font-semibold leading-tight tracking-[0.06em] text-text min-[380px]:text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
             <SignatureName name={SITE.name} />
           </h1>
-          <p className="mt-4 text-lg font-medium text-secondary sm:text-xl">
+          <p className="hero-role mt-4 text-lg font-medium text-secondary sm:text-xl">
             {SITE.title}
           </p>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-secondary sm:text-lg">
+          <p className="hero-tagline mt-5 max-w-xl text-base leading-relaxed text-secondary sm:text-lg">
             {SITE.tagline}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="hero-cta mt-8 flex flex-wrap gap-3">
             <Button href="/projects" size="lg">
               View Projects
             </Button>
@@ -194,16 +205,16 @@ export function Hero() {
               className={`pointer-events-none absolute z-[5] ${label.slot}`}
               style={{ rotate: label.rotate }}
               animate={
-                reducedMotion
-                  ? undefined
+                reducedMotion || !idle
+                  ? { x: 0, y: 0 }
                   : {
                       x: [-label.motion.x, label.motion.x, -label.motion.x],
                       y: [-label.motion.y, label.motion.y, -label.motion.y],
                     }
               }
               transition={
-                reducedMotion
-                  ? undefined
+                reducedMotion || !idle
+                  ? { duration: reducedMotion ? 0 : 0.35 }
                   : {
                       // Shared phase family so floats feel synced, not random
                       duration: 7.5,
@@ -319,16 +330,18 @@ export function Hero() {
 
           <motion.div
             className="glass absolute bottom-2 right-2 z-[16] flex max-w-[min(90%,14rem)] items-center gap-2.5 rounded-xl px-2.5 py-2 -rotate-1 sm:bottom-3 sm:right-3 sm:max-w-none sm:gap-3 sm:px-3 md:right-4"
-            animate={reducedMotion ? undefined : { y: [0, -6, 0] }}
+            animate={
+              reducedMotion || !idle ? { y: 0 } : { y: [0, -6, 0] }
+            }
             transition={{
               duration: 7.5,
-              repeat: Infinity,
+              repeat: reducedMotion || !idle ? 0 : Infinity,
               ease: "easeInOut",
               delay: 0.4,
             }}
           >
             <span className="relative flex size-2.5">
-              {!reducedMotion ? (
+              {!reducedMotion && idle ? (
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-[color:var(--hero-panel-text-secondary)] opacity-40" />
               ) : null}
               <span className="relative inline-flex size-2.5 rounded-full bg-[color:var(--hero-panel-text-secondary)] opacity-70" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/lib/projectData";
 import { durations, easings } from "@/lib/animation";
 import { cn } from "@/lib/utils";
+import { useDialogFocus } from "@/lib/useDialogFocus";
 
 type CommandItem = {
   id: string;
@@ -50,6 +51,15 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const [prevOpen, setPrevOpen] = useState(open);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useDialogFocus({
+    open,
+    containerRef: panelRef,
+    initialFocusRef: inputRef,
+    onClose: () => onOpenChange(false),
+  });
 
   // Reset search session when the palette opens (render-time sync, not an effect).
   if (open !== prevOpen) {
@@ -140,7 +150,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onOpenChange(false);
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setActive((i) => Math.min(i + 1, Math.max(filtered.length - 1, 0)));
@@ -169,12 +178,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: reducedMotion ? 0 : durations.button }}
           onClick={() => onOpenChange(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Command palette"
         >
           <motion.div
-            className="glass w-full max-w-lg overflow-hidden rounded-[var(--radius)] shadow-2xl"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command palette"
+            tabIndex={-1}
+            className="glass w-full max-w-lg overflow-hidden rounded-[var(--radius)] shadow-2xl outline-none"
             initial={reducedMotion ? false : { opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reducedMotion ? undefined : { opacity: 0, y: -6, scale: 0.98 }}
@@ -184,7 +195,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             <div className="flex items-center gap-3 border-b border-border px-4 py-3">
               <Search className="size-4 text-muted" aria-hidden />
               <input
-                autoFocus
+                ref={inputRef}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -195,14 +206,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 aria-label="Command search"
               />
             </div>
-            <ul className="max-h-80 overflow-y-auto p-2" role="listbox">
+            <ul className="max-h-80 overflow-y-auto p-2">
               {filtered.length === 0 ? (
                 <li className="px-3 py-6 text-center text-sm text-muted">
                   No matches
                 </li>
               ) : (
                 filtered.map((item, i) => (
-                  <li key={item.id} role="option" aria-selected={i === cappedActive}>
+                  <li key={item.id}>
                     <button
                       type="button"
                       className={cn(
@@ -211,6 +222,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                           ? "bg-white/[0.08] text-text ring-1 ring-primary/40"
                           : "text-secondary hover:bg-white/5 hover:text-text",
                       )}
+                      aria-current={i === cappedActive ? "true" : undefined}
                       onMouseEnter={() => setActive(i)}
                       onClick={() => {
                         item.action();

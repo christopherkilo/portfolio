@@ -15,6 +15,8 @@ type PageMetaInput = {
   images?: NonNullable<NonNullable<Metadata["openGraph"]>["images"]>;
   robots?: Metadata["robots"];
   type?: "website" | "article";
+  /** Skip the root `title.template` (homepage only). */
+  absoluteTitle?: boolean;
 };
 
 export function pageMetadata({
@@ -25,11 +27,12 @@ export function pageMetadata({
   images,
   robots,
   type = "website",
+  absoluteTitle = false,
 }: PageMetaInput): Metadata {
   const url = absoluteUrl(path);
   const resolvedTitle = ogTitle ?? title;
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical: path },
     openGraph: {

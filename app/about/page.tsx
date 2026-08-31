@@ -19,12 +19,13 @@ const icons = {
 };
 
 /** Transparent cutout portrait — keep PNG alpha; no baked-in plate behind it. */
-const PORTRAIT_SRC = "/about/portrait.png";
+const PORTRAIT_SRC = "/about/portrait.webp";
 
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <SectionHeader
+        as="h1"
         eyebrow="About"
         title={`Hi, I'm ${SITE.name}.`}
         description="Full-stack developer with a background in IT and web design, focused on software that solves practical problems."

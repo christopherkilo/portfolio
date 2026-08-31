@@ -10,6 +10,7 @@ export const metadata = pageMetadata({
   title: `${SITE.name} — ${SITE.title}`,
   description: SITE.description,
   path: "/",
+  absoluteTitle: true,
 });
 
 export default function HomePage() {

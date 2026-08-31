@@ -70,6 +70,7 @@ export default function ProjectsPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <SectionHeader
+        as="h1"
         eyebrow="Projects"
         title="Selected work across disciplines"
         description="Full-stack applications, professional IT utilities, and visual identity systems."

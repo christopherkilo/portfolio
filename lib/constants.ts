@@ -4,7 +4,7 @@ export const SITE = {
   tagline:
     "Full-stack developer specializing in modern web applications, business automation, collaborative software, and IT tools.",
   description:
-    "Christopher Kilo is a full-stack developer specializing in modern web applications, business automation, collaborative software, and IT tools built with React, Next.js, TypeScript, PostgreSQL, and Supabase.",
+    "Christopher Kilo is a full-stack developer specializing in modern web applications, business automation, collaborative software, and IT tools built with React, Next.js, TypeScript, PostgreSQL, Supabase, and AWS.",
   email: "christopherkilo.pro@gmail.com",
   linkedin: "https://www.linkedin.com/in/christopher-kilo-312467425/",
   github: "https://github.com/christopherkilo",

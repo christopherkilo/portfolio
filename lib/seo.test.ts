@@ -30,6 +30,18 @@ describe("SEO helpers", () => {
     );
   });
 
+  it("can emit an absolute homepage title that skips the layout template", () => {
+    const home = pageMetadata({
+      title: "Christopher Kilo — Full-Stack Developer",
+      description: "Portfolio",
+      path: "/",
+      absoluteTitle: true,
+    });
+    expect(home.title).toEqual({
+      absolute: "Christopher Kilo — Full-Stack Developer",
+    });
+  });
+
   it("keeps demos, APIs, and auth out of the sitemap and robots index", () => {
     const entries = sitemap();
     const urls = entries.map((entry) => entry.url);

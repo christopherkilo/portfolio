@@ -29,8 +29,57 @@ Runs, in order, and stops on the first failure:
 2. `npx tsc --noEmit`
 3. `npm test`
 4. `npm run build`
+5. `npm run test:e2e` (Playwright Chromium, Firefox, WebKit, accessibility, and visual snapshots)
 
 Individual commands remain available if you need a narrower check.
+
+## Testing / Quality
+
+| Command | What it covers |
+| --- | --- |
+| `npm test` | Vitest unit and integration tests |
+| `npm run test:e2e` | Playwright against a production-like `next start` server |
+| `npm run test:e2e:ui` | Playwright UI mode |
+| `npm run test:a11y` | axe-core on representative pages |
+| `npm run test:visual` | Visual snapshot baselines (Chromium) |
+| `npm run verify` | Lint, typecheck, unit tests, production build, then Playwright |
+
+First-time Playwright setup:
+
+```bash
+npx playwright install
+```
+
+E2E tests start `next start` on port 4173. If `.next` is missing, the Playwright web server builds first.
+
+### Visual snapshots
+
+Baselines live in `e2e/__screenshots__/`. They are meant to catch missing content, broken layout, clipping, and responsive regressions—not animation frames.
+
+Screenshot tests emulate reduced motion and inject test-only CSS. Production animations are unchanged.
+
+Update approved snapshots **intentionally**:
+
+```bash
+npm run test:visual -- --update-snapshots
+```
+
+Do this on the same OS that captured the current baselines when possible. The committed snapshots were generated on macOS. Linux CI does **not** run the visual project yet — font rasterization would fail those baselines. Generate Linux snapshots with `npm run test:visual -- --update-snapshots` on Ubuntu, then add `--project=visual` to `.github/workflows/verify.yml`.
+
+CI never passes `--update-snapshots`. When visual tests are enabled on Linux, a mismatch should fail the job and upload the Playwright HTML report plus failure screenshots/traces.
+
+### CI
+
+GitHub Actions (`.github/workflows/verify.yml`) runs on pull requests and pushes to `main`:
+
+1. Checkout
+2. Node 22 with npm cache
+3. `npm ci`
+4. Lint, typecheck, unit tests, production build
+5. Playwright browsers
+6. `npm run test:e2e:ci` — Chromium, Firefox, and WebKit (smoke, core E2E, accessibility). Visual snapshots stay local until Linux baselines exist.
+
+Artifacts (HTML report, failure screenshots, traces on retry) upload only when Playwright fails.
 
 ## Embedded demos
 

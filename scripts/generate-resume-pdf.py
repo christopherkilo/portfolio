@@ -31,15 +31,15 @@ LINKEDIN = "linkedin.com/in/christopher-kilo-312467425"
 PROFILE = (
     "I build responsive web apps that pair clean interfaces with practical backend "
     "architecture - Next.js, React, TypeScript, PostgreSQL, Prisma, Supabase, and AWS. "
-    "CompTIA A+ certified, with an IT and design background that keeps troubleshooting "
-    "and UX in the same toolkit."
+    "CompTIA A+ certified, with an IT and design background (Adobe Photoshop and "
+    "Illustrator) that keeps troubleshooting and UX in the same toolkit."
 )
 
 SKILLS = [
     ("Frontend", "React | Next.js | TypeScript | JavaScript | Tailwind CSS | Framer Motion"),
     ("Backend / Data", "PostgreSQL | Prisma | Supabase | Auth.js | REST APIs | Zod"),
-    ("Cloud / AWS", "CDK | ECS/Fargate | Lambda | SQS | DynamoDB | EventBridge"),
-    ("Design & Tools", "UI/UX | Figma | Git | GitHub | VS Code"),
+    ("Cloud / AWS", "CDK | ECS/Fargate | Lambda | SQS | DynamoDB | EventBridge | Step Functions"),
+    ("Design & Tools", "UI/UX | Figma | Photoshop | Illustrator | Git | GitHub | VS Code"),
     (
         "IT",
         "CompTIA A+ | PC diagnostics | Hardware repair | Networking fundamentals | Technical support",
@@ -50,22 +50,28 @@ PROJECTS = [
     (
         "Event Horizon",
         "Next.js | TypeScript | PostgreSQL | AWS",
-        "Built an AWS ingestion pipeline (Docker, Fargate, SQS, Lambda, DynamoDB) that "
-        "refreshes real Ticketmaster events while PostgreSQL stays the source of truth "
-        "for reservations.",
+        "Full-stack event product with Auth.js, Prisma, and PostgreSQL for users, favorites, "
+        "inventory, and transactional ticket holds so reservations cannot go negative. A "
+        "separate AWS path (Docker on Fargate, SQS, Lambda, DynamoDB, EventBridge) ingests "
+        "real Ticketmaster listings twice a day; those cards are discovery-only and never "
+        "enter checkout.",
     ),
     (
         "NovaTech Solutions",
         "Next.js | TypeScript | HubSpot | AWS",
-        "Built a serverless AWS inquiry workflow using Step Functions, Lambda, DynamoDB, "
-        "SQS, and SSM, integrating HubSpot CRM and asynchronous Resend notifications "
-        "with durable idempotency and failure isolation.",
+        "Grew a same-origin contact form into a durable inquiry workflow: Cloudflare "
+        "Turnstile and Zod at Next.js ingress, then Vercel OIDC with a StartExecution-only "
+        "IAM role. Step Functions claims the submission in DynamoDB, a Lambda writes HubSpot "
+        "(contact, deal, note), and SQS plus Resend send mail at-least-once so email failure "
+        "cannot roll back the CRM lead.",
     ),
     (
         "TaskFlow",
         "Next.js | TypeScript | Supabase | TanStack Query",
-        "Collaborative workspace on Supabase with RLS, conflict detection, realtime "
-        "invalidation, and an offline mutation outbox.",
+        "Collaborative workspace with Google OAuth, Postgres, and row-level security so "
+        "workspaces stay isolated. Optimistic edits use an expectedVersion conflict check "
+        "(409 + dialog), TanStack Query plus Supabase realtime for cache invalidation, and "
+        "an IndexedDB outbox that replays mutations when the network returns.",
     ),
 ]
 
@@ -79,7 +85,7 @@ EXPERIENCE = (
 EDUCATION = [
     ("Davis Technical College  |  Kaysville, UT", "Web & Graphic Design | July 2025 - May 2026"),
     (
-        "Clearfield Job Corps Center  |  Salt Lake City, UT",
+        "Clearfield Job Corps Center  |  Clearfield, UT",
         "Computer Technician Program | August 2024 - June 2025",
     ),
 ]
@@ -101,7 +107,7 @@ class ResumePDF(FPDF):
 
 def main() -> None:
     pdf = ResumePDF(format="Letter")
-    pdf.set_auto_page_break(auto=True, margin=16)
+    pdf.set_auto_page_break(auto=True, margin=14)
     pdf.add_page()
     pdf.set_left_margin(0.7 * 25.4)
     pdf.set_right_margin(0.7 * 25.4)
@@ -115,10 +121,10 @@ def main() -> None:
         pdf.set_line_width(0.3)
         y = pdf.get_y()
         pdf.line(left, y, left + width, y)
-        pdf.ln(4)
+        pdf.ln(3.2)
 
     def section(title: str) -> None:
-        pdf.ln(2.5)
+        pdf.ln(1.8)
         pdf.set_x(left)
         pdf.set_font("Helvetica", "B", 9.5)
         pdf.set_text_color(18, 18, 18)
@@ -167,7 +173,7 @@ def main() -> None:
         pdf.set_font("Helvetica", "", 9)
         pdf.set_text_color(50, 50, 50)
         pdf.multi_cell(width - 34, 4.8, body)
-        pdf.ln(0.8)
+        pdf.ln(0.5)
 
     section("Selected Projects")
     for title, tech, summary in PROJECTS:
@@ -184,8 +190,8 @@ def main() -> None:
         pdf.set_x(left)
         pdf.set_font("Helvetica", "", 9)
         pdf.set_text_color(45, 45, 45)
-        pdf.multi_cell(width, 4.6, summary)
-        pdf.ln(2)
+        pdf.multi_cell(width, 4.4, summary)
+        pdf.ln(1.2)
 
     section("Experience")
     role, dates, summary = EXPERIENCE

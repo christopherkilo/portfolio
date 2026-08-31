@@ -68,4 +68,14 @@ describe("demo shell return navigation", () => {
     expect(page).toContain("hasLiveDemo");
     expect(page).toContain("isInternalHref");
   });
+
+  it("keeps a Back to portfolio control in the toolkit shell", () => {
+    const shell = readFileSync(
+      join(root, "components/toolkit/ToolkitShell.tsx"),
+      "utf8",
+    );
+    expect(shell).toContain('href="/"');
+    expect(shell).toContain("Back to portfolio");
+    expect(shell).not.toContain('target="_blank"');
+  });
 });

@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 import { Command, Menu } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { MobileMenu, useMobileMenu } from "@/components/layout/MobileMenu";
+import {
+  MOBILE_NAV_ID,
+  MobileMenu,
+  useMobileMenu,
+} from "@/components/layout/MobileMenu";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 type NavbarProps = {
@@ -84,8 +88,9 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
             <button
               type="button"
               className="inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-text backdrop-blur-xl md:hidden"
-              aria-label="Open menu"
+              aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
+              aria-controls={MOBILE_NAV_ID}
               onClick={openMenu}
             >
               <Menu className="size-5" />

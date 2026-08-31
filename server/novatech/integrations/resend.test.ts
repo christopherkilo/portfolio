@@ -59,7 +59,6 @@ describe("NovaTech Resend integration", () => {
 
   it("sends visitor and staff emails with escaped content and idempotency keys", async () => {
     const fetchImpl = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
-      const body = JSON.parse(String(init?.body)) as { html?: string };
       expect(String(init?.headers)).toBeDefined();
       return json({ id: "email-1" });
     });

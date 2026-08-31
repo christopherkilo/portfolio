@@ -41,10 +41,6 @@ That identity was the asset. The mistake would have been to treat the mockups as
 
 Copying mobile screens onto a desktop canvas almost always fails. Padding inflates. Hierarchy collapses. Backgrounds that felt rich at phone width become empty or overpowering at 1200 pixels. The job was translation: keep the feeling, change the composition.
 
-![Original StarLenz constellation screens from the mobile design](placeholder:starlenz/original-constellations.png)
-
-![Original StarLenz profile screen from the mobile design](placeholder:starlenz/original-profile.png)
-
 Those frames still sit next to the running app. When a visual decision gets noisy, I go back to them. They are the identity. The website has to earn the same recognition without pretending it is still a phone.
 
 ## 2. Translating StarLenz to the Web
@@ -63,8 +59,6 @@ The first desktop layouts exposed the gaps immediately:
 I did not want a stretched phone UI. The desktop experience needed to feel like StarLenz with more sky — a telescope viewport rather than an enlarged mockup. Navigation moved out of a bottom bar into a pattern the rest of the product could support. The constellation frame became the focal object. Copy sat below it, not competing with it.
 
 Mobile-first still mattered. If the constellation could not be selected comfortably on a phone, the desktop version was not finished either.
-
-![Current StarLenz desktop constellation experience](placeholder:starlenz/current-desktop.png)
 
 ## 3. Building the Celestial Background
 
@@ -92,8 +86,6 @@ That forced a hierarchy I now treat as a rule:
 4. Gradient last
 
 If the gradient is the loudest element on the page, the environment has won and the product has lost.
-
-![Animated celestial background iterations](placeholder:starlenz/background-atmosphere.png)
 
 ## 4. Defining the StarLenz Interaction Language
 
@@ -140,8 +132,6 @@ Constellation data → renderer → interactive star point → star detail page
 
 That is the difference between an illustration of a constellation and an interface for exploring one. If the data is honest, the visualization can stay responsive. If the data is a pile of magic numbers, every new constellation becomes a one-off.
 
-![Interactive constellation mapping in the gold frame](placeholder:starlenz/constellation-interaction.png)
-
 ## 6. Responsive Constellation Mapping
 
 One problem showed up after a change that was otherwise correct.
@@ -181,8 +171,6 @@ Clicking an important constellation point should feel like traveling toward that
 
 That sounds obvious after the fact. The first versions were less intentional. A centered zoom is easier to code and easier to notice as fake. Originating from the selected point is a small geometric choice with a large perceptual payoff. It is one of the few motions in StarLenz I consider load-bearing.
 
-![Star detail page after traveling from the constellation](placeholder:starlenz/star-detail.png)
-
 ## 8. Learning When to Remove Animation
 
 This was the most useful mistake.
@@ -208,8 +196,6 @@ Click → focus → zoom → arrive
 Stellar pages moved toward a different ratio: about 90% still, 10% animation. The star should look like a strong astronomical image first. Subtle motion — atmosphere, a quiet flare — should be something the viewer discovers after looking, not something that announces itself on entry.
 
 Removing effects was harder than adding them. It also improved the product more than any of the effects I removed.
-
-![Before and after simplifying the star transition](placeholder:starlenz/motion-simplification.png)
 
 ## 9. Rethinking Multiple-Star Systems
 

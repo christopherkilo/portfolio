@@ -16,6 +16,7 @@ describe("blog content source", () => {
     expect(post?.href).toBe("/blog/building-starlenz");
     expect(post?.readingMinutes).toBeGreaterThanOrEqual(6);
     expect(post?.content.includes("fit-to-frame")).toBe(true);
+    expect(post?.content).not.toMatch(/placeholder:starlenz/);
     expect(post?.headings.length).toBeGreaterThan(8);
   });
 

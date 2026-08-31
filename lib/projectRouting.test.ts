@@ -92,8 +92,11 @@ describe("web project routing metadata", () => {
     expect(hasLiveDemo("https://example.com/demo")).toBe(true);
   });
 
-  it("lists three featured web applications", () => {
-    expect(getProjectsByCategory("web").map((p) => p.id)).toEqual([...WEB_IDS]);
+  it("lists the three flagship web case studies plus StarLenz", () => {
+    expect(getProjectsByCategory("web").map((p) => p.id)).toEqual([
+      ...WEB_IDS,
+      "starlenz",
+    ]);
   });
 
   it("features all four software apps on the homepage carousel", () => {
@@ -109,11 +112,14 @@ describe("web project routing metadata", () => {
     ]);
     expect(getPortfolioProjects().map((p) => p.id)).toEqual([
       ...WEB_IDS,
+      "starlenz",
       "kilo-toolkit",
       "voltline",
       "nightshift",
       "signal-magazine",
     ]);
+    expect(getProjectById("starlenz")?.inDevelopment).toBe(true);
+    expect(getProjectHref(getProjectById("starlenz")!)).toBe("/projects/starlenz");
   });
 
   it("routes Kilo Toolkit to the live suite, not a web case-study page", () => {
@@ -193,7 +199,10 @@ describe("web project routing metadata", () => {
       expect(isExternalHref(project.github)).toBe(true);
     }
     expect(getProjectById("event-horizon")?.github).toBe(
-      "https://github.com/christopherkilo/portfolio",
+      "https://github.com/christopherkilo/portfolio/tree/main/app/demos/event-horizon",
+    );
+    expect(getProjectById("event-horizon")?.githubNote).toBe(
+      "Source: portfolio monorepo",
     );
     expect(getProjectById("novatech-solutions")?.github).toBe(
       "https://github.com/christopherkilo/novatech-solutions",
@@ -201,6 +210,31 @@ describe("web project routing metadata", () => {
     expect(getProjectById("taskflow")?.github).toBe(
       "https://github.com/christopherkilo/taskflow",
     );
+    expect(getProjectById("kilo-toolkit")?.github).toBe(
+      "https://github.com/christopherkilo/portfolio/tree/main/app/toolkit",
+    );
+    expect(getProjectById("kilo-toolkit")?.githubNote).toBe(
+      "Source: portfolio monorepo",
+    );
+  });
+
+  it("labels shared GitHub links as the portfolio monorepo", async () => {
+    const {
+      githubControlLabel,
+      isPortfolioMonorepoGithub,
+      PORTFOLIO_GITHUB_REPO,
+    } = await import("./projectData");
+    expect(isPortfolioMonorepoGithub(PORTFOLIO_GITHUB_REPO)).toBe(true);
+    expect(
+      isPortfolioMonorepoGithub(`${PORTFOLIO_GITHUB_REPO}/tree/main/app/toolkit`),
+    ).toBe(true);
+    expect(
+      isPortfolioMonorepoGithub("https://github.com/christopherkilo/taskflow"),
+    ).toBe(false);
+    const eventHorizon = getProjectById("event-horizon")!;
+    expect(githubControlLabel(eventHorizon)).toContain("portfolio monorepo");
+    const taskflow = getProjectById("taskflow")!;
+    expect(githubControlLabel(taskflow)).toBe("TaskFlow on GitHub");
   });
 
   it("never stores localhost liveDemo anywhere in project metadata", () => {

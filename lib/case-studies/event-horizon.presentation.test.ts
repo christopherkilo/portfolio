@@ -42,8 +42,12 @@ describe("Event Horizon case-study presentation", () => {
 
   it("points GitHub to the portfolio repo that contains the current implementation", () => {
     const project = getProjectById("event-horizon");
-    expect(project?.github).toBe("https://github.com/christopherkilo/portfolio");
+    expect(project?.github).toBe(
+      "https://github.com/christopherkilo/portfolio/tree/main/app/demos/event-horizon",
+    );
+    expect(project?.github).toContain("christopherkilo/portfolio");
     expect(project?.github).not.toContain("christopherkilo/event-horizon");
+    expect(project?.githubNote).toBe("Source: portfolio monorepo");
   });
 
   it("renders grouped technologies instead of a card-sized AWS badge wall", () => {

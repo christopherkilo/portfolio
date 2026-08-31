@@ -9,6 +9,8 @@ export interface Project {
   image: string;
   imageAlt?: string;
   github?: string;
+  /** Optional visitor-facing note when GitHub points at this portfolio monorepo. */
+  githubNote?: string;
   /**
    * Internal live-demo path (e.g. `/demos/event-horizon`) or a public HTTPS URL.
    * Never use localhost for visitor-facing links.
@@ -22,6 +24,8 @@ export interface Project {
    * homepage featured + Projects page grids.
    */
   portfolioVisible?: boolean;
+  /** Honest in-progress marker. Not a general status system. */
+  inDevelopment?: boolean;
 }
 
 export const projects: Project[] = [
@@ -35,7 +39,9 @@ export const projects: Project[] = [
     image: "/projects/event-horizon-logo.svg",
     imageAlt:
       "Event Horizon portfolio cover with a supporting black-hole mark above a fully readable title",
-    github: "https://github.com/christopherkilo/portfolio",
+    github:
+      "https://github.com/christopherkilo/portfolio/tree/main/app/demos/event-horizon",
+    githubNote: "Source: portfolio monorepo",
     liveDemo: "/demos/event-horizon",
     featured: true,
     href: "/projects/event-horizon",
@@ -71,6 +77,19 @@ export const projects: Project[] = [
     href: "/projects/taskflow",
   },
   {
+    id: "starlenz",
+    title: "StarLenz",
+    category: "web",
+    description:
+      "An interactive astronomy experience that started as a graphic design concept. The case study is still being written.",
+    technologies: ["Next.js", "TypeScript", "UI/UX", "Motion Design"],
+    image: "",
+    imageAlt: "StarLenz gold lens mark on a navy star field",
+    featured: false,
+    href: "/projects/starlenz",
+    inDevelopment: true,
+  },
+  {
     id: "kilo-toolkit",
     title: "Kilo Toolkit",
     category: "it",
@@ -79,7 +98,8 @@ export const projects: Project[] = [
     technologies: ["Next.js", "TypeScript", "Diagnostics", "Networking"],
     image: "/projects/kilo-toolkit.svg",
     imageAlt: "Kilo Toolkit diagnostics suite cover",
-    github: "https://github.com/christopherkilo/portfolio",
+    github: "https://github.com/christopherkilo/portfolio/tree/main/app/toolkit",
+    githubNote: "Source: portfolio monorepo",
     liveDemo: "/toolkit",
     featured: true,
     href: "/toolkit",
@@ -147,7 +167,8 @@ export const projects: Project[] = [
       "Hardware inventory, live performance simulation, storage health, and diagnostic findings inside Kilo Toolkit.",
     technologies: ["Next.js", "TypeScript", "Hardware", "Diagnostics"],
     image: "/projects/systemscope.svg",
-    github: "https://github.com/christopherkilo/portfolio",
+    github: "https://github.com/christopherkilo/portfolio/tree/main/app/toolkit",
+    githubNote: "Source: portfolio monorepo",
     featured: false,
     href: "/toolkit/system",
     portfolioVisible: false,
@@ -160,7 +181,8 @@ export const projects: Project[] = [
       "Memory timelines, process analysis, findings, and workload-aware RAM guidance inside Kilo Toolkit.",
     technologies: ["TypeScript", "Recharts", "Memory", "Troubleshooting"],
     image: "/projects/memorymedic.svg",
-    github: "https://github.com/christopherkilo/portfolio",
+    github: "https://github.com/christopherkilo/portfolio/tree/main/app/toolkit",
+    githubNote: "Source: portfolio monorepo",
     featured: false,
     href: "/toolkit/memory",
     portfolioVisible: false,
@@ -173,7 +195,8 @@ export const projects: Project[] = [
       "Connection testing, adapter inspection, DNS comparison, device mapping, and guided network troubleshooting.",
     technologies: ["TypeScript", "Networking", "DNS", "Decision Trees"],
     image: "/projects/netcheck.svg",
-    github: "https://github.com/christopherkilo/portfolio",
+    github: "https://github.com/christopherkilo/portfolio/tree/main/app/toolkit",
+    githubNote: "Source: portfolio monorepo",
     featured: false,
     href: "/toolkit/network",
     portfolioVisible: false,
@@ -305,4 +328,25 @@ export function hasLiveDemo(url: string | undefined): url is string {
 export function isExternalHref(url: string | undefined): boolean {
   if (!url) return false;
   return !isInternalHref(url);
+}
+
+export const PORTFOLIO_GITHUB_REPO =
+  "https://github.com/christopherkilo/portfolio";
+
+/** True when a GitHub URL is this site’s portfolio/monorepo, including subdirectory links. */
+export function isPortfolioMonorepoGithub(url: string | undefined): boolean {
+  if (!url) return false;
+  return (
+    url === PORTFOLIO_GITHUB_REPO ||
+    url.startsWith(`${PORTFOLIO_GITHUB_REPO}/`)
+  );
+}
+
+export function githubControlLabel(project: Project): string {
+  if (isPortfolioMonorepoGithub(project.github)) {
+    return project.githubNote
+      ? `${project.title} on GitHub — ${project.githubNote}`
+      : `${project.title} on GitHub — portfolio monorepo`;
+  }
+  return `${project.title} on GitHub`;
 }

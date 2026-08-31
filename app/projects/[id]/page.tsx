@@ -15,7 +15,13 @@ import {
   getAllCaseStudyIds,
   getCaseStudy,
 } from "@/lib/caseStudies";
-import { categoryBadgeLabels, hasLiveDemo, isInternalHref } from "@/lib/projectData";
+import {
+  categoryBadgeLabels,
+  githubControlLabel,
+  hasLiveDemo,
+  isInternalHref,
+  isPortfolioMonorepoGithub,
+} from "@/lib/projectData";
 import { pageMetadata } from "@/lib/seo";
 
 type PageProps = {
@@ -110,9 +116,20 @@ export default async function CaseStudyPage({ params }: PageProps) {
             </Button>
           ) : null}
           {project.github ? (
-            <Button href={project.github} external variant="outline" size="lg">
+            <Button
+              href={project.github}
+              external
+              variant="outline"
+              size="lg"
+              aria-label={githubControlLabel(project)}
+            >
               <GithubIcon className="size-4" />
               GitHub
+              {isPortfolioMonorepoGithub(project.github) ? (
+                <span className="text-xs font-normal text-muted">
+                  portfolio monorepo
+                </span>
+              ) : null}
             </Button>
           ) : null}
           <Button href="/projects" variant="ghost" size="lg">
@@ -248,7 +265,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
         {study.currentState ? (
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] label-accent">
                 Implemented
               </p>
               <ul className="mt-3 space-y-2">
@@ -353,7 +370,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
                 key={step}
                 className="flex items-start gap-3 text-sm leading-relaxed text-secondary"
               >
-                <span className="font-mono text-xs text-primary">
+                <span className="font-mono text-xs label-accent">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 {step}
@@ -389,9 +406,18 @@ export default async function CaseStudyPage({ params }: PageProps) {
             </Button>
           ) : null}
           {project.github && !hasLiveDemo(project.liveDemo) ? (
-            <Button href={project.github} external>
+            <Button
+              href={project.github}
+              external
+              aria-label={githubControlLabel(project)}
+            >
               <GithubIcon className="size-4" />
               GitHub
+              {isPortfolioMonorepoGithub(project.github) ? (
+                <span className="text-xs font-normal text-muted">
+                  portfolio monorepo
+                </span>
+              ) : null}
             </Button>
           ) : null}
           <Button href="/projects" variant="outline">

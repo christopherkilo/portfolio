@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { buttonTransition, springHover } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 import { Shimmer } from "@/components/ui/Shimmer";
@@ -134,6 +134,7 @@ export function Button({
 }: ButtonProps) {
   const isGithub =
     shimmer ?? Boolean(href?.includes("github.com"));
+  const reducedMotion = useReducedMotion();
 
   const classes = cn(
     "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl font-semibold transition-[colors,box-shadow] duration-[var(--duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
@@ -145,8 +146,8 @@ export function Button({
   return (
     <motion.div
       className="inline-flex"
-      whileHover={{ y: -2, scale: 1.02 }}
-      whileTap={{ scale: 0.97, y: 1 }}
+      whileHover={reducedMotion ? undefined : { y: -2, scale: 1.02 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.97, y: 1 }}
       transition={href ? springHover : buttonTransition}
     >
       <ButtonShell

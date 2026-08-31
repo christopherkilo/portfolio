@@ -41,9 +41,9 @@ export function BlogCard({ post }: { post: BlogPostMeta }) {
         >
         <Link
           href={post.href}
-          className="absolute inset-0 z-[1] rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+          className="relative z-[1] flex h-full flex-col rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
           aria-label={`Read article: ${post.title}`}
-        />
+        >
 
         <div className="relative aspect-[16/9] overflow-hidden bg-surface-elevated">
           <BlogGeneratedCover post={post} className="absolute inset-0" />
@@ -64,9 +64,9 @@ export function BlogCard({ post }: { post: BlogPostMeta }) {
           </div>
 
           <div>
-            <h2 className="line-clamp-2 font-display text-xl font-semibold tracking-tight text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary sm:text-2xl">
+            <h3 className="line-clamp-2 font-display text-xl font-semibold tracking-tight text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary sm:text-2xl">
               {post.title}
-            </h2>
+            </h3>
             <p className="mt-3 line-clamp-3 max-w-prose text-sm leading-relaxed text-secondary md:text-[0.95rem]">
               {post.description}
             </p>
@@ -90,6 +90,7 @@ export function BlogCard({ post }: { post: BlogPostMeta }) {
             Read article →
           </p>
         </div>
+        </Link>
       </article>
       </Shimmer>
     </motion.div>

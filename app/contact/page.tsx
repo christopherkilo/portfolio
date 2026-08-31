@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMetadata({
 export default function ContactPage() {
   return (
     <div className="pt-8">
-      <ContactCTA />
+      <ContactCTA headingAs="h1" />
     </div>
   );
 }

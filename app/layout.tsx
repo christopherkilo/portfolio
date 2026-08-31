@@ -69,6 +69,7 @@ export const metadata: Metadata = {
     "React",
     "PostgreSQL",
     "Supabase",
+    "AWS",
     "portfolio",
   ],
 };

@@ -1,0 +1,79 @@
+:host {
+  display: block;
+}
+
+.panel {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  border: 1px solid var(--tf-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--tf-elevated) 40%, transparent);
+  padding: 0.75rem;
+}
+
+h3 {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tf-muted);
+}
+
+.muted {
+  margin: 0;
+  color: var(--tf-muted);
+  font-size: 0.75rem;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.item {
+  border: 1px solid var(--tf-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.heading {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.detail {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--tf-muted);
+}
+
+time {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  color: var(--tf-muted);
+}
+
+.ghost {
+  height: 2rem;
+  border: 1px solid var(--tf-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--tf-ink);
+  padding: 0 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.alert {
+  margin: 0;
+  color: var(--tf-danger);
+  font-size: 0.75rem;
+}

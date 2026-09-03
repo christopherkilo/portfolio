@@ -1,0 +1,105 @@
+<form
+  class="form"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  [attr.aria-busy]="submitting()"
+>
+  @if (conflict(); as conflictState) {
+    <tf-conflict-notice
+      entityLabel="project"
+      (review)="reviewConflict()"
+      (keepEditing)="keepEditing()"
+      (cancelled)="cancelled.emit()"
+    />
+    <p class="sr-only">
+      Latest server version is {{ conflictState.latest.version }}. Your draft
+      expected version {{ conflictState.expectedVersion }}.
+    </p>
+  }
+
+  @if (errorMessage(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+
+  @if (mode() === "create") {
+    <label>
+      Name
+      <input
+        type="text"
+        formControlName="name"
+        [attr.aria-invalid]="fieldError('name') ? true : null"
+        [attr.aria-describedby]="fieldError('name') ? 'project-name-error' : null"
+      />
+      @if (fieldError("name"); as err) {
+        <span id="project-name-error" class="field-error">{{ err }}</span>
+      }
+    </label>
+    <label>
+      Description
+      <textarea rows="3" formControlName="description"></textarea>
+    </label>
+    <label>
+      Due date
+      <input type="date" formControlName="dueDate" />
+    </label>
+    <fieldset>
+      <legend>Color</legend>
+      <div class="swatches" role="radiogroup" aria-label="Project color">
+        @for (color of colors; track color) {
+          <button
+            type="button"
+            class="swatch"
+            [class.on]="form.controls.color.value === color"
+            [style.background]="color"
+            [attr.aria-pressed]="form.controls.color.value === color"
+            [attr.aria-label]="'Color ' + color"
+            (click)="selectColor(color)"
+          ></button>
+        }
+      </div>
+    </fieldset>
+  } @else {
+    <label>
+      Rename
+      <input
+        type="text"
+        [formControl]="rename"
+        [attr.aria-invalid]="renameError() ? true : null"
+        [attr.aria-describedby]="renameError() ? 'project-rename-error' : null"
+      />
+      @if (renameError(); as err) {
+        <span id="project-rename-error" class="field-error">{{ err }}</span>
+      }
+    </label>
+  }
+
+  <div class="actions">
+    <button
+      type="button"
+      class="ghost"
+      [disabled]="submitting()"
+      (click)="cancelled.emit()"
+    >
+      {{ mode() === "edit" ? "Close" : "Cancel" }}
+    </button>
+    @if (mode() === "edit") {
+      <button
+        type="button"
+        class="ghost"
+        [disabled]="submitting()"
+        (click)="archiveOrRestore()"
+      >
+        {{ project()?.archived ? "Restore" : "Archive" }}
+      </button>
+    }
+    <button type="submit" class="primary" [disabled]="submitting()">
+      @if (submitting()) {
+        <span>{{ mode() === "create" ? "Creating…" : "Saving…" }}</span>
+      } @else if (mode() === "create") {
+        <span>Create</span>
+      } @else {
+        <span>Save name</span>
+      }
+    </button>
+  </div>
+</form>

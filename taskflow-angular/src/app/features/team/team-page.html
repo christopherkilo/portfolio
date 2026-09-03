@@ -1,0 +1,225 @@
+@if (reads.isLoading()) {
+  <tf-query-loading label="Loading team…" />
+} @else if (loadError(); as err) {
+  <tf-query-error
+    [title]="err.title"
+    [message]="err.message"
+    (retry)="reads.reloadAll()"
+  />
+} @else if (!workspaceId()) {
+  <tf-query-error
+    title="No workspace available"
+    message="Create or join a workspace to view your team."
+    [showRetry]="false"
+  />
+} @else {
+  <div class="page">
+    <section class="members">
+      <div class="head">
+        <h2>Team members</h2>
+        @if (permissions.canInviteMembers()) {
+          <button type="button" class="primary" (click)="openInvite()">
+            Invite member
+          </button>
+        }
+      </div>
+
+      @if (actionError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+
+      @if (rows().length === 0) {
+        <tf-empty-state
+          title="No members yet"
+          description="This workspace has no members to display."
+        />
+      } @else {
+        <ul class="cards" data-density-list>
+          @for (row of rows(); track row.member.id) {
+            <li>
+              <article class="card">
+                <div class="identity">
+                  <span class="avatar" aria-hidden="true">{{ row.member.avatar }}</span>
+                  <div class="meta">
+                    <div class="name-row">
+                      <h3>{{ row.member.name }}</h3>
+                      <span class="workload" [attr.data-label]="row.label">
+                        {{ row.label }}
+                      </span>
+                    </div>
+                    @if (canChangeRole(row.member)) {
+                      <label>
+                        Role
+                        <select
+                          class="role"
+                          [value]="row.member.role"
+                          [disabled]="rolePendingId() === row.member.id"
+                          [attr.aria-label]="'Change role for ' + row.member.name"
+                          (change)="onRoleChange(row.member, $event)"
+                        >
+                          @for (option of roleOptions(); track option) {
+                            <option [value]="option">{{ option }}</option>
+                          }
+                        </select>
+                      </label>
+                    } @else {
+                      <p class="role-label">{{ row.member.role }}</p>
+                    }
+                    @if (row.member.email) {
+                      <a class="email" [href]="'mailto:' + row.member.email">
+                        {{ row.member.email }}
+                      </a>
+                    }
+                  </div>
+                </div>
+                <div class="stats">
+                  <div class="stat-row">
+                    <span>Completion {{ row.completion }}%</span>
+                    <span>{{ row.active }} active · {{ row.overdue }} overdue</span>
+                  </div>
+                  <tf-progress-bar
+                    [value]="row.completion"
+                    [label]="row.member.name + ' completion'"
+                  />
+                  <div
+                    class="segments"
+                    [attr.aria-label]="'Workload breakdown for ' + row.member.name"
+                  >
+                    <div>
+                      <p>Assigned</p>
+                      <p>{{ row.assigned }}</p>
+                    </div>
+                    <div>
+                      <p>Done</p>
+                      <p>{{ row.completed }}</p>
+                    </div>
+                    <div>
+                      <p>Active</p>
+                      <p>{{ row.active }}</p>
+                    </div>
+                    <div>
+                      <p>Overdue</p>
+                      <p>{{ row.overdue }}</p>
+                    </div>
+                  </div>
+                </div>
+                @if (canRemove(row.member)) {
+                  <button
+                    type="button"
+                    class="danger"
+                    [disabled]="removing() && removeTarget()?.id === row.member.id"
+                    (click)="confirmRemove(row.member)"
+                  >
+                    Remove
+                  </button>
+                }
+              </article>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (permissions.canInviteMembers()) {
+        <section class="pending" aria-labelledby="pending-heading">
+          <h2 id="pending-heading">Pending invitations</h2>
+          @if (invitations.isLoading()) {
+            <p class="status" role="status">Loading invitations…</p>
+          } @else if (invitationError(); as message) {
+            <p class="alert" role="alert">{{ message }}</p>
+          } @else if (invitations.invitations().length === 0) {
+            <tf-empty-state
+              title="No pending invitations"
+              description="Invite a teammate to collaborate in this workspace."
+              actionLabel="Invite member"
+              (action)="openInvite()"
+            />
+          } @else {
+            <ul class="invites">
+              @for (invitation of invitations.invitations(); track invitation.id) {
+                <li>
+                  <div>
+                    <p class="invite-email">{{ invitation.email }}</p>
+                    <p class="muted">
+                      {{ invitation.role }} · expires
+                      {{ formatRelativeTime(invitation.expires_at) }}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="ghost"
+                    [disabled]="revokePendingId() === invitation.id"
+                    (click)="revokeInvitation(invitation)"
+                  >
+                    Revoke
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    </section>
+
+    <section class="feed-panel">
+      <h2>Activity feed</h2>
+      @if (feed().length === 0) {
+        <p class="status">No recent activity</p>
+      } @else {
+        <ul class="feed">
+          @for (item of feed(); track item.id) {
+            <li>
+              <span class="avatar small" aria-hidden="true">
+                {{ findMember(reads.members.members(), item.userId)?.avatar || "TF" }}
+              </span>
+              <div>
+                <p>{{ describeActivity(item) }}</p>
+                <p class="muted">
+                  {{ findMember(reads.members.members(), item.userId)?.name || "Someone" }}
+                </p>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+}
+
+<tf-read-dialog
+  [open]="inviteOpen()"
+  title="Invite member"
+  (closed)="closeInvite()"
+>
+  @if (inviteOpen() && workspaceId(); as id) {
+    <tf-invite-member-form
+      [workspaceId]="id"
+      (cancelled)="closeInvite()"
+    />
+  }
+</tf-read-dialog>
+
+<tf-read-dialog
+  [open]="removeTarget() !== null"
+  title="Remove member?"
+  descriptionId="remove-member-copy"
+  [dismissible]="!removing()"
+  (closed)="closeRemove()"
+>
+  @if (removeTarget(); as member) {
+    <p id="remove-member-copy">
+      Remove {{ member.name }} from this workspace? They will lose access until
+      invited again.
+    </p>
+    @if (actionError(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
+    }
+    <div class="dialog-actions">
+      <button type="button" class="ghost" [disabled]="removing()" (click)="closeRemove()">
+        Cancel
+      </button>
+      <button type="button" class="danger" [disabled]="removing()" (click)="removeMember()">
+        {{ removing() ? "Removing…" : "Remove member" }}
+      </button>
+    </div>
+  }
+</tf-read-dialog>

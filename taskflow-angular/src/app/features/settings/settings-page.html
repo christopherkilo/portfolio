@@ -1,0 +1,148 @@
+<div class="page">
+  <nav class="tabs" aria-label="Settings sections">
+    @for (item of tabs; track item.id) {
+      <button
+        type="button"
+        [class.active]="tab() === item.id"
+        [attr.aria-current]="tab() === item.id ? 'page' : null"
+        (click)="selectTab(item.id)"
+      >
+        {{ item.label }}
+      </button>
+    }
+  </nav>
+
+  <section class="panel">
+    @if (tab() === "appearance") {
+      <header>
+        <h2>Appearance</h2>
+        <p>
+          Theme follows the top navigation toggle. Density controls spacing in
+          lists and boards.
+        </p>
+      </header>
+      <fieldset>
+        <legend>Density</legend>
+        <div class="choices">
+          <button
+            type="button"
+            [class.active]="effectiveDensity() === 'compact'"
+            [attr.aria-pressed]="effectiveDensity() === 'compact'"
+            (click)="setDensityDraft('compact')"
+          >
+            compact
+          </button>
+          <button
+            type="button"
+            [class.active]="effectiveDensity() === 'comfortable'"
+            [attr.aria-pressed]="effectiveDensity() === 'comfortable'"
+            (click)="setDensityDraft('comfortable')"
+          >
+            comfortable
+          </button>
+        </div>
+      </fieldset>
+      <div class="save-row">
+        <button type="button" class="primary" (click)="saveAppearance()">
+          Save
+        </button>
+        @if (saved()) {
+          <p class="status" role="status">{{ saved() }}</p>
+        }
+      </div>
+    }
+
+    @if (tab() === "notifications") {
+      <header>
+        <h2>Notifications</h2>
+        <p>
+          In-app categories only — email and push delivery are not part of this
+          phase.
+        </p>
+      </header>
+      @if (prefs.isLoading() && !effectivePrefs()) {
+        <tf-query-loading label="Loading preferences…" />
+      } @else if (loadError(); as err) {
+        <tf-query-error
+          [title]="err.title"
+          [message]="err.message"
+          (retry)="retryPrefs()"
+        />
+      } @else if (effectivePrefs(); as current) {
+        @for (row of prefRows; track row[0]) {
+          <label class="toggle">
+            <span>{{ row[1] }}</span>
+            <button
+              type="button"
+              role="switch"
+              [attr.aria-checked]="current[row[0]]"
+              [class.on]="current[row[0]]"
+              (click)="togglePref(row[0])"
+            >
+              <span class="knob" aria-hidden="true"></span>
+            </button>
+          </label>
+        }
+        @if (saveError(); as message) {
+          <p class="alert" role="alert">{{ message }}</p>
+        }
+        <div class="save-row">
+          <button
+            type="button"
+            class="primary"
+            [disabled]="saving()"
+            (click)="saveNotificationPrefs()"
+          >
+            {{ saving() ? "Saving…" : "Save preferences" }}
+          </button>
+          @if (saved()) {
+            <p class="status" role="status">{{ saved() }}</p>
+          }
+        </div>
+      }
+    }
+
+    @if (tab() === "account") {
+      <header>
+        <h2>Account</h2>
+        <p>
+          Profile shown throughout TaskFlow comes from your signed-in Google
+          account. It is not stored only in this browser.
+        </p>
+      </header>
+      <label class="field">
+        Display name
+        <input [value]="displayName()" readonly />
+      </label>
+      <label class="field">
+        Email
+        <input [value]="email()" readonly />
+      </label>
+    }
+
+    @if (tab() === "preferences") {
+      <header>
+        <h2>Preferences</h2>
+        <p>Workspace defaults for planning views.</p>
+      </header>
+      <label class="field">
+        Week starts on
+        <select
+          [value]="effectiveWeekStart()"
+          (change)="setWeekStartDraft($any($event.target).value)"
+        >
+          <option value="sunday">Sunday</option>
+          <option value="monday">Monday</option>
+        </select>
+      </label>
+      <div class="save-row">
+        <button type="button" class="primary" (click)="savePreferences()">
+          Save
+        </button>
+        @if (saved()) {
+          <p class="status" role="status">{{ saved() }}</p>
+        }
+      </div>
+    }
+  </section>
+</div>

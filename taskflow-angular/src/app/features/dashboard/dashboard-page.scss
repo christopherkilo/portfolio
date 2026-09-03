@@ -1,0 +1,166 @@
+:host {
+  display: block;
+}
+
+.page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.cards {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.card,
+.panel {
+  border: 1px solid var(--tf-border);
+  border-radius: 0.75rem;
+  background: var(--tf-surface);
+  padding: 1rem 1.25rem;
+}
+
+.muted {
+  margin: 0;
+  color: var(--tf-muted);
+  font-size: 0.75rem;
+}
+
+.tiny {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.stat {
+  margin: 0.5rem 0 0;
+  font-family: var(--tf-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.split,
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 40rem) {
+  .split,
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+h2 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+dl {
+  margin: 1rem 0 0;
+}
+
+dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+dt {
+  color: var(--tf-muted);
+}
+
+dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+.overdue,
+.health,
+.deadlines,
+.feed {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.overdue li,
+.deadlines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--tf-danger) 20%, var(--tf-border));
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.deadlines li {
+  border-color: var(--tf-border);
+  background: color-mix(in srgb, var(--tf-elevated) 50%, transparent);
+}
+
+.overdue time {
+  color: var(--tf-danger);
+  font-size: 0.75rem;
+}
+
+.deadlines time {
+  color: var(--tf-accent);
+  font-size: 0.75rem;
+}
+
+.health li {
+  margin-bottom: 1rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.feed li {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.avatar {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--tf-elevated);
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+.activity-empty {
+  margin: 1rem 0 0;
+  border: 1px dashed var(--tf-border);
+  border-radius: 0.5rem;
+  padding: 2rem 0.75rem;
+  text-align: center;
+  color: var(--tf-muted);
+  font-size: 0.875rem;
+}
+
+.activity-empty span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--tf-ink);
+  font-weight: 500;
+}

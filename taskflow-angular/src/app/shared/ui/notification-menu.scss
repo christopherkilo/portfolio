@@ -1,0 +1,140 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.wrap {
+  position: relative;
+}
+
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--tf-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--tf-ink);
+  cursor: pointer;
+}
+
+.icon-btn svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dot {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--tf-danger);
+}
+
+.panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 50;
+  width: min(20rem, calc(100vw - 2rem));
+  border: 1px solid var(--tf-border);
+  border-radius: 0.75rem;
+  background: var(--tf-surface);
+  padding: 0.75rem;
+  box-shadow: 0 1rem 2.5rem color-mix(in srgb, #000 18%, transparent);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.text {
+  border: 0;
+  background: transparent;
+  color: var(--tf-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.text:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.muted,
+.status {
+  margin: 0.5rem 0 0;
+  color: var(--tf-muted);
+  font-size: 0.75rem;
+}
+
+.empty {
+  margin-top: 0.75rem;
+  border: 1px dashed var(--tf-border);
+  border-radius: 0.5rem;
+  padding: 1rem 0.75rem;
+  text-align: center;
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  max-height: 20rem;
+  overflow: auto;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.item {
+  width: 100%;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--tf-elevated);
+  color: inherit;
+  text-align: left;
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+.item.unread {
+  background: color-mix(in srgb, var(--tf-accent) 10%, transparent);
+}
+
+.item-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.alert {
+  margin: 0.5rem 0 0;
+  color: var(--tf-danger);
+  font-size: 0.75rem;
+}

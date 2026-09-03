@@ -1,0 +1,48 @@
+<dl class="detail">
+  <div>
+    <dt>Status</dt>
+    <dd>{{ statusLabel() }}</dd>
+  </div>
+  <div>
+    <dt>Priority</dt>
+    <dd>
+      <span [class]="priorityClass(task().priority)">{{ task().priority }}</span>
+    </dd>
+  </div>
+  <div>
+    <dt>Project</dt>
+    <dd>{{ projectName() || "—" }}</dd>
+  </div>
+  <div>
+    <dt>Assignee</dt>
+    <dd>{{ assigneeName() || "Unassigned" }}</dd>
+  </div>
+  <div>
+    <dt>Due</dt>
+    <dd>{{ dueLabel() }}</dd>
+  </div>
+  <div>
+    <dt>Version</dt>
+    <dd>{{ task().version }}</dd>
+  </div>
+</dl>
+<p class="body">{{ task().description || "No description." }}</p>
+@if (task().labels.length) {
+  <p class="labels">
+    @for (label of task().labels; track label) {
+      <span>{{ label }}</span>
+    }
+  </p>
+}
+<tf-entity-presence [entityId]="task().id" />
+@if (canEdit()) {
+  <div class="detail-actions">
+    <button type="button" class="ghost" (click)="close.emit()">Close</button>
+    <button type="button" class="ghost" (click)="archive.emit()">Archive</button>
+    <button type="button" class="ghost" (click)="delete.emit()">Delete</button>
+    <button type="button" class="primary" (click)="edit.emit()">Edit</button>
+  </div>
+}
+<tf-task-comments />
+<tf-task-attachments />
+<tf-task-history />

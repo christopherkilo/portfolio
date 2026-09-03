@@ -1,0 +1,23 @@
+<section class="panel" aria-labelledby="tf-history-heading">
+  <h3 id="tf-history-heading">History</h3>
+  @if (history.isLoading() && !history.hasValue()) {
+    <p class="muted" role="status">Loading history…</p>
+  } @else if (loadError(); as err) {
+    <p class="alert" role="alert">{{ err.message }}</p>
+    <button type="button" class="ghost" (click)="retry()">Retry</button>
+  } @else if (history.events().length === 0) {
+    <p class="muted">No history for this task yet.</p>
+  } @else {
+    <ol class="list">
+      @for (item of history.events(); track item.id) {
+        <li class="item">
+          <p class="heading">{{ formatted(item).heading }}</p>
+          <p class="detail">{{ formatted(item).detail }}</p>
+          <time [attr.dateTime]="item.created_at">
+            {{ formatRelativeTime(item.created_at) }}
+          </time>
+        </li>
+      }
+    </ol>
+  }
+</section>

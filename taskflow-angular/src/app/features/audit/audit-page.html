@@ -1,0 +1,81 @@
+<div class="page">
+  <header>
+    <h2>Workspace audit</h2>
+    <p class="lede">
+      Append-only history for admins and owners. Ordinary members cannot rewrite
+      these records.
+    </p>
+  </header>
+
+  <div class="filters">
+    <label>
+      Entity
+      <select [value]="audit.entityType()" (change)="onEntity($event)">
+        <option value="">All</option>
+        <option value="task">Task</option>
+        <option value="project">Project</option>
+        <option value="member">Member</option>
+        <option value="workspace">Workspace</option>
+      </select>
+    </label>
+    <label>
+      Action
+      <input
+        type="search"
+        [value]="audit.action()"
+        placeholder="e.g. updated"
+        (input)="onAction($event)"
+      />
+    </label>
+    <button type="button" class="ghost" (click)="retry()">Refresh</button>
+  </div>
+
+  @if (!reads.workspace.currentWorkspaceId()) {
+    <tf-query-error
+      title="No workspace available"
+      message="Create or join a workspace to view audit history."
+      [showRetry]="false"
+    />
+  } @else if (denied()) {
+    <tf-query-error
+      title="You don’t have access"
+      message="Audit history is limited to workspace admins and owners."
+      [showRetry]="false"
+    />
+  } @else if (audit.isLoading() && !audit.hasValue()) {
+    <tf-query-loading label="Loading audit events…" />
+  } @else if (loadError(); as err) {
+    <tf-query-error
+      [title]="err.title"
+      [message]="err.message"
+      (retry)="retry()"
+    />
+  } @else if (audit.events().length === 0) {
+    <tf-empty-state
+      title="No matching audit events"
+      description="Try a different entity or action, or refresh the feed."
+    />
+  } @else {
+    <ul class="list">
+      @for (item of audit.events(); track item.id) {
+        <li>
+          <div class="row">
+            <p class="heading">
+              {{ formatted(item).heading }}
+              <span class="muted">
+                · {{ item.entity_type }}
+                @if (item.entity_title) {
+                  · {{ item.entity_title }}
+                }
+              </span>
+            </p>
+            <time [attr.dateTime]="item.created_at">
+              {{ formatRelativeTime(item.created_at) }}
+            </time>
+          </div>
+          <p class="detail">{{ formatted(item).detail }}</p>
+        </li>
+      }
+    </ul>
+  }
+</div>

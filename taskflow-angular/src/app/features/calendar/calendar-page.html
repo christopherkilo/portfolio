@@ -1,0 +1,138 @@
+@if (reads.isLoading()) {
+  <tf-query-loading label="Loading calendar…" />
+} @else if (loadError(); as err) {
+  <tf-query-error
+    [title]="err.title"
+    [message]="err.message"
+    (retry)="reads.reloadAll()"
+  />
+} @else if (!reads.workspace.currentWorkspaceId()) {
+  <tf-query-error
+    title="No workspace available"
+    message="Create or join a workspace to view the calendar."
+    [showRetry]="false"
+  />
+} @else {
+  <div class="page">
+    <section class="month" aria-labelledby="tf-calendar-heading">
+      <div class="toolbar">
+        <h2 id="tf-calendar-heading">{{ label() }}</h2>
+        <div class="nav">
+          <button type="button" class="ghost" (click)="goToday()">Today</button>
+          <button
+            type="button"
+            class="icon"
+            aria-label="Previous month"
+            (click)="moveMonth(-1)"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            class="icon"
+            aria-label="Next month"
+            (click)="moveMonth(1)"
+          >
+            ›
+          </button>
+        </div>
+      </div>
+      <p class="hint">Swipe horizontally to view the full month.</p>
+      <div class="scroller">
+        <div class="grid-wrap">
+          <div class="weekdays">
+            @for (day of weekdays(); track day) {
+              <div>{{ day }}</div>
+            }
+          </div>
+          <div class="days">
+            @for (cell of cells(); track $index) {
+              <div class="cell" [class.today]="cell?.iso === today">
+                @if (cell) {
+                  <p class="day">
+                    {{ cell.day }}
+                    @if (cell.iso === today) {
+                      <span class="sr-only">, today</span>
+                    }
+                  </p>
+                  <ul>
+                    @for (task of cell.dayTasks.slice(0, 2); track task.id) {
+                      <li>
+                        <button
+                          type="button"
+                          class="chip"
+                          [title]="task.title"
+                          (click)="openTask(task)"
+                        >
+                          {{ task.title }}
+                        </button>
+                      </li>
+                    }
+                    @if (cell.dayTasks.length > 2) {
+                      <li class="more">+{{ cell.dayTasks.length - 2 }} more</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="upcoming" aria-labelledby="tf-upcoming-heading">
+      <h2 id="tf-upcoming-heading">Upcoming deadlines</h2>
+      <p class="muted">Open tasks due today or later.</p>
+      @if (upcoming().length === 0) {
+        <tf-empty-state
+          title="No upcoming deadlines"
+          description="Open tasks with due dates will appear here."
+        />
+      } @else {
+        <ul>
+          @for (task of upcoming(); track task.id) {
+            <li>
+              <button type="button" class="deadline" (click)="openTask(task)">
+                <span class="title">{{ task.title }}</span>
+                <span class="muted">
+                  {{ projectName(task.projectId) }} · {{ formatDate(task.dueDate) }}
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+
+  <tf-read-dialog
+    [open]="selected() !== null"
+    [title]="selected()?.title ?? 'Deadline'"
+    (closed)="closeTask()"
+  >
+    @if (selected(); as task) {
+      <p class="body">{{ task.description || "No description." }}</p>
+      <dl class="detail">
+        <div>
+          <dt>Due</dt>
+          <dd>{{ formatDate(task.dueDate) }}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>{{ task.status }}</dd>
+        </div>
+        <div>
+          <dt>Project</dt>
+          <dd>{{ projectName(task.projectId) || "—" }}</dd>
+        </div>
+        <div>
+          <dt>Assignee</dt>
+          <dd>{{ assigneeName(task) }}</dd>
+        </div>
+      </dl>
+      <button type="button" class="primary" (click)="openOnBoard()">
+        Open on task board
+      </button>
+    }
+  </tf-read-dialog>
+}

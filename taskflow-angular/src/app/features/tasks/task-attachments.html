@@ -1,0 +1,71 @@
+<section class="panel" aria-labelledby="tf-attachments-heading">
+  <div class="head">
+    <h3 id="tf-attachments-heading">Attachments</h3>
+    @if (permissions.canUploadAttachment()) {
+      <input
+        #fileInput
+        class="sr-only"
+        type="file"
+        [accept]="accept"
+        [disabled]="uploading() || offline()"
+        (change)="onFile($event)"
+      />
+      <button
+        type="button"
+        class="ghost"
+        [disabled]="uploading() || offline()"
+        [attr.title]="offline() ? 'This action requires an internet connection.' : null"
+        (click)="openPicker()"
+      >
+        {{ uploading() ? "Uploading…" : "Add file" }}
+      </button>
+    }
+  </div>
+  <p class="hint">PNG, JPEG, WebP, PDF, or plain text · max 10 MB · private storage</p>
+  @if (selectedName(); as name) {
+    <p class="muted" role="status">Selected: {{ name }}</p>
+  }
+  @if (errorMessage(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+
+  @if (attachments.isLoading() && !attachments.hasValue()) {
+    <p class="muted" role="status">Loading attachments…</p>
+  } @else if (loadError(); as err) {
+    <p class="alert" role="alert">{{ err.message }}</p>
+    <button type="button" class="ghost" (click)="retry()">Retry</button>
+  } @else if (attachments.attachments().length === 0) {
+    <p class="empty">No attachments yet.</p>
+  } @else {
+    <ul class="list">
+      @for (item of attachments.attachments(); track item.id) {
+        <li class="item">
+          <div class="meta">
+            <p class="name">{{ item.fileName }}</p>
+            <p class="muted">
+              {{ formatBytes(item.sizeBytes) }}
+              · {{ uploaderName(item.uploadedBy) }}
+              · {{ formatRelativeTime(item.createdAt) }}
+            </p>
+          </div>
+          <div class="row">
+            <button type="button" class="ghost" (click)="download(item.id)">
+              Download
+            </button>
+            @if (permissions.canDeleteAttachment()) {
+              <button
+                type="button"
+                class="ghost"
+                [disabled]="deletingId() === item.id || offline()"
+                [attr.aria-label]="'Delete ' + item.fileName"
+                (click)="remove(item.id)"
+              >
+                Delete
+              </button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

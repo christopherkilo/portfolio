@@ -1,0 +1,42 @@
+<aside class="sidebar">
+  <div class="brand">
+    <tf-mark size="sm" [decorative]="true" />
+    <a routerLink="/dashboard" class="brand-name" (click)="onNavigate()">TaskFlow</a>
+  </div>
+
+  <nav class="nav" aria-label="Sidebar">
+    @for (item of items; track item.path) {
+      <a
+        class="nav-link"
+        [routerLink]="item.path"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        (click)="onNavigate()"
+      >
+        <tf-nav-icon [name]="item.icon" />
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <div class="workspace">
+    <label class="workspace-label" for="tf-workspace">Workspace</label>
+    @if (workspace.isLoading() && !workspace.hasValue()) {
+      <p class="workspace-name muted">Loading…</p>
+    } @else if (workspace.workspaces().length > 1) {
+      <select
+        id="tf-workspace"
+        class="workspace-select"
+        [value]="workspace.currentWorkspaceId() ?? ''"
+        (change)="onWorkspaceChange($any($event.target).value)"
+      >
+        @for (row of workspace.workspaces(); track row.id) {
+          <option [value]="row.id">{{ row.name }}</option>
+        }
+      </select>
+    } @else {
+      <p class="workspace-name">{{ workspace.currentWorkspace()?.name ?? "No workspace" }}</p>
+    }
+  </div>
+</aside>

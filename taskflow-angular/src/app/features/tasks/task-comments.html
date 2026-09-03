@@ -1,0 +1,99 @@
+<section class="panel" aria-labelledby="tf-comments-heading">
+  <h3 id="tf-comments-heading">Comments</h3>
+
+  @if (comments.isLoading() && !comments.hasValue()) {
+    <p class="muted" role="status">Loading comments…</p>
+  } @else if (loadError(); as err) {
+    <p class="alert" role="alert">{{ err.message }}</p>
+    <button type="button" class="ghost" (click)="retry()">Retry</button>
+  } @else if (comments.comments().length === 0) {
+    <div class="empty">
+      <p class="empty-title">No comments yet</p>
+      <p class="muted">Start the discussion for this task.</p>
+    </div>
+  } @else {
+    <ul class="list" data-density-list>
+      @for (comment of comments.comments(); track comment.id) {
+        <li class="item">
+          <span class="avatar" aria-hidden="true">{{ authorInitials(comment.author) }}</span>
+          <div class="item-body">
+            <div class="meta">
+              <p class="name">{{ authorLabel(comment.author) }}</p>
+              <time [attr.dateTime]="comment.created_at">
+                {{ formatRelativeTime(comment.created_at) }}
+              </time>
+            </div>
+            @if (editingId() === comment.id) {
+              <label class="field">
+                Edit comment
+                <textarea
+                  rows="3"
+                  [value]="editBody()"
+                  (input)="editBody.set($any($event.target).value)"
+                ></textarea>
+              </label>
+              <div class="row">
+                <button type="button" class="ghost" (click)="cancelEdit()">Cancel</button>
+                <button
+                  type="button"
+                  class="primary"
+                  [disabled]="editBusy() || !editBody().trim()"
+                  (click)="submitEdit(comment.id)"
+                >
+                  Save
+                </button>
+              </div>
+            } @else {
+              <p class="body">{{ comment.body }}</p>
+              @if (canManage(comment)) {
+                <div class="row">
+                  <button type="button" class="text" (click)="startEdit(comment)">Edit</button>
+                  <button
+                    type="button"
+                    class="text danger"
+                    [disabled]="editBusy()"
+                    (click)="remove(comment.id)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (permissions.canComment()) {
+    <form class="compose" [formGroup]="form" (ngSubmit)="submitNew()">
+      <label class="field">
+        Add a comment
+        <textarea
+          formControlName="body"
+          rows="3"
+          placeholder="Share an update…"
+          [attr.aria-invalid]="submitted() && form.controls.body.invalid"
+        ></textarea>
+      </label>
+      @if (submitted() && !form.controls.body.value.trim()) {
+        <p class="alert" role="alert">Enter a comment.</p>
+      }
+      <div class="row end">
+        <button
+          type="submit"
+          class="primary"
+          [disabled]="submitting() || !form.controls.body.value.trim() || network.online() === false"
+        >
+          {{ submitting() ? "Posting…" : "Post comment" }}
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="muted">Viewers can read comments but cannot post.</p>
+  }
+
+  @if (submitError(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+</section>

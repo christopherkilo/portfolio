@@ -1,0 +1,39 @@
+<div class="shell">
+  <a class="sr-only" href="#main">Skip to content</a>
+
+  <div class="desktop-sidebar">
+    <div class="desktop-sidebar-inner">
+      <tf-sidebar />
+    </div>
+  </div>
+
+  @if (ui.mobileSidebarOpen()) {
+    <div class="mobile-nav" role="presentation">
+      <button
+        type="button"
+        class="backdrop"
+        aria-label="Close sidebar"
+        (click)="ui.closeMobileSidebar()"
+      ></button>
+      <div
+        id="tf-mobile-nav"
+        class="drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+        cdkTrapFocus
+        [cdkTrapFocusAutoCapture]="true"
+      >
+        <tf-sidebar />
+      </div>
+    </div>
+  }
+
+  <div class="column">
+    <tf-top-nav [pageTitle]="pageTitle()" />
+    <main id="main" class="main">
+      <router-outlet />
+    </main>
+    <tf-conflict-dialog />
+  </div>
+</div>

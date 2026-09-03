@@ -1,15 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import {
+  requestPublicOrigin,
+  safeNextPath,
+  signInPathForNext,
+} from "@/lib/demos/taskflow/auth/safeNextPath";
 
 function normalizeUrl(raw: string) {
   return raw.replace(/\/$/, "").replace(/\/rest\/v1$/i, "");
-}
-
-function safeNextPath(raw: string | null) {
-  if (!raw) return "/demos/taskflow/dashboard";
-  if (!raw.startsWith("/demos/taskflow")) return "/demos/taskflow/dashboard";
-  return raw;
 }
 
 /**
@@ -19,35 +18,33 @@ function safeNextPath(raw: string | null) {
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  const origin = requestPublicOrigin(request);
   const code = requestUrl.searchParams.get("code");
   const oauthError =
     requestUrl.searchParams.get("error_description") ||
     requestUrl.searchParams.get("error");
   const next = safeNextPath(requestUrl.searchParams.get("next"));
-  const origin = requestUrl.origin;
+  const signIn = signInPathForNext(next);
+
+  const redirectToSignIn = (message: string) => {
+    const url = new URL(signIn, origin);
+    url.searchParams.set("error", message);
+    url.searchParams.set("next", next);
+    return NextResponse.redirect(url);
+  };
 
   if (oauthError) {
-    return NextResponse.redirect(
-      `${origin}/demos/taskflow/signin?error=${encodeURIComponent(oauthError)}`,
-    );
+    return redirectToSignIn(oauthError);
   }
 
   if (!code) {
-    return NextResponse.redirect(
-      `${origin}/demos/taskflow/signin?error=${encodeURIComponent(
-        "Sign-in could not complete. Please try again.",
-      )}`,
-    );
+    return redirectToSignIn("Sign-in could not complete. Please try again.");
   }
 
   const url = normalizeUrl(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "");
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
   if (!url || !key) {
-    return NextResponse.redirect(
-      `${origin}/demos/taskflow/signin?error=${encodeURIComponent(
-        "Authentication is temporarily unavailable.",
-      )}`,
-    );
+    return redirectToSignIn("Authentication is temporarily unavailable.");
   }
 
   const cookieStore = await cookies();
@@ -60,9 +57,7 @@ export async function GET(request: Request) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          // Persist for this request context…
           cookieStore.set(name, value, options);
-          // …and on the redirect response the browser actually receives.
           redirectResponse.cookies.set(name, value, options);
         });
       },
@@ -75,11 +70,7 @@ export async function GET(request: Request) {
       message: error.message,
       status: error.status,
     });
-    return NextResponse.redirect(
-      `${origin}/demos/taskflow/signin?error=${encodeURIComponent(
-        error.message || "Could not complete Google sign-in.",
-      )}`,
-    );
+    return redirectToSignIn("Could not complete Google sign-in.");
   }
 
   return redirectResponse;

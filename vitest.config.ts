@@ -8,6 +8,7 @@ export default defineConfig({
       "**/node_modules/**",
       "**/dist/**",
       "**/infrastructure/**",
+      "**/taskflow-angular/**",
       "**/e2e/**",
       "**/playwright-report/**",
       "**/test-results/**",

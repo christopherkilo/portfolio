@@ -1,0 +1,93 @@
+:host {
+  display: block;
+}
+
+.detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+dt {
+  font-size: 0.75rem;
+  color: var(--tf-muted);
+}
+
+dd {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+}
+
+.body {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+}
+
+.labels span {
+  border-radius: 0.375rem;
+  background: var(--tf-subtle);
+  padding: 0.125rem 0.4rem;
+  font-size: 0.6875rem;
+}
+
+.priority {
+  border-radius: 0.375rem;
+  background: var(--tf-subtle);
+  padding: 0.125rem 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.priority-low {
+  color: var(--tf-muted);
+}
+.priority-medium {
+  background: color-mix(in srgb, var(--tf-accent) 15%, transparent);
+  color: var(--tf-accent);
+}
+.priority-high {
+  background: color-mix(in srgb, var(--tf-warning) 15%, transparent);
+  color: var(--tf-warning);
+}
+.priority-urgent {
+  background: color-mix(in srgb, var(--tf-danger) 15%, transparent);
+  color: var(--tf-danger);
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.ghost,
+.primary {
+  height: 2.5rem;
+  border: 1px solid var(--tf-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--tf-ink);
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  border: 0;
+  background: var(--tf-accent);
+  color: var(--tf-on-accent, #fff);
+}

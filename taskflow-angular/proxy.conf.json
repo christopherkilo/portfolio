@@ -1,0 +1,22 @@
+{
+  "/api": {
+    "target": "http://127.0.0.1:3000",
+    "secure": false,
+    "changeOrigin": false,
+    "logLevel": "info",
+    "headers": {
+      "X-Forwarded-Host": "localhost:4200",
+      "X-Forwarded-Proto": "http"
+    }
+  },
+  "/auth": {
+    "target": "http://127.0.0.1:3000",
+    "secure": false,
+    "changeOrigin": false,
+    "logLevel": "info",
+    "headers": {
+      "X-Forwarded-Host": "localhost:4200",
+      "X-Forwarded-Proto": "http"
+    }
+  }
+}

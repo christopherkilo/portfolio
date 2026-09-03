@@ -1,0 +1,54 @@
+<div class="auth">
+  <tf-mark size="lg" />
+
+  @if (!hasToken() || !tokenValid()) {
+    <h1>Invalid invite</h1>
+    <p>
+      This invitation link is missing a token. Ask your admin to resend the
+      invite.
+    </p>
+    <a routerLink="/signin">Go to sign in</a>
+  } @else if (auth.status() === "checking") {
+    <p class="status" role="status">Checking your session…</p>
+  } @else if (auth.status() === "unauthenticated") {
+    <h1>Accept your invitation</h1>
+    <p>
+      Sign in with the email this invitation was sent to, then join the
+      workspace.
+    </p>
+    <button type="button" class="primary" (click)="signIn()">
+      Sign in to continue
+    </button>
+  } @else if (auth.status() !== "authenticated") {
+    <h1>Session unavailable</h1>
+    <p class="alert" role="alert">Couldn’t verify your session.</p>
+    <button type="button" class="primary" (click)="signIn()">Sign in</button>
+  } @else {
+    <h1>Join this workspace</h1>
+    <p>
+      Signed in as {{ signedInAs() }}. Accept to become a member.
+    </p>
+    @if (errorMessage(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
+    }
+    @if (expired()) {
+      <p>This invitation can no longer be used. Ask an admin to send a new one.</p>
+    }
+    @if (alreadyAccepted()) {
+      <p>You can open the dashboard if you already joined this workspace.</p>
+    }
+    <div class="actions">
+      @if (!alreadyAccepted() && !expired()) {
+        <button
+          type="button"
+          class="primary"
+          [disabled]="accepting()"
+          (click)="accept()"
+        >
+          {{ accepting() ? "Joining…" : "Accept invitation" }}
+        </button>
+      }
+      <a routerLink="/dashboard">{{ alreadyAccepted() || expired() ? "Back to TaskFlow" : "Cancel" }}</a>
+    </div>
+  }
+</div>

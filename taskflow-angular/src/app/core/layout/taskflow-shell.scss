@@ -1,0 +1,88 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--tf-bg);
+}
+
+.desktop-sidebar {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .desktop-sidebar {
+    display: block;
+  }
+}
+
+.desktop-sidebar-inner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.mobile-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+@media (min-width: 64rem) {
+  .mobile-nav {
+    display: none;
+  }
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: var(--tf-overlay-soft);
+  cursor: pointer;
+}
+
+.drawer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .drawer {
+    animation: tf-drawer-in 160ms ease-out;
+  }
+}
+
+@keyframes tf-drawer-in {
+  from {
+    transform: translateX(-0.75rem);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.column {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  padding: 1rem;
+}
+
+@media (min-width: 40rem) {
+  .main {
+    padding: 1.5rem;
+  }
+}

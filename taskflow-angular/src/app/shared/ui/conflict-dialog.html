@@ -1,0 +1,202 @@
+@if (conflicts.session(); as session) {
+  <tf-read-dialog
+    [open]="conflicts.dialogOpen()"
+    [title]="title()"
+    [wide]="true"
+    [dismissible]="!conflicts.submitting()"
+    [descriptionId]="descriptionId"
+    (closed)="conflicts.hideDialog()"
+  >
+    <div class="conflict">
+      @if (session.missing) {
+        <p [id]="descriptionId">
+          This item is no longer on the server. Your local draft is still here.
+          TaskFlow will not recreate a deleted item.
+        </p>
+        <pre class="draft-export" tabindex="0">{{
+          session.entityType === "task"
+            ? session.localDraft.title + "\n" + session.localDraft.description
+            : session.localDraft.name + "\n" + session.localDraft.description
+        }}</pre>
+        <div class="actions">
+          <button type="button" class="ghost" (click)="conflicts.hideDialog()">
+            Keep my draft
+          </button>
+          <button
+            type="button"
+            class="danger"
+            (click)="conflicts.startDiscard()"
+          >
+            Dismiss draft
+          </button>
+        </div>
+      } @else {
+        <p [id]="descriptionId">
+          {{ headingName() }} changed while you were working. Your edits have not
+          been lost. The server has a newer version — review the differences,
+          then save a combined result.
+        </p>
+        <p class="meta">
+          Latest version {{ session.latestVersion }}
+          · your draft was based on version {{ session.baseVersion }}
+        </p>
+        <p class="summary" role="status">{{ summaryText() }}</p>
+
+        @if (conflicts.errorMessage(); as message) {
+          <p class="alert" role="alert">{{ message }}</p>
+        }
+
+        @if (autoMerged().length) {
+          <section>
+            <h3>Merged automatically</h3>
+            <ul class="fields">
+              @for (diff of autoMerged(); track diff.key) {
+                <li>
+                  <p class="field-label">
+                    {{ diff.label }}
+                    <span class="kind">{{ kindLabel(diff.kind) }}</span>
+                  </p>
+                  <p class="value">{{ display(diff, "resolved") }}</p>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (conflicting().length) {
+          <section>
+            <h3>Needs your decision</h3>
+            <ul class="fields">
+              @for (diff of conflicting(); track diff.key) {
+                <li>
+                  <p class="field-label">
+                    {{ diff.label }}
+                    <span class="kind warn">{{ kindLabel(diff.kind) }}</span>
+                  </p>
+                  <div class="sides">
+                    <div>
+                      <p class="side-label">Yours</p>
+                      <p class="value">{{ display(diff, "local") }}</p>
+                    </div>
+                    <div>
+                      <p class="side-label">Latest</p>
+                      <p class="value">{{ display(diff, "server") }}</p>
+                    </div>
+                  </div>
+                  <div class="choices" role="group" [attr.aria-label]="'Choose ' + diff.label">
+                    <button
+                      type="button"
+                      [attr.aria-pressed]="choicePressed(diff, 'local')"
+                      (click)="conflicts.choose(diff.key, 'local')"
+                    >
+                      Use mine
+                    </button>
+                    <button
+                      type="button"
+                      [attr.aria-pressed]="choicePressed(diff, 'server')"
+                      (click)="conflicts.choose(diff.key, 'server')"
+                    >
+                      Use latest
+                    </button>
+                  </div>
+                  @if (diff.editable) {
+                    <label class="override">
+                      Edit resolved {{ diff.label }}
+                      @if (diff.key === "description") {
+                        <textarea
+                          rows="3"
+                          [value]="resolvedText(diff)"
+                          (input)="onOverride(diff, $event)"
+                        ></textarea>
+                      } @else {
+                        <input
+                          type="text"
+                          [value]="resolvedText(diff)"
+                          (input)="onOverride(diff, $event)"
+                        />
+                      }
+                    </label>
+                  }
+                </li>
+              }
+            </ul>
+            <div class="bulk">
+              <button type="button" class="ghost" (click)="conflicts.chooseRemaining('local')">
+                Use mine for remaining
+              </button>
+              <button type="button" class="ghost" (click)="conflicts.chooseRemaining('server')">
+                Use latest for remaining
+              </button>
+            </div>
+          </section>
+        }
+
+        @if (preview().length && conflicts.canSave()) {
+          <section>
+            <h3>Resolved result</h3>
+            <ul class="fields">
+              @for (diff of preview(); track diff.key) {
+                <li>
+                  <p class="field-label">{{ diff.label }}</p>
+                  <p class="value">{{ display(diff, "resolved") }}</p>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      }
+
+      @if (conflicts.discardConfirming()) {
+        <div class="confirm" role="alertdialog" aria-labelledby="tf-discard-title">
+          <p id="tf-discard-title">
+            Discard your unsaved edits and use the latest server version? This
+            cannot be undone.
+          </p>
+          <div class="actions">
+            <button type="button" class="ghost" (click)="conflicts.cancelDiscard()">
+              Keep my edits
+            </button>
+            <button type="button" class="danger" (click)="conflicts.discard()">
+              Discard my changes
+            </button>
+          </div>
+        </div>
+      } @else if (!session.missing) {
+        <div class="actions">
+          <button
+            type="button"
+            class="ghost"
+            [disabled]="conflicts.submitting()"
+            (click)="conflicts.hideDialog()"
+          >
+            Continue editing
+          </button>
+          <button
+            type="button"
+            class="ghost"
+            [disabled]="conflicts.submitting() || conflicts.refreshing()"
+            (click)="conflicts.refreshLatest()"
+          >
+            {{ conflicts.refreshing() ? "Refreshing…" : "Refresh latest" }}
+          </button>
+          <button
+            type="button"
+            class="danger"
+            [disabled]="conflicts.submitting()"
+            (click)="conflicts.startDiscard()"
+          >
+            Discard my changes
+          </button>
+          <button
+            type="button"
+            class="primary"
+            [disabled]="!conflicts.canSave() || conflicts.submitting()"
+            (click)="conflicts.submit()"
+          >
+            {{ conflicts.submitting() ? "Saving…" : "Save resolved version" }}
+          </button>
+        </div>
+      }
+    </div>
+  </tf-read-dialog>
+}

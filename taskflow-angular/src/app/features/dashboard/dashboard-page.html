@@ -1,0 +1,161 @@
+@if (reads.isLoading()) {
+  <tf-query-loading label="Loading dashboard…" />
+} @else if (loadError(); as err) {
+  <tf-query-error
+    [title]="err.title"
+    [message]="err.message"
+    (retry)="reads.reloadAll()"
+  />
+} @else {
+  <div class="page">
+    <section class="cards" aria-label="Dashboard stats">
+      <article class="card">
+        <p class="muted">Completed today</p>
+        <p class="stat">{{ insights().completedToday }}</p>
+      </article>
+      <article class="card">
+        <p class="muted">Overdue</p>
+        <p class="stat">{{ insights().overdue }}</p>
+      </article>
+      <article class="card">
+        <p class="muted">Due today</p>
+        <p class="stat">{{ insights().dueToday }}</p>
+      </article>
+      <article class="card">
+        <p class="muted">Completion</p>
+        <p class="stat">{{ insights().completion }}%</p>
+      </article>
+    </section>
+
+    <div class="split">
+      <section class="panel">
+        <h2>Workspace pulse</h2>
+        <dl>
+          <div>
+            <dt>Most active project</dt>
+            <dd>
+              @if (insights().mostActiveProject; as project) {
+                {{ project.name }} ({{ project.open }} open)
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Busiest teammate</dt>
+            <dd>
+              @if (insights().busiestMember; as member) {
+                {{ member.name }} · {{ member.label }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="panel">
+        <h2>Overdue tasks</h2>
+        @if (overdue().length === 0) {
+          <tf-empty-state
+            title="No overdue tasks"
+            description="Everything due so far is on track."
+            actionLabel="Open tasks"
+            (action)="openTasks()"
+          />
+        } @else {
+          <ul class="overdue">
+            @for (task of overdue().slice(0, 5); track task.id) {
+              <li>
+                <span>{{ task.title }}</span>
+                <time [attr.dateTime]="task.dueDate">{{ formatDate(task.dueDate) }}</time>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Project health</h2>
+        @if (projectRows().length === 0) {
+          <tf-empty-state
+            title="No active projects"
+            description="Create a project in the React client, or wait until this workspace has projects."
+            actionLabel="View projects"
+            (action)="openProjects()"
+          />
+        } @else {
+          <ul class="health">
+            @for (project of projectRows(); track project.id) {
+              <li>
+                <div class="row">
+                  <span>{{ project.name }}</span>
+                  <span class="muted">{{ project.completion }}%</span>
+                </div>
+                <tf-progress-bar
+                  [value]="project.completion"
+                  [color]="project.color"
+                  [label]="project.name + ' completion'"
+                />
+                <p class="muted tiny">
+                  {{ project.completed }} complete · {{ project.active }} active ·
+                  {{ project.overdue }} overdue · {{ project.blocked }} blocked
+                </p>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="panel">
+        <h2>Upcoming deadlines</h2>
+        @if (upcoming().length === 0) {
+          <tf-empty-state
+            title="No upcoming deadlines"
+            description="Add due dates on open tasks to fill this list."
+          />
+        } @else {
+          <ul class="deadlines">
+            @for (task of upcoming(); track task.id) {
+              <li>
+                <div>
+                  <p>{{ task.title }}</p>
+                  <p class="muted tiny">{{ projectName(task.projectId) }}</p>
+                </div>
+                <time [attr.dateTime]="task.dueDate">{{ formatDate(task.dueDate) }}</time>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+
+    <section class="panel">
+      <h2>Recent activity</h2>
+      @if (feed().length === 0) {
+        <p class="activity-empty">
+          <span>No recent activity</span>
+          Create a task or move a card in the React client to see workspace activity here.
+        </p>
+      } @else {
+        <ul class="feed">
+          @for (item of feed(); track item.id) {
+            <li>
+              <span class="avatar" aria-hidden="true">
+                {{ findMember(reads.members.members(), item.userId)?.avatar || "TF" }}
+              </span>
+              <div>
+                <p>{{ describeActivity(item) }}</p>
+                <p class="muted tiny">
+                  {{ findMember(reads.members.members(), item.userId)?.name || "Someone" }}
+                </p>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+}

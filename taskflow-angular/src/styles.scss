@@ -1,0 +1,149 @@
+/* TaskFlow tokens only — extracted from app/demos/demos.css [data-demo="taskflow"].
+   Event Horizon and other demo scopes are intentionally omitted. */
+
+:root {
+  --tf-bg: #09090b;
+  --tf-surface: #111113;
+  --tf-elevated: #18181b;
+  --tf-ink: #f5f5f5;
+  --tf-muted: #a3a3a3;
+  --tf-border: rgba(255, 255, 255, 0.08);
+  --tf-accent: #10b981;
+  --tf-accent-strong: #059669;
+  --tf-accent-highlight: #6ee7b7;
+  --tf-danger: #f87171;
+  --tf-success: #34d399;
+  --tf-warning: #fbbf24;
+  --tf-subtle: rgba(255, 255, 255, 0.05);
+  --tf-overlay-soft: rgba(0, 0, 0, 0.6);
+  --tf-sidebar: 15.5rem;
+  --tf-nav-height: 3.5rem;
+  --tf-font-sans: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+  --tf-font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --tf-bg: #f6f7fb;
+  --tf-surface: #ffffff;
+  --tf-elevated: #eef1f6;
+  --tf-ink: #18181b;
+  --tf-muted: #5f6470;
+  --tf-border: rgba(24, 24, 27, 0.12);
+  --tf-accent: #059669;
+  --tf-accent-strong: #047857;
+  --tf-accent-highlight: #10b981;
+  --tf-danger: #dc2626;
+  --tf-success: #047857;
+  --tf-warning: #b45309;
+  --tf-subtle: rgba(24, 24, 27, 0.05);
+  --tf-overlay-soft: rgba(15, 23, 42, 0.4);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--tf-bg);
+  color: var(--tf-ink);
+  font-family: var(--tf-font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--tf-accent);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus,
+.sr-only:focus-visible {
+  position: absolute;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  border-radius: 0.5rem;
+  background: var(--tf-accent);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+html[data-theme="dark"] .theme-icon-light,
+html:not([data-theme]) .theme-icon-light {
+  display: block;
+}
+
+html[data-theme="dark"] .theme-icon-dark,
+html:not([data-theme]) .theme-icon-dark {
+  display: none;
+}
+
+html[data-theme="light"] .theme-icon-light {
+  display: none;
+}
+
+html[data-theme="light"] .theme-icon-dark {
+  display: block;
+}
+
+html[data-density="compact"] [data-density-list] > li > button {
+  padding-block: 0.5rem;
+}
+
+html[data-density="compact"] [data-density-card] {
+  padding: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

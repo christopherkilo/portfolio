@@ -1,0 +1,174 @@
+<form
+  class="form"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  [attr.aria-busy]="submitting()"
+>
+  @if (conflict(); as conflictState) {
+    <tf-conflict-notice
+      entityLabel="task"
+      (review)="reviewConflict()"
+      (keepEditing)="keepEditing()"
+      (cancelled)="cancelled.emit()"
+    />
+    <p class="sr-only">
+      Latest server version is {{ conflictState.latest.version }}. Your draft
+      expected version {{ conflictState.expectedVersion }}.
+    </p>
+  }
+
+  @if (errorMessage(); as message) {
+    <p class="alert" role="alert" id="task-editor-error">{{ message }}</p>
+  }
+
+  @if (queuedNotice(); as queued) {
+    <p class="queued" role="status">{{ queued }}</p>
+  }
+
+  @if (submitted() && form.invalid) {
+    <div class="alert" role="alert">
+      Fix the highlighted fields before saving.
+    </div>
+  }
+
+  <label>
+    Title
+    <input
+      type="text"
+      formControlName="title"
+      [attr.aria-invalid]="fieldError('title') ? true : null"
+      [attr.aria-describedby]="fieldError('title') ? 'task-title-error' : null"
+    />
+    @if (fieldError("title"); as err) {
+      <span id="task-title-error" class="field-error">{{ err }}</span>
+    }
+  </label>
+
+  <label>
+    Description
+    <textarea rows="3" formControlName="description"></textarea>
+  </label>
+
+  <div class="grid">
+    <label>
+      Project
+      <select
+        formControlName="projectId"
+        [attr.aria-invalid]="fieldError('projectId') ? true : null"
+        [attr.aria-describedby]="fieldError('projectId') ? 'task-project-error' : null"
+      >
+        @if (liveProjects().length === 0) {
+          <option value="">No projects</option>
+        }
+        @for (project of liveProjects(); track project.id) {
+          <option [value]="project.id">{{ project.name }}</option>
+        }
+      </select>
+      @if (fieldError("projectId"); as err) {
+        <span id="task-project-error" class="field-error">{{ err }}</span>
+      }
+    </label>
+
+    <div class="assignees">
+      <p id="assignee-label">Assignees</p>
+      <div class="chips" role="group" aria-labelledby="assignee-label">
+        @if (members().length === 0) {
+          <span class="hint">No members</span>
+        } @else {
+          @for (member of members(); track member.id) {
+            <button
+              type="button"
+              [class.on]="isAssigneeSelected(member.id)"
+              [attr.aria-pressed]="isAssigneeSelected(member.id)"
+              (click)="toggleAssignee(member.id)"
+            >
+              <span class="avatar" aria-hidden="true">{{ member.avatar }}</span>
+              {{ member.name }}
+            </button>
+          }
+        }
+      </div>
+      @if (fieldError("assigneeIds"); as err) {
+        <span id="task-assignee-error" class="field-error">{{ err }}</span>
+      }
+    </div>
+
+    <label>
+      Priority
+      <select formControlName="priority">
+        @for (priority of priorities; track priority) {
+          <option [value]="priority">{{ priority }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select formControlName="status">
+        @for (column of columns; track column.id) {
+          <option [value]="column.id">{{ statusLabels[column.id] }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Due date
+      <input
+        type="date"
+        formControlName="dueDate"
+        [attr.aria-invalid]="fieldError('dueDate') ? true : null"
+        [attr.aria-describedby]="fieldError('dueDate') ? 'task-due-error' : null"
+      />
+      @if (fieldError("dueDate"); as err) {
+        <span id="task-due-error" class="field-error">{{ err }}</span>
+      }
+    </label>
+
+    <label>
+      Estimate (hours, optional)
+      <input type="number" min="0" max="400" formControlName="estimate" />
+      @if (fieldError("estimate"); as err) {
+        <span class="field-error">{{ err }}</span>
+      }
+    </label>
+  </div>
+
+  <div>
+    <p>Labels</p>
+    <div class="labels">
+      @for (label of form.controls.labels.value; track label) {
+        <button type="button" (click)="removeLabel(label)">{{ label }} ×</button>
+      }
+    </div>
+    <div class="label-row">
+      <input
+        type="text"
+        [value]="labelInput()"
+        placeholder="Add label"
+        (input)="labelInput.set($any($event.target).value)"
+        (keydown)="onLabelKeydown($event)"
+      />
+      <button type="button" class="ghost" (click)="addLabel()">Add</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button
+      type="button"
+      class="ghost"
+      [disabled]="submitting()"
+      (click)="cancelled.emit()"
+    >
+      Cancel
+    </button>
+    <button type="submit" class="primary" [disabled]="submitting()">
+      @if (submitting()) {
+        <span>Saving…</span>
+      } @else if (mode() === "create") {
+        <span>Create task</span>
+      } @else {
+        <span>Save changes</span>
+      }
+    </button>
+  </div>
+</form>

@@ -1,0 +1,89 @@
+<div class="wrap">
+  <button
+    #trigger
+    type="button"
+    class="icon-btn"
+    [attr.aria-label]="triggerLabel()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="dialog"
+    aria-controls="tf-notification-panel"
+    (click)="toggle()"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10 21a2 2 0 0 0 4 0" />
+    </svg>
+    @if (notifications.unreadCount()) {
+      <span class="dot" aria-hidden="true"></span>
+    }
+  </button>
+
+  @if (open()) {
+    <div
+      #panel
+      id="tf-notification-panel"
+      class="panel"
+      role="dialog"
+      aria-labelledby="tf-notification-title"
+    >
+      <div class="head">
+        <p id="tf-notification-title" class="title">Notifications</p>
+        <button
+          type="button"
+          class="text"
+          [disabled]="!notifications.unreadCount() || marking() || network.online() === false"
+          (click)="markAll()"
+        >
+          Mark all read
+        </button>
+      </div>
+
+      @if (notifications.isLoading() && !notifications.hasValue()) {
+        <p class="muted" role="status">Loading…</p>
+      } @else if (loadError(); as err) {
+        <p class="alert" role="alert">{{ err.message }}</p>
+        <button type="button" class="text" (click)="retry()">Retry</button>
+      } @else if (notifications.notifications().length === 0) {
+        <div class="empty">
+          <p class="empty-title">You’re all caught up</p>
+          <p class="muted">New mentions and assignments will show up here.</p>
+        </div>
+      } @else {
+        <ul class="list">
+          @for (item of notifications.notifications(); track item.id) {
+            <li>
+              <button
+                type="button"
+                class="item"
+                [class.unread]="!item.readAt"
+                (click)="onItem(item)"
+              >
+                <p class="item-title">{{ heading(item) }}</p>
+                @if (item.message) {
+                  <p class="muted">{{ item.message }}</p>
+                }
+                <p class="muted">
+                  {{ formatRelativeTime(item.lastOccurredAt || item.createdAt) }}
+                  @if (!item.readAt) {
+                    <span> · Unread</span>
+                  }
+                </p>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (actionError(); as message) {
+        <p class="alert" role="alert">{{ message }}</p>
+      }
+      <p class="status" role="status">
+        @if (notifications.unreadCount(); as count) {
+          {{ count }} unread update{{ count === 1 ? "" : "s" }}
+        } @else {
+          You’re all caught up.
+        }
+      </p>
+    </div>
+  }
+</div>

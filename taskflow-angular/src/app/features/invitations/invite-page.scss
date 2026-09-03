@@ -1,0 +1,77 @@
+:host {
+  display: block;
+}
+
+.auth {
+  display: flex;
+  min-height: 60vh;
+  max-width: 28rem;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--tf-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--tf-muted);
+}
+
+.status {
+  font-size: 0.875rem;
+}
+
+.alert {
+  color: var(--tf-danger);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.primary {
+  min-height: 2.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--tf-accent);
+  color: var(--tf-on-accent, #042f2e);
+  padding: 0 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  border: 1px solid var(--tf-border);
+  border-radius: 0.5rem;
+  padding: 0 0.85rem;
+  color: var(--tf-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

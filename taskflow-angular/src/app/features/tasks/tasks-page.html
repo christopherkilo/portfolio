@@ -1,0 +1,351 @@
+@if (reads.isLoading()) {
+  <tf-query-loading label="Loading tasks…" />
+} @else if (loadError(); as err) {
+  <tf-query-error
+    [title]="err.title"
+    [message]="err.message"
+    (retry)="reads.reloadAll()"
+  />
+} @else if (!reads.workspace.currentWorkspaceId()) {
+  <tf-query-error
+    title="No workspace available"
+    message="Create or join a workspace to manage tasks."
+    [showRetry]="false"
+  />
+} @else {
+  <div class="page">
+    <p class="lede">
+      Filters sync to the URL so you can share a focused board view. Saves wait
+      for the server, then reload this workspace’s tasks.
+    </p>
+
+    <div class="toolbar">
+      <label class="search">
+        Search
+        <input
+          type="search"
+          [value]="taskFilters().q"
+          placeholder="Search title, labels, or project"
+          (input)="patchFilters({ q: $any($event.target).value || '' })"
+        />
+      </label>
+      <div class="actions">
+        <button
+          type="button"
+          class="ghost"
+          [attr.aria-expanded]="filtersOpen()"
+          (click)="toggleFilters()"
+        >
+          Filters
+        </button>
+        @if (hasActiveFilters()) {
+          <button type="button" class="ghost" (click)="clearFilters()">Clear</button>
+        }
+        <div class="segment" role="group" aria-label="Board or list view">
+          <button
+            type="button"
+            [class.on]="viewMode() === 'board'"
+            [attr.aria-pressed]="viewMode() === 'board'"
+            (click)="setView('board')"
+          >
+            Board
+          </button>
+          <button
+            type="button"
+            [class.on]="viewMode() === 'list'"
+            [attr.aria-pressed]="viewMode() === 'list'"
+            (click)="setView('list')"
+          >
+            List
+          </button>
+        </div>
+        @if (permissions.canEditTask()) {
+          <button type="button" class="primary" (click)="openCreate()">
+            Create task
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (filtersOpen()) {
+      <div class="filter-grid">
+        <label>
+          Project
+          <select
+            [value]="taskFilters().projectId"
+            (change)="patchFilters({ projectId: $any($event.target).value })"
+          >
+            <option value="all">All projects</option>
+            @for (project of reads.projects.projects(); track project.id) {
+              @if (!project.archived) {
+                <option [value]="project.id">{{ project.name }}</option>
+              }
+            }
+          </select>
+        </label>
+        <label>
+          Assignee
+          <select
+            [value]="taskFilters().assigneeId"
+            (change)="patchFilters({ assigneeId: $any($event.target).value })"
+          >
+            <option value="all">Anyone</option>
+            @for (member of reads.members.members(); track member.id) {
+              <option [value]="member.id">{{ member.name }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Priority
+          <select
+            [value]="taskFilters().priority"
+            (change)="patchFilters({ priority: $any($event.target).value })"
+          >
+            <option value="all">All priorities</option>
+            <option value="urgent">Urgent</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
+        <label>
+          Status
+          <select
+            [value]="taskFilters().status"
+            (change)="patchFilters({ status: $any($event.target).value })"
+          >
+            <option value="all">All statuses</option>
+            @for (column of columns; track column.id) {
+              <option [value]="column.id">{{ column.label }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Due
+          <select
+            [value]="taskFilters().due"
+            (change)="patchFilters({ due: $any($event.target).value })"
+          >
+            <option value="any">Any due date</option>
+            <option value="today">Due today</option>
+            <option value="week">Next 7 days</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </label>
+        <label>
+          Label
+          <select
+            [value]="taskFilters().label"
+            (change)="patchFilters({ label: $any($event.target).value })"
+          >
+            <option value="all">All labels</option>
+            @for (label of labels(); track label) {
+              <option [value]="label">{{ label }}</option>
+            }
+          </select>
+        </label>
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="taskFilters().overdueOnly"
+            (change)="patchFilters({ overdueOnly: $any($event.target).checked })"
+          />
+          Overdue only
+        </label>
+      </div>
+    }
+
+    @if (filteredTasks().length === 0) {
+      <tf-empty-state
+        [title]="hasActiveFilters() ? 'No search results' : 'No tasks yet'"
+        [description]="
+          hasActiveFilters()
+            ? 'Nothing matches these filters. Clear them to see the full board.'
+            : 'There are no tasks in this workspace yet.'
+        "
+        [actionLabel]="
+          hasActiveFilters()
+            ? 'Clear filters'
+            : permissions.canEditTask()
+              ? 'Create task'
+              : undefined
+        "
+        (action)="hasActiveFilters() ? clearFilters() : openCreate()"
+      />
+    } @else if (viewMode() === "list") {
+      <section class="list" aria-label="Task list">
+        <ul data-density-list>
+          @for (task of filteredTasks(); track task.id) {
+            <li>
+              <button type="button" (click)="openTask(task.id)">
+                <span class="title">{{ task.title }}</span>
+                <span class="muted">
+                  {{ projectName(task.projectId) }} · {{ statusLabels[task.status] }}
+                  @if (assignee(task); as person) {
+                    · {{ person.name }}
+                  }
+                </span>
+                <span [class]="priorityClass(task.priority)">{{ task.priority }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    } @else {
+      <div class="board">
+        @for (column of columns; track column.id) {
+          <section class="column" [attr.aria-label]="column.label + ' column'">
+            <header>
+              <h2>{{ column.label }}</h2>
+              <span>{{ columnTasks(column.id).length }}</span>
+            </header>
+            <ul data-density-list>
+              @for (task of columnTasks(column.id); track task.id) {
+                <li>
+                  <article data-density-card>
+                    <button type="button" class="card-open" (click)="openTask(task.id)">
+                      <span class="title">{{ task.title }}</span>
+                      <span class="muted">{{ projectName(task.projectId) }}</span>
+                    </button>
+                    <div class="card-meta">
+                      <span [class]="priorityClass(task.priority)">{{ task.priority }}</span>
+                      @if (assignee(task); as person) {
+                        <span class="avatar" [attr.aria-label]="person.name">{{ person.avatar }}</span>
+                      }
+                    </div>
+                    @if (permissions.canEditTask()) {
+                      <label class="status-field">
+                        <span class="sr-only">Change status for {{ task.title }}</span>
+                        <select
+                          [value]="task.status"
+                          [disabled]="statusBusyId() === task.id"
+                          [attr.aria-label]="'Change status for ' + task.title"
+                          (click)="$event.stopPropagation()"
+                          (change)="onStatusSelect(task, $event)"
+                        >
+                          @for (column of columns; track column.id) {
+                            <option [value]="column.id">{{ column.label }}</option>
+                          }
+                        </select>
+                      </label>
+                    }
+                  </article>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    }
+
+    @if (statusConflict(); as conflict) {
+      <tf-conflict-notice
+        entityLabel="task"
+        (review)="reviewStatusConflict()"
+        (keepEditing)="clearStatusConflict()"
+        (cancelled)="clearStatusConflict()"
+      />
+    }
+    @if (actionError(); as message) {
+      <p class="page-alert" role="alert">{{ message }}</p>
+    }
+
+    <tf-read-dialog
+      [open]="detailOpen()"
+      [title]="selected()?.title ?? 'Task'"
+      [wide]="true"
+      (closed)="closeTask()"
+    >
+      @if (selected(); as task) {
+        <tf-task-detail-panel
+          [task]="task"
+          [statusLabel]="statusLabels[task.status]"
+          [projectName]="projectName(task.projectId)"
+          [assigneeName]="assignee(task)?.name ?? ''"
+          [dueLabel]="formatDate(task.dueDate)"
+          [canEdit]="permissions.canEditTask()"
+          (edit)="openEdit()"
+          (archive)="openConfirm('archive')"
+          (delete)="openConfirm('delete')"
+          (close)="closeTask()"
+        />
+      }
+    </tf-read-dialog>
+
+    <tf-read-dialog
+      [open]="createOpen()"
+      title="Create task"
+      [wide]="true"
+      [dismissible]="true"
+      (closed)="closeCreate()"
+    >
+      @if (createOpen()) {
+        <tf-task-editor
+          mode="create"
+          [workspaceId]="reads.workspace.currentWorkspaceId()"
+          [projects]="reads.projects.projects()"
+          [members]="reads.members.members()"
+          (saved)="onTaskCreated($event)"
+          (cancelled)="closeCreate()"
+        />
+      }
+    </tf-read-dialog>
+
+    <tf-read-dialog
+      [open]="editOpen() && editSnapshot() !== null"
+      title="Edit task"
+      [wide]="true"
+      (closed)="closeEdit()"
+    >
+      @if (editSnapshot(); as task) {
+        <tf-task-editor
+          mode="edit"
+          [workspaceId]="reads.workspace.currentWorkspaceId()"
+          [projects]="reads.projects.projects()"
+          [members]="reads.members.members()"
+          [task]="task"
+          (saved)="onTaskEdited()"
+          (cancelled)="closeEdit()"
+        />
+      }
+    </tf-read-dialog>
+
+    <tf-read-dialog
+      [open]="confirm() !== null && selected() !== null"
+      [title]="confirm() === 'delete' ? 'Delete task?' : 'Archive task?'"
+      [dismissible]="!confirmBusy()"
+      (closed)="closeConfirm()"
+    >
+      @if (selected(); as task) {
+        <p class="confirm-body">
+          @if (confirm() === "delete") {
+            Permanently remove “{{ task.title }}” from the workspace.
+          } @else {
+            Archive “{{ task.title }}”.
+          }
+        </p>
+        @if (actionError(); as message) {
+          <p class="page-alert" role="alert">{{ message }}</p>
+        }
+        <div class="confirm-actions">
+          <button
+            type="button"
+            class="ghost"
+            [disabled]="confirmBusy()"
+            (click)="closeConfirm()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="primary"
+            [disabled]="confirmBusy()"
+            (click)="confirmDestructive()"
+          >
+            {{ confirm() === "delete" ? "Delete" : "Archive" }}
+          </button>
+        </div>
+      }
+    </tf-read-dialog>
+  </div>
+}

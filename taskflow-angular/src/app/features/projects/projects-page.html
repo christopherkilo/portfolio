@@ -1,0 +1,178 @@
+@if (reads.isLoading()) {
+  <tf-query-loading label="Loading projects…" />
+} @else if (loadError(); as err) {
+  <tf-query-error
+    [title]="err.title"
+    [message]="err.message"
+    (retry)="reads.reloadAll()"
+  />
+} @else if (!reads.workspace.currentWorkspaceId()) {
+  <tf-query-error
+    title="No workspace available"
+    message="Create or join a workspace to manage projects."
+    [showRetry]="false"
+  />
+} @else {
+  <div class="page">
+    <div class="toolbar">
+      <label class="search">
+        <span class="sr-only">Search projects</span>
+        <input
+          id="project-search"
+          type="search"
+          [value]="searchValue()"
+          placeholder="Search projects…"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </label>
+      <div class="filters">
+        <label>
+          Status
+          <select [value]="status()" (change)="onStatus($any($event.target).value)">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="planning">Planning</option>
+            <option value="paused">Paused</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+        <label>
+          Sort
+          <select [value]="sort()" (change)="onSort($any($event.target).value)">
+            <option value="progress">Progress</option>
+            <option value="due">Due date</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+        @if (permissions.canManageProjects()) {
+          <button type="button" class="primary" (click)="openCreate()">
+            New project
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (filtered().length === 0) {
+      <tf-empty-state
+        title="No projects match"
+        description="Try a different search or clear filters, or create a new project."
+        [actionLabel]="searchValue() ? 'Clear search' : undefined"
+        (action)="clearSearch()"
+      />
+    } @else {
+      <div class="grid">
+        @for (row of filtered(); track row.project.id) {
+          <article class="card">
+            <button
+              type="button"
+              class="open"
+              [attr.aria-label]="'Open ' + row.project.name + ' details'"
+              (click)="openProject(row.project.id)"
+            >
+              <div class="head">
+                <span class="dot" [style.background]="row.project.color" aria-hidden="true"></span>
+                <h2>{{ row.project.name }}</h2>
+                <span [class]="statusClass(row.project.status)">{{ row.project.status }}</span>
+              </div>
+              <p class="desc">{{ row.project.description }}</p>
+              <div class="meta">
+                <span>{{ row.health.completion }}% complete</span>
+                <span>Due {{ formatDate(row.project.dueDate) }}</span>
+              </div>
+              <tf-progress-bar
+                [value]="row.health.completion"
+                [color]="row.project.color"
+                [label]="row.project.name + ' completion'"
+              />
+              <p class="muted">
+                {{ row.health.completed }} complete · {{ row.health.active }} active ·
+                {{ row.health.overdue }} overdue · {{ row.health.blocked }} blocked
+              </p>
+              <span class="link">View project details</span>
+            </button>
+          </article>
+        }
+      </div>
+    }
+
+    <tf-read-dialog
+      [open]="selected() !== null"
+      [title]="selected()?.name ?? 'Project'"
+      (closed)="closeProject()"
+    >
+      @if (selected(); as project) {
+        <p class="desc">{{ project.description }}</p>
+        <dl class="facts">
+          <div>
+            <dt>Completion</dt>
+            <dd>{{ selectedHealth()?.completion }}%</dd>
+          </div>
+          <div>
+            <dt>Complete</dt>
+            <dd>{{ selectedHealth()?.completed }}</dd>
+          </div>
+          <div>
+            <dt>Active</dt>
+            <dd>{{ selectedHealth()?.active }}</dd>
+          </div>
+          <div>
+            <dt>Backlog</dt>
+            <dd>{{ selectedHealth()?.backlog }}</dd>
+          </div>
+          <div>
+            <dt>Blocked</dt>
+            <dd>{{ selectedHealth()?.blocked }}</dd>
+          </div>
+          <div>
+            <dt>Overdue</dt>
+            <dd>{{ selectedHealth()?.overdue }}</dd>
+          </div>
+          <div>
+            <dt>Nearest due</dt>
+            <dd>
+              {{
+                selectedHealth()?.nearestDueDate
+                  ? formatDate(selectedHealth()!.nearestDueDate!)
+                  : "—"
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt>Open tasks</dt>
+            <dd>{{ openTaskCount(project.id) }}</dd>
+          </div>
+        </dl>
+        <tf-progress-bar
+          [value]="selectedHealth()?.completion ?? 0"
+          [color]="project.color"
+          [label]="project.name + ' completion'"
+        />
+        @if (permissions.canManageProjects() && editSnapshot(); as snapshot) {
+          <tf-project-editor
+            mode="edit"
+            [workspaceId]="reads.workspace.currentWorkspaceId()"
+            [project]="snapshot"
+            (saved)="onProjectEdited($event)"
+            (cancelled)="closeProject()"
+            (archived)="closeProject()"
+          />
+        }
+      }
+    </tf-read-dialog>
+
+    <tf-read-dialog
+      [open]="createOpen()"
+      title="Create project"
+      (closed)="closeCreate()"
+    >
+      @if (createOpen()) {
+        <tf-project-editor
+          mode="create"
+          [workspaceId]="reads.workspace.currentWorkspaceId()"
+          (saved)="onProjectCreated($event)"
+          (cancelled)="closeCreate()"
+        />
+      }
+    </tf-read-dialog>
+  </div>
+}

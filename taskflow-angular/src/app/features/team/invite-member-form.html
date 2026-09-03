@@ -1,0 +1,61 @@
+<form
+  class="form"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  [attr.aria-busy]="sending()"
+>
+  @if (errorMessage(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+
+  @if (acceptUrl(); as url) {
+    <div class="dev">
+      <p class="dev-title">Invitation created (development)</p>
+      <p class="break">{{ url }}</p>
+      <button type="button" class="link" (click)="copyAcceptUrl()">
+        Copy accept URL
+      </button>
+    </div>
+    <div class="actions">
+      <button type="button" class="ghost" (click)="cancelled.emit()">Done</button>
+    </div>
+  } @else {
+    <label>
+      Email
+      <input
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="teammate@company.com"
+        [attr.aria-invalid]="fieldError('email') ? true : null"
+        [attr.aria-describedby]="fieldError('email') ? 'invite-email-error' : null"
+      />
+      @if (fieldError("email"); as err) {
+        <span id="invite-email-error" class="field-error">{{ err }}</span>
+      }
+    </label>
+
+    <label>
+      Role
+      <select formControlName="role">
+        @for (role of roles; track role) {
+          <option [value]="role">{{ role }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="actions">
+      <button
+        type="button"
+        class="ghost"
+        [disabled]="sending()"
+        (click)="cancelled.emit()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="primary" [disabled]="sending()">
+        {{ sending() ? "Sending…" : "Send invite" }}
+      </button>
+    </div>
+  }
+</form>

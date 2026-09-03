@@ -6,12 +6,7 @@ import { TaskflowMark } from "@/components/demos/taskflow/brand/TaskflowMark";
 import { createTaskflowBrowserClient } from "@/lib/demos/taskflow/supabase/browser";
 import { Button } from "@/components/demos/taskflow/ui/Button";
 import { DEMO_BASE } from "@/lib/demos/taskflow/data";
-
-function safeNextPath(raw: string | null) {
-  if (!raw) return `${DEMO_BASE}/dashboard`;
-  if (!raw.startsWith(DEMO_BASE)) return `${DEMO_BASE}/dashboard`;
-  return raw;
-}
+import { safeNextPath } from "@/lib/demos/taskflow/auth/safeNextPath";
 
 function isLocalDevHost(hostname: string) {
   return hostname === "localhost" || hostname === "127.0.0.1";
@@ -30,7 +25,7 @@ function getLocalCallbackUrl(): string | null {
 
 export function TaskflowSignInView() {
   const searchParams = useSearchParams();
-  const next = safeNextPath(searchParams.get("next"));
+  const next = safeNextPath(searchParams.get("next"), `${DEMO_BASE}/dashboard`);
   const urlError = searchParams.get("error");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(urlError ?? "");

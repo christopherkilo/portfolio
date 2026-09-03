@@ -3,6 +3,7 @@
 import { EventHorizonBlogCover } from "@/components/blog/EventHorizonBlogCover";
 import { NovaTechBlogCover } from "@/components/blog/NovaTechBlogCover";
 import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
+import { TaskFlowBlogCover } from "@/components/blog/TaskFlowBlogCover";
 import { getGeneratedCoverKind } from "@/lib/blog/covers";
 import type { BlogPostMeta } from "@/lib/blog/types";
 
@@ -23,6 +24,9 @@ export function BlogGeneratedCover({
   }
   if (kind === "starlenz") {
     return <StarLenzBlogCover className={className} />;
+  }
+  if (kind === "taskflow") {
+    return <TaskFlowBlogCover className={className} />;
   }
 
   return (

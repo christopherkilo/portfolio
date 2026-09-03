@@ -24,12 +24,12 @@ describe("blog content source", () => {
     const posts = getAllPosts();
     const featured = getFeaturedPost();
     const latest = getLatestPosts(3);
-    expect(posts.length).toBeGreaterThanOrEqual(3);
+    expect(posts.length).toBeGreaterThanOrEqual(4);
     expect(featured?.slug).toBe("building-starlenz");
     expect(latest.map((post) => post.slug)).toEqual([
+      "rebuilding-taskflow-in-angular",
       "taking-novatech-to-aws",
       "taking-event-horizon-to-aws",
-      "building-starlenz",
     ]);
     expect(posts.every((post) => post.href.startsWith("/blog/"))).toBe(true);
     expect(posts.every((post) => getGeneratedCoverKind(post) !== null)).toBe(
@@ -66,6 +66,12 @@ describe("blog content source", () => {
     expect(related?.inDevelopment).toBeUndefined();
   });
 
+  it("links TaskFlow writing to the case study", () => {
+    const related = getRelatedProject("TaskFlow");
+    expect(related?.href).toBe("/projects/taskflow");
+    expect(related?.inDevelopment).toBeUndefined();
+  });
+
   it("loads the NovaTech AWS development update", () => {
     const post = getPostBySlug("taking-novatech-to-aws");
     expect(post).not.toBeNull();
@@ -82,6 +88,22 @@ describe("blog content source", () => {
     expect(post?.content).toMatch(/instance-local/);
     expect(post?.content).not.toMatch(/868150783834/);
     expect(post?.content).not.toMatch(/lambda-url/);
+    expect(post?.headings.length).toBeGreaterThan(5);
+  });
+
+  it("loads the TaskFlow Angular development update", () => {
+    const post = getPostBySlug("rebuilding-taskflow-in-angular");
+    expect(post).not.toBeNull();
+    expect(post?.title).toBe("Rebuilding TaskFlow in Angular");
+    expect(post?.project).toBe("TaskFlow");
+    expect(post?.featured).toBe(false);
+    expect(post?.coverImage).toBe("generated:taskflow");
+    expect(getGeneratedCoverKind(post!)).toBe("taskflow");
+    expect(post?.content).toContain("Angular");
+    expect(post?.content).toContain("learn the framework");
+    expect(post?.content).toContain("/demos/taskflow");
+    expect(post?.content).toMatch(/full application/);
+    expect(post?.content).toContain("I am not going to call that production parity");
     expect(post?.headings.length).toBeGreaterThan(5);
   });
 

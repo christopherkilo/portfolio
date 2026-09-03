@@ -27,6 +27,10 @@ const RELATED_PROJECTS: Record<string, RelatedProjectLink> = {
     label: "NovaTech",
     href: "/projects/novatech-solutions",
   },
+  taskflow: {
+    label: "TaskFlow",
+    href: "/projects/taskflow",
+  },
 };
 
 export function getRelatedProject(project?: string): RelatedProjectLink | null {

@@ -8,9 +8,11 @@ import {
   FileText,
   FolderKanban,
   Home,
+  LayoutList,
   Mail,
   PenLine,
   Search,
+  Terminal,
   User,
 } from "lucide-react";
 import { NAV_LINKS, SITE } from "@/lib/constants";
@@ -92,6 +94,22 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       }));
 
     const actions: CommandItem[] = [
+      {
+        id: "all-work",
+        label: "Explore all work",
+        hint: "/work",
+        icon: <LayoutList className="size-4" />,
+        action: () => router.push("/work"),
+        keywords: "work index all projects lab scan recruiter",
+      },
+      {
+        id: "engineering-lab",
+        label: "Engineering Lab",
+        hint: "/#engineering-lab",
+        icon: <Terminal className="size-4" />,
+        action: () => router.push("/#engineering-lab"),
+        keywords: "lab live demo experiment taskflow angular",
+      },
       {
         id: "email",
         label: "Email me",

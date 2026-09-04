@@ -8,8 +8,14 @@ export type {
   CaseStudy,
   CaseStudyChart,
   ChartPoint,
+  ProjectSnapshot,
+  ProjectVerification,
   TechGroup,
+  VerificationCategory,
+  VerificationItem,
+  VerificationReceipt,
 } from "./types";
+export { VERIFICATION_CATEGORY_LABELS } from "./types";
 export { eventHorizonStudy } from "./event-horizon";
 export { novatechSolutionsStudy } from "./novatech-solutions";
 export { taskflowStudy } from "./taskflow";

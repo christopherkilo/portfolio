@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getGeneratedCoverKind } from "./covers";
 import { extractHeadings } from "./headings";
-import { getAllPosts, getFeaturedPost, getLatestPosts, getPostBySlug } from "./posts";
+import { BLOG_PRIMARY_FILTERS, partitionBlogFilters } from "./filters";
+import { getAllPosts, getAllTags, getFeaturedPost, getLatestPosts, getPostBySlug } from "./posts";
 import { getRelatedProject } from "./relatedProjects";
 import { readingMinutesFromText } from "./readingTime";
 
@@ -123,5 +124,35 @@ describe("blog content source", () => {
   it("estimates reading time from copy, not frontmatter", () => {
     const minutes = readingMinutesFromText("word ".repeat(440));
     expect(minutes).toBe(2);
+  });
+
+  it("keeps blog index filters to browse categories, not a tag cloud", () => {
+    const { primary, more } = partitionBlogFilters(getAllTags());
+    expect(primary).toEqual([...BLOG_PRIMARY_FILTERS]);
+    expect(primary).not.toContain("DynamoDB");
+    expect(primary).not.toContain("Next.js");
+    expect(more).toEqual(
+      expect.arrayContaining([
+        "DynamoDB",
+        "ECS",
+        "HubSpot",
+        "Next.js",
+        "Step Functions",
+        "Supabase",
+        "TypeScript",
+        "UI/UX",
+      ]),
+    );
+  });
+
+  it("uses complete card excerpts instead of clipped summaries", () => {
+    for (const post of getAllPosts()) {
+      expect(post.description.endsWith("...")).toBe(false);
+      expect(post.description).not.toMatch(/—without\.\.\.$/);
+      expect(post.description.length).toBeLessThanOrEqual(160);
+    }
+    expect(getPostBySlug("taking-novatech-to-aws")?.description).toBe(
+      "How a contact form grew from a synchronous HubSpot handler into a durable AWS inquiry workflow.",
+    );
   });
 });

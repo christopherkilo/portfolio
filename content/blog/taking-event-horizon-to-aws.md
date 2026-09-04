@@ -1,6 +1,6 @@
 ---
 title: "Taking Event Horizon to AWS"
-description: "How I turned a Next.js reservation demo into a real Ticketmaster ingestion pipeline—without moving bookings off PostgreSQL."
+description: "How I turned a reservation demo into a Ticketmaster ingestion pipeline without moving bookings off PostgreSQL."
 date: 2026-08-26
 project: Event Horizon
 featured: false

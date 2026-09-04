@@ -23,17 +23,13 @@ describe("Event Horizon case-study presentation", () => {
   });
 
   it("keeps Ticketmaster listings as discovery, not reservations", () => {
-    expect(study?.outcome).toMatch(/cannot enter the reservation/i);
-    expect(study?.currentState?.demo?.some((item) => /discovery links/i.test(item))).toBe(
-      true,
-    );
+    expect(study?.verification?.limitations?.join(" ")).toMatch(/discovery-only/i);
+    expect(study?.outcome).toMatch(/Ticketweb|Ticketmaster/i);
   });
 
   it("uses verified engineering metrics rather than traffic or revenue", () => {
     const labels = study?.metrics.map((metric) => metric.label) ?? [];
-    expect(labels).toEqual(
-      expect.arrayContaining(["Refresh cadence", "Provider page", "Queue redrive"]),
-    );
+    expect(labels).toEqual(["Refresh cadence"]);
     const blob = JSON.stringify(study?.metrics);
     expect(blob).not.toMatch(/uptime/i);
     expect(blob).not.toMatch(/revenue/i);
@@ -53,11 +49,25 @@ describe("Event Horizon case-study presentation", () => {
   it("renders grouped technologies instead of a card-sized AWS badge wall", () => {
     const project = getProjectById("event-horizon");
     expect(project?.technologies).toEqual(["Next.js", "TypeScript", "PostgreSQL", "AWS"]);
+    expect(project?.proofPoints).toEqual(
+      expect.arrayContaining(["SQS + DLQ", "Idempotent DynamoDB writes", "Playwright QA"]),
+    );
+    expect(project?.featuredProofPoints).toEqual([
+      "AWS CDK ingestion · SQS + DLQ",
+      "Idempotent DynamoDB writes",
+    ]);
+    expect(project?.featuredProofPoints).not.toContain("Playwright QA");
     expect(study?.architectureEntry).toEqual(["User", "Event Horizon / Next.js"]);
-    expect(study?.decisionsHeading).toBe("Engineering decisions");
     expect(study?.techGroups?.find((group) => group.label === "AWS cloud")?.items).toEqual(
       expect.arrayContaining(["CloudWatch", "CDK", "SQS", "DynamoDB"]),
     );
+  });
+
+  it("uses a single Engineering Decisions list and one future-work list", () => {
+    expect(study?.decisions?.length).toBe(4);
+    expect(study?.decisionsHeading).toBe("Engineering decisions");
+    expect(study?.nextSteps?.length).toBeLessThanOrEqual(4);
+    expect(study?.architectureLanesTitle).toBe("Two persistence paths");
   });
 
   it("keeps the resume bullet architectural and outcome-focused", () => {

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Christopher Kilo — Full-Stack Developer";
+export const alt = "Christopher Kilo — Software Engineer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -38,7 +38,7 @@ export default function OpenGraphImage() {
               color: "#f8e71c",
             }}
           >
-            Full-Stack Developer
+            Software Engineer
           </div>
           <div
             style={{
@@ -49,8 +49,7 @@ export default function OpenGraphImage() {
               lineHeight: 1.35,
             }}
           >
-            Modern web applications, business automation, collaborative software,
-            and IT tools.
+            Full-Stack Development · Cloud / IT · Graphic Design
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 22, color: "#a3a3a3" }}>

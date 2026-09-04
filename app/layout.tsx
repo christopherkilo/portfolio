@@ -63,13 +63,14 @@ export const metadata: Metadata = {
   creator: SITE.name,
   keywords: [
     "Christopher Kilo",
-    "full-stack developer",
+    "software engineer",
+    "full-stack development",
     "Next.js",
     "TypeScript",
     "React",
-    "PostgreSQL",
-    "Supabase",
     "AWS",
+    "IT",
+    "graphic design",
     "portfolio",
   ],
 };

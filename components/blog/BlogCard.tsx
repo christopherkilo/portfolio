@@ -67,7 +67,7 @@ export function BlogCard({ post }: { post: BlogPostMeta }) {
             <h3 className="line-clamp-2 font-display text-xl font-semibold tracking-tight text-text transition-colors duration-[var(--duration-fast)] group-hover:text-primary sm:text-2xl">
               {post.title}
             </h3>
-            <p className="mt-3 line-clamp-3 max-w-prose text-sm leading-relaxed text-secondary md:text-[0.95rem]">
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-secondary md:text-[0.95rem]">
               {post.description}
             </p>
           </div>

@@ -1,6 +1,6 @@
 ---
 title: "Rebuilding TaskFlow in Angular"
-description: "How I rebuilt TaskFlow as a second Angular client against the same Next.js APIs—as a way to learn the framework before a full application, not as a replacement for the React product."
+description: "How I rebuilt TaskFlow as a second Angular client against the same APIs, to learn the framework before a full application."
 date: 2026-09-02
 project: TaskFlow
 featured: false

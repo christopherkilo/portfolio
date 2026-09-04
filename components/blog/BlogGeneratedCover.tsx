@@ -17,16 +17,16 @@ export function BlogGeneratedCover({
   const kind = getGeneratedCoverKind(post);
 
   if (kind === "novatech") {
-    return <NovaTechBlogCover className={className} />;
+    return <NovaTechBlogCover className={className} showTitle={false} />;
   }
   if (kind === "event-horizon") {
-    return <EventHorizonBlogCover className={className} />;
+    return <EventHorizonBlogCover className={className} showTitle={false} />;
   }
   if (kind === "starlenz") {
-    return <StarLenzBlogCover className={className} />;
+    return <StarLenzBlogCover className={className} showTitle={false} />;
   }
   if (kind === "taskflow") {
-    return <TaskFlowBlogCover className={className} />;
+    return <TaskFlowBlogCover className={className} showTitle={false} />;
   }
 
   return (

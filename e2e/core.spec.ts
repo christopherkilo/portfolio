@@ -11,7 +11,7 @@ test.describe("portfolio e2e", () => {
     page,
   }) => {
     const consoleGuard = attachConsoleGuard(page);
-    for (const path of ["/about", "/projects", "/blog", "/contact"]) {
+    for (const path of ["/about", "/projects", "/work", "/blog", "/contact"]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await assertNoHorizontalOverflow(page);
@@ -39,13 +39,15 @@ test.describe("portfolio e2e", () => {
 
   test("Live Demo links have valid destinations", async ({ page }) => {
     await page.goto("/projects/event-horizon");
+    await expect(page.getByRole("heading", { name: /at a glance/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /built, not mocked/i })).toBeVisible();
     await expect(page.getByRole("link", { name: "Live Demo" }).first()).toHaveAttribute(
       "href",
       "/demos/event-horizon",
     );
 
     await page.goto("/projects/novatech-solutions");
-    await expect(page.getByRole("link", { name: "Live Demo" }).first()).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Open demo" }).first()).toHaveAttribute(
       "href",
       "/demos/novatech-solutions",
     );
@@ -172,6 +174,19 @@ test.describe("portfolio e2e", () => {
     await expect(page.getByRole("link", { name: "All posts" })).toBeVisible();
   });
 
+  test("blog index shows browse filters, not a tag cloud", async ({ page }) => {
+    await page.goto("/blog");
+    const filters = page.getByRole("navigation", { name: "Filter by tag" });
+    await expect(filters.getByRole("link", { name: "All" })).toBeVisible();
+    await expect(filters.getByRole("link", { name: "Angular" })).toBeVisible();
+    await expect(filters.getByRole("link", { name: "Graphic Design" })).toBeVisible();
+    await expect(filters.getByRole("link", { name: "DynamoDB" })).toHaveCount(0);
+    await expect(filters.getByRole("link", { name: "Next.js" })).toHaveCount(0);
+    await filters.getByRole("button", { name: "More filters" }).click();
+    await expect(filters.getByRole("link", { name: "DynamoDB" })).toBeVisible();
+    await expect(page.getByText("workflow—without...")).toHaveCount(0);
+  });
+
   test("contact mailto handoff does not claim delivery and keeps values", async ({
     page,
   }) => {
@@ -211,6 +226,7 @@ test.describe("portfolio e2e", () => {
       "/",
       "/about",
       "/projects",
+      "/work",
       "/projects/event-horizon",
       "/blog",
       "/blog/taking-event-horizon-to-aws",

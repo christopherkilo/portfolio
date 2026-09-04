@@ -6,7 +6,7 @@
 
 export const resumeMeta = {
   name: "Christopher Kilo",
-  headline: "Full-Stack Developer",
+  headline: "Software Engineer | Full-Stack Developer | Cloud / IT | Graphic Designer",
   location: "DeSoto, TX",
   summary:
     "I build responsive web apps that pair clean interfaces with practical backend architecture—Next.js, React, TypeScript, PostgreSQL, Prisma, Supabase, and AWS. CompTIA A+ certified, with an IT and design background (Adobe Photoshop and Illustrator) that keeps troubleshooting and UX in the same toolkit.",

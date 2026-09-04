@@ -62,9 +62,9 @@ describe("demo shell return navigation", () => {
     }
   });
 
-  it("exposes Live Demo on case-study pages via internal liveDemo", () => {
+  it("exposes a public surface control on case-study pages via internal liveDemo", () => {
     const page = readFileSync(join(root, "app/projects/[id]/page.tsx"), "utf8");
-    expect(page).toContain("Live Demo");
+    expect(page).toContain("getPublicSurfaceLinkLabel");
     expect(page).toContain("hasLiveDemo");
     expect(page).toContain("isInternalHref");
   });

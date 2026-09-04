@@ -1,5 +1,6 @@
 export { getGeneratedCoverKind } from "./covers";
 export type { GeneratedBlogCover } from "./covers";
+export { BLOG_PRIMARY_FILTERS, partitionBlogFilters } from "./filters";
 export { formatBlogDate } from "./dates";
 export { extractHeadings, slugifyHeading } from "./headings";
 export {

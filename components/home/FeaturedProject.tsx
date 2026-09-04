@@ -3,6 +3,7 @@
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Carousel } from "@/components/ui/Carousel";
 import { ProjectCard } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import {
   HOMEPAGE_FEATURED_DESCRIPTION,
   getHomepageFeaturedProjects,
@@ -27,6 +28,12 @@ export function FeaturedProject() {
           <ProjectCard key={project.id} project={project} variant="carousel" />
         ))}
       </Carousel>
+
+      <div className="mt-8 flex justify-start sm:justify-end">
+        <Button href="/work" variant="outline">
+          Explore All Work
+        </Button>
+      </div>
     </section>
   );
 }

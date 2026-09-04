@@ -27,6 +27,22 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/work"
+                  className="inline-flex min-h-11 items-center px-2.5 text-sm text-secondary transition hover:text-text"
+                >
+                  All Work
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#engineering-lab"
+                  className="inline-flex min-h-11 items-center px-2.5 text-sm text-secondary transition hover:text-text"
+                >
+                  Lab
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>

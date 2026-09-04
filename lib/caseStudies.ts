@@ -11,8 +11,14 @@ export type {
   CaseStudy,
   CaseStudyChart,
   ChartPoint,
+  ProjectSnapshot,
+  ProjectVerification,
   TechGroup,
+  VerificationCategory,
+  VerificationItem,
+  VerificationReceipt,
 } from "@/lib/case-studies/types";
+export { VERIFICATION_CATEGORY_LABELS } from "@/lib/case-studies/types";
 
 /** Active portfolio case studies only — no legacy placeholder entries. */
 const studies: Record<string, Omit<CaseStudy, "projectId">> = {

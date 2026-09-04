@@ -21,7 +21,7 @@ OUT = ROOT / "public" / "Christopher_Kilo_Resume.pdf"
 
 # Contact fields must match lib/constants.ts + lib/resume.ts.
 NAME = "CHRISTOPHER KILO"
-TITLE = "Full-Stack Developer"
+TITLE = "Software Engineer | Full-Stack Developer | Cloud / IT | Graphic Designer"
 LOCATION = "DeSoto, TX"
 EMAIL = "christopherkilo.pro@gmail.com"
 SITE_URL = "www.christopherkilo.com"

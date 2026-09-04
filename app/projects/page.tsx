@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProjectCard } from "@/components/ui/Card";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import {
   categoryDescriptions,
   categoryLabels,
+  getFeaturedApplicationProjects,
   getPortfolioProjectsByCategory,
   type Project,
   type ProjectCategory,
@@ -47,9 +49,11 @@ const sections: {
 function ProjectGrid({
   items,
   gridClass,
+  proofPresentation = "full",
 }: {
   items: Project[];
   gridClass: string;
+  proofPresentation?: "featured" | "full";
 }) {
   return (
     <div className={gridClass}>
@@ -59,7 +63,11 @@ function ProjectGrid({
           key={project.id}
           className="min-h-0 scroll-mt-[var(--scroll-mt)]"
         >
-          <ProjectCard project={project} variant="grid" />
+          <ProjectCard
+            project={project}
+            variant="grid"
+            proofPresentation={proofPresentation}
+          />
         </div>
       ))}
     </div>
@@ -75,9 +83,20 @@ export default function ProjectsPage() {
         title="Selected work across disciplines"
         description="Full-stack applications, professional IT utilities, and visual identity systems."
       />
+      <p className="-mt-4 mb-10 sm:-mt-6 sm:mb-12">
+        <Link
+          href="/work"
+          className="inline-flex min-h-11 items-center text-sm font-medium text-muted transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          Prefer a compact index? Explore all work →
+        </Link>
+      </p>
 
       {sections.map((section) => {
-        const items = getPortfolioProjectsByCategory(section.category);
+        const items =
+          section.category === "web"
+            ? getFeaturedApplicationProjects()
+            : getPortfolioProjectsByCategory(section.category);
         if (!items.length) return null;
         return (
           <section key={section.category} className="mb-12 last:mb-0 sm:mb-16">
@@ -89,7 +108,13 @@ export default function ProjectsPage() {
                 {section.description}
               </p>
             </div>
-            <ProjectGrid items={items} gridClass={section.gridClass} />
+            <ProjectGrid
+              items={items}
+              gridClass={section.gridClass}
+              proofPresentation={
+                section.category === "web" ? "featured" : "full"
+              }
+            />
           </section>
         );
       })}

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 type TaskFlowBlogCoverProps = {
   className?: string;
   title?: string;
+  showTitle?: boolean;
 };
 
 /**
@@ -15,6 +16,7 @@ type TaskFlowBlogCoverProps = {
 export function TaskFlowBlogCover({
   className,
   title = "TaskFlow",
+  showTitle = true,
 }: TaskFlowBlogCoverProps) {
   const uid = useId().replace(/:/g, "");
   const reducedMotion = useReducedMotion();
@@ -122,9 +124,11 @@ export function TaskFlowBlogCover({
       </svg>
 
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
-      <p className="absolute bottom-4 left-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white sm:bottom-5 sm:left-5 sm:text-base">
-        {title}
-      </p>
+      {showTitle ? (
+        <p className="absolute bottom-4 left-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white sm:bottom-5 sm:left-5 sm:text-base">
+          {title}
+        </p>
+      ) : null}
     </div>
   );
 }

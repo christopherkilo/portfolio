@@ -2,13 +2,57 @@ import type { CaseStudy } from "./types";
 
 export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
   overview:
-    "NovaTech Solutions is a fictional MSP marketing site with a real inquiry workflow behind the contact form. The browser talks only to Next.js. Cloudflare Turnstile sits on that ingress. Vercel assumes a StartExecution-only IAM role through OIDC. Step Functions then runs HubSpot CRM writes and asynchronous Resend notifications with DynamoDB as the durable idempotency authority.",
+    "NovaTech Solutions is a fictional MSP marketing site with a real inquiry workflow behind the contact form. Submit the form and the lead is accepted immediately; CRM and email continue in the background.",
+  snapshot: {
+    role: "Full-Stack / Cloud Developer",
+    type: "MSP marketing site with a durable inquiry workflow",
+    frontend: "Next.js 16 · React 19 · TypeScript · Tailwind CSS",
+    backend: "Next.js Route Handler · Zod",
+    cloud: "AWS CDK · Step Functions · Lambda · DynamoDB · SQS",
+    testing: "Inquiry-path unit tests · Playwright QA",
+    architecture:
+      "Turnstile and OIDC at ingress, then Step Functions → DynamoDB claim → HubSpot → SQS → Resend.",
+    status: "Production-verified inquiry path · architecture demo",
+  },
+  verification: {
+    items: [
+      {
+        category: "deployed",
+        detail:
+          "The inquiry workflow was deployed through AWS CDK and successfully executed from the public Vercel application.",
+      },
+      {
+        category: "tested",
+        detail:
+          "A production submission completed end-to-end, and repeating the same submission ID did not create a second workflow execution.",
+      },
+      {
+        category: "secure",
+        detail:
+          "Vercel authenticates to AWS through a scoped OIDC role; no long-lived AWS credentials are stored in the deployment.",
+      },
+      {
+        category: "observable",
+        detail:
+          "CloudTrail recorded the web-identity role assumption, and Step Functions exposed the completed execution path.",
+      },
+      {
+        category: "integrated",
+        detail:
+          "The verified workflow completed its HubSpot CRM write and notification path.",
+      },
+    ],
+    limitations: [
+      "Company identity and marketing statistics are fictional.",
+      "Email is at-least-once; an unverified sending domain can fail for some inboxes.",
+    ],
+  },
   problem:
-    "MSP sites often explain services well and then drop the inquiry into a void: no validation story, no CRM, no spam control, and no honest failure modes. I wanted the services → proof → contact journey to end in a durable lead, even while the company identity stayed fictional.",
+    "MSP sites often explain services well and then drop the inquiry into a void: no validation, no CRM, no spam control. I wanted the services → proof → contact journey to end in a durable lead, even with a fictional company identity.",
   approach:
-    "I kept marketing content in typed constants so six routes and service detail pages stayed consistent. The contact form validates on the client for fast feedback, then posts to a same-origin Route Handler that re-validates with a strict Zod schema, verifies Turnstile, and starts the AWS workflow. The HTTP response does not wait for HubSpot or email.",
+    "Marketing content lives in typed constants so routes stay consistent. The form validates on the client, then a same-origin handler re-validates, checks Turnstile, and starts the workflow. The HTTP response does not wait for HubSpot or email.",
   howItWorks:
-    "A visitor submits an inquiry with a Turnstile token and a submission id. The Route Handler rate-limits by IP as a best-effort extra, verifies the token, discards it, and calls states:StartExecution with a deterministic execution name. Step Functions claims the submission in DynamoDB, the HubSpot Lambda upserts a contact and creates a deal plus note, then SQS carries customer and staff notification jobs to a Lambda that sends Resend. If a name already exists, StartExecution returns ExecutionAlreadyExists and the API still answers 202. Email can fail after CRM success without rolling the lead back.",
+    "A visitor submits an inquiry with a Turnstile token and a submission id. The Route Handler verifies the token, discards it, and calls states:StartExecution with a deterministic execution name. Step Functions claims the submission in DynamoDB, the HubSpot Lambda upserts a contact and creates a deal plus note, then SQS carries customer and staff jobs to a Lambda that sends Resend. If that name already exists, StartExecution returns ExecutionAlreadyExists and the API still answers 202. Email can fail after CRM success without rolling the lead back.",
   architecture: [
     "Visitor",
     "NovaTech form",
@@ -42,11 +86,14 @@ export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
       },
     ],
   },
+  architectureLanesTitle: "Ingress and workflow",
+  architectureLanesDescription:
+    "The browser stays on Next.js. AWS starts after the request is accepted.",
   architectureLanes: [
     {
       title: "Public ingress",
       caption:
-        "Same-origin HTTP. Zod, Turnstile, and StartExecution live here. Secrets, ARNs, and provider tokens never go to the browser.",
+        "Same-origin HTTP. Secrets, ARNs, and provider tokens never go to the browser.",
       steps: [
         "NovaTech form",
         "POST /api/novatech/inquiries",
@@ -58,7 +105,7 @@ export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
     {
       title: "Durable workflow",
       caption:
-        "Asynchronous path. DynamoDB claims the submission id. HubSpot is the CRM system of record. Resend is at-least-once via SQS, isolated from the CRM write.",
+        "DynamoDB claims the submission. HubSpot is the CRM record. Email is isolated from that write.",
       steps: [
         "Step Functions",
         "DynamoDB claim",
@@ -98,12 +145,11 @@ export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
     },
   ],
   outcome:
-    "Production inquiries on christopherkilo.com follow that path with a 202 accepted contract. Vercel assumes the ingress role through OIDC; there are no long-lived AWS access keys on the project. HubSpot still receives the lead when visitor email cannot be delivered. Testimonials and stats stay illustrative on purpose.",
+    "Production inquiries on christopherkilo.com return 202 and continue asynchronously. HubSpot still receives the lead when visitor email cannot be delivered.",
   learned:
     "I learned to keep spam control and AWS identity on the HTTP edge, then let DynamoDB own idempotency. That split made retries, duplicate submissions, and email failure easy to explain: the visitor hears that the request was received, HubSpot keeps the lead, and Resend is allowed to fail without pretending the message already sent.",
   currentState: {
     implemented: [
-      "Six marketing routes plus per-service detail pages",
       "Shared Zod contract for client and API",
       "Cloudflare Turnstile at public ingress",
       "Vercel OIDC role limited to states:StartExecution",
@@ -118,11 +164,6 @@ export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
       "Forced failure mode for UI QA",
       "Resend test sender — unverified visitor inboxes can fail permanently",
     ],
-    planned: [
-      "Distributed rate limiting so multiple instances agree",
-      "Alertable monitoring beyond allowlisted console JSON",
-      "Background inertness for the mobile menu",
-    ],
   },
   decisions: [
     {
@@ -133,7 +174,7 @@ export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
     {
       title: "OIDC instead of long-lived AWS keys",
       explanation:
-        "Production and Preview assume portfolio-dev-novatech-vercel-ingress through the Vercel team issuer. The role can call only states:StartExecution on the NovaTech state machine. Local next dev keeps using the AWS CLI profile.",
+        "Production and Preview assume the ingress role through the Vercel team issuer. The role can call only states:StartExecution on the NovaTech state machine. Local next dev keeps using the AWS CLI profile.",
     },
     {
       title: "DynamoDB as idempotency authority",
@@ -145,47 +186,13 @@ export const novatechSolutionsStudy: Omit<CaseStudy, "projectId"> = {
       explanation:
         "Sales needs a durable lead more than a pretty success toast. I upsert by email, open a deal, and attach a note with the message. Email can fail without undoing the CRM write.",
     },
-    {
-      title: "Turnstile before StartExecution",
-      explanation:
-        "Spam protection has to sit in front of AWS and paid/third-party side effects. The widget token is required client-side, verified server-side, then discarded — it never lands in Step Functions input, DynamoDB, SQS, or logs.",
-    },
-    {
-      title: "Notifications are at-least-once",
-      explanation:
-        "SQS can deliver a job more than once. Resend Idempotency-Key reduces duplicate mail for 24 hours. Delivery is at-least-once.",
-    },
   ],
-  nextStepsIntro:
-    "NovaTech AWS is closed. Remaining work is product polish, not another cloud phase.",
   nextSteps: [
     "Move rate limiting to shared storage so multiple instances agree",
     "Add alertable monitoring beyond allowlisted console logs",
     "Finish mobile-menu background inertness",
     "Use a verified Resend sending domain if visitor mail must reach arbitrary inboxes",
   ],
-  highlights: [
-    "Marketing site with service detail routes",
-    "Turnstile at ingress, then Step Functions → HubSpot → SQS → Resend",
-    "Vercel OIDC with a StartExecution-only IAM role",
-    "Durable idempotency and email failure isolation",
-  ],
-  metrics: [
-    {
-      label: "HTTP success",
-      value: "202",
-      detail: "Accepted workflow; UI does not claim email already sent",
-    },
-    {
-      label: "Ingress IAM",
-      value: "1 action",
-      detail: "states:StartExecution only on the NovaTech state machine",
-    },
-    {
-      label: "Notification jobs",
-      value: "2",
-      detail: "Customer and staff SQS messages, isolated from the CRM write",
-    },
-  ],
+  metrics: [],
   charts: [],
 };

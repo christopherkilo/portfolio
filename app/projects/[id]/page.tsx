@@ -11,6 +11,8 @@ import {
 } from "@/components/projects/ArchitectureDiagram";
 import { CaseStudyChartView } from "@/components/projects/CaseStudyChart";
 import { CaseStudyHeroCover } from "@/components/projects/CaseStudyHeroCover";
+import { ProjectSnapshotCard } from "@/components/projects/ProjectSnapshot";
+import { BuiltNotMocked } from "@/components/projects/BuiltNotMocked";
 import {
   getAllCaseStudyIds,
   getCaseStudy,
@@ -21,6 +23,8 @@ import {
   hasLiveDemo,
   isInternalHref,
   isPortfolioMonorepoGithub,
+  getPublicSurfaceCta,
+  getPublicSurfaceLinkLabel,
 } from "@/lib/projectData";
 import { pageMetadata } from "@/lib/seo";
 
@@ -112,7 +116,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
               {isInternalHref(project.liveDemo) ? null : (
                 <ExternalLink className="size-4" aria-hidden />
               )}
-              Live Demo
+              {getPublicSurfaceLinkLabel(project.id)}
             </Button>
           ) : null}
           {project.github ? (
@@ -139,34 +143,40 @@ export default async function CaseStudyPage({ params }: PageProps) {
         </div>
       </header>
 
+      {study.snapshot ? (
+        <ProjectSnapshotCard snapshot={study.snapshot} project={project} />
+      ) : null}
+
       <CaseStudyHeroCover
         projectId={project.id}
         title={project.title}
         image={project.image}
       />
 
-      <div
-        className={
-          study.metrics.length > 3
-            ? "mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-            : "mb-12 grid gap-4 md:grid-cols-3"
-        }
-      >
-        {study.metrics.map((m) => (
-          <div
-            key={m.label}
-            className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 backdrop-blur-xl"
-          >
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">
-              {m.label}
-            </p>
-            <p className="mt-2 font-display text-3xl font-semibold text-primary">
-              {m.value}
-            </p>
-            <p className="mt-2 text-sm text-secondary">{m.detail}</p>
-          </div>
-        ))}
-      </div>
+      {study.metrics.length ? (
+        <div
+          className={
+            study.metrics.length === 1
+              ? "mb-12 grid gap-4 md:max-w-sm"
+              : "mb-12 grid gap-4 md:grid-cols-3"
+          }
+        >
+          {study.metrics.map((m) => (
+            <div
+              key={m.label}
+              className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 backdrop-blur-xl"
+            >
+              <p className="text-xs uppercase tracking-[0.18em] text-muted">
+                {m.label}
+              </p>
+              <p className="mt-2 font-display text-3xl font-semibold text-primary">
+                {m.value}
+              </p>
+              <p className="mt-2 text-sm text-secondary">{m.detail}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <div className="mb-12 grid gap-8 lg:grid-cols-2">
         <section className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
@@ -203,39 +213,38 @@ export default async function CaseStudyPage({ params }: PageProps) {
 
       {study.architectureLanes?.length ? (
         <ArchitectureLanes
-          title="Two persistence paths"
-          description="Users hit one Next.js app. Native booking and external discovery do not share a database on purpose."
+          title={study.architectureLanesTitle ?? "Architecture"}
+          description={study.architectureLanesDescription}
           entry={study.architectureEntry}
           lanes={study.architectureLanes}
         />
       ) : null}
 
-      {study.deepDives?.length ? (
+      {study.decisions?.length ? (
         <section className="mb-12">
-          <div className="mb-6 max-w-2xl">
-            <h2 className="font-display text-2xl font-semibold text-text">
-              Why these pieces
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-secondary">
-              Service choices for this workload—not a claim that the same stack is right everywhere.
-            </p>
-          </div>
+          <h2 className="mb-6 font-display text-2xl font-semibold text-text">
+            {study.decisionsHeading ?? "Engineering decisions"}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {study.deepDives.map((dive) => (
+            {study.decisions.map((decision) => (
               <section
-                key={dive.title}
+                key={decision.title}
                 className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl"
               >
                 <h3 className="font-display text-lg font-semibold text-text">
-                  {dive.title}
+                  {decision.title}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-secondary">
-                  {dive.explanation}
+                  {decision.explanation}
                 </p>
               </section>
             ))}
           </div>
         </section>
+      ) : null}
+
+      {study.verification ? (
+        <BuiltNotMocked verification={study.verification} />
       ) : null}
 
       <section className="mb-12 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
@@ -245,25 +254,14 @@ export default async function CaseStudyPage({ params }: PageProps) {
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary md:text-base">
           {study.outcome}
         </p>
-        {study.learned ? (
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-secondary md:text-base">
-            <span className="font-medium text-text">What I learned. </span>
-            {study.learned}
-          </p>
-        ) : null}
-        <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-          {study.highlights.map((h) => (
-            <li
-              key={h}
-              className="flex items-start gap-2 text-sm text-secondary"
-            >
-              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-              {h}
-            </li>
-          ))}
-        </ul>
         {study.currentState ? (
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div
+            className={
+              study.currentState.demo?.length
+                ? "mt-8 grid gap-6 md:grid-cols-2"
+                : "mt-8"
+            }
+          >
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] label-accent">
                 Implemented
@@ -290,63 +288,26 @@ export default async function CaseStudyPage({ params }: PageProps) {
                 </ul>
               </div>
             ) : null}
-            {study.currentState.planned?.length ? (
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-                  Next
-                </p>
-                <ul className="mt-3 space-y-2">
-                  {study.currentState.planned.map((item) => (
-                    <li key={item} className="text-sm leading-relaxed text-secondary">
-                      → {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </div>
         ) : null}
       </section>
 
-      {study.decisions?.length ? (
-        <section className="mb-12">
-          <div className="mb-6 max-w-2xl">
-            <h2 className="font-display text-2xl font-semibold text-text">
-              {study.decisionsHeading ?? "Key decisions and why"}
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-secondary">
-              The reasoning and tradeoffs behind the current implementation.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {study.decisions.map((decision) => (
-              <section
-                key={decision.title}
-                className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl"
-              >
-                <h3 className="font-display text-lg font-semibold text-text">
-                  {decision.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-secondary">
-                  {decision.explanation}
-                </p>
-              </section>
-            ))}
-          </div>
+      {study.learned ? (
+        <section className="mb-12 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
+          <h2 className="font-display text-xl font-semibold text-text">
+            What I learned
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-secondary md:text-base">
+            {study.learned}
+          </p>
         </section>
       ) : null}
 
       {study.charts.length ? (
         <section className="mb-12 space-y-6">
-          <div>
-            <h2 className="font-display text-2xl font-semibold text-text">
-              Results & analysis
-            </h2>
-            <p className="mt-2 text-sm text-secondary">
-              Charts appear only when they communicate something useful about the
-              current project.
-            </p>
-          </div>
+          <h2 className="font-display text-2xl font-semibold text-text">
+            Results
+          </h2>
           <div className="grid gap-6 lg:grid-cols-1">
             {study.charts.map((chart) => (
               <CaseStudyChartView key={chart.id} chart={chart} />
@@ -358,12 +319,8 @@ export default async function CaseStudyPage({ params }: PageProps) {
       {study.nextSteps?.length ? (
         <section className="mb-12 rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-xl">
           <h2 className="font-display text-xl font-semibold text-text">
-            What I would build next
+            Next
           </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-secondary">
-            {study.nextStepsIntro ??
-              "Focused next steps based on the current implementation—not a wish list of work already shipped."}
-          </p>
           <ol className="mt-5 grid gap-3 md:grid-cols-2">
             {study.nextSteps.map((step, index) => (
               <li
@@ -384,12 +341,12 @@ export default async function CaseStudyPage({ params }: PageProps) {
         <div>
           <p className="font-display text-lg font-semibold text-text">
             {hasLiveDemo(project.liveDemo)
-              ? "Explore the live build"
+              ? getPublicSurfaceCta(project.id).title
               : "Continue exploring"}
           </p>
           <p className="mt-1 text-sm text-secondary">
             {hasLiveDemo(project.liveDemo)
-              ? "Open the demo, then return here anytime via the demo chrome or browser Back."
+              ? getPublicSurfaceCta(project.id).body
               : "Return to the projects index or open the repository when available."}
           </p>
         </div>
@@ -402,7 +359,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
               {isInternalHref(project.liveDemo) ? null : (
                 <ExternalLink className="size-4" aria-hidden />
               )}
-              Live Demo
+              {getPublicSurfaceLinkLabel(project.id)}
             </Button>
           ) : null}
           {project.github && !hasLiveDemo(project.liveDemo) ? (

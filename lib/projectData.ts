@@ -26,6 +26,16 @@ export interface Project {
   portfolioVisible?: boolean;
   /** Honest in-progress marker. Not a general status system. */
   inDevelopment?: boolean;
+  /**
+   * Compact proof line for cards (2–4 facts). Architectural evidence only —
+   * never invented traffic, revenue, uptime, or unverified counts.
+   */
+  proofPoints?: string[];
+  /**
+   * Homepage / Featured Applications cards only. Max two facts.
+   * Full `proofPoints` stay available for other surfaces.
+   */
+  featuredProofPoints?: string[];
 }
 
 export const projects: Project[] = [
@@ -45,6 +55,16 @@ export const projects: Project[] = [
     liveDemo: "/demos/event-horizon",
     featured: true,
     href: "/projects/event-horizon",
+    proofPoints: [
+      "AWS CDK ingestion pipeline",
+      "SQS + DLQ",
+      "Idempotent DynamoDB writes",
+      "Playwright QA",
+    ],
+    featuredProofPoints: [
+      "AWS CDK ingestion · SQS + DLQ",
+      "Idempotent DynamoDB writes",
+    ],
   },
   {
     id: "novatech-solutions",
@@ -60,6 +80,16 @@ export const projects: Project[] = [
     liveDemo: "/demos/novatech-solutions",
     featured: true,
     href: "/projects/novatech-solutions",
+    proofPoints: [
+      "OIDC-authenticated AWS workflow",
+      "Step Functions verified",
+      "HubSpot CRM completed",
+      "Turnstile at ingress",
+    ],
+    featuredProofPoints: [
+      "OIDC-authenticated AWS workflow",
+      "Step Functions + CRM verified",
+    ],
   },
   {
     id: "taskflow",
@@ -75,6 +105,16 @@ export const projects: Project[] = [
     liveDemo: "/demos/taskflow",
     featured: true,
     href: "/projects/taskflow",
+    proofPoints: [
+      "React + Angular clients",
+      "Realtime collaboration",
+      "Offline mutation queue",
+      "Optimistic concurrency",
+    ],
+    featuredProofPoints: [
+      "React + Angular clients",
+      "Offline queue + optimistic concurrency",
+    ],
   },
   {
     id: "starlenz",
@@ -88,6 +128,11 @@ export const projects: Project[] = [
     featured: false,
     href: "/projects/starlenz",
     inDevelopment: true,
+    proofPoints: [
+      "Interactive astronomy UI",
+      "Custom constellations",
+      "Motion system",
+    ],
   },
   {
     id: "kilo-toolkit",
@@ -103,6 +148,15 @@ export const projects: Project[] = [
     liveDemo: "/toolkit",
     featured: true,
     href: "/toolkit",
+    proofPoints: [
+      "Interactive diagnostics suite",
+      "Guided troubleshooting",
+      "Demo-mode data",
+    ],
+    featuredProofPoints: [
+      "Guided troubleshooting",
+      "Demo-mode data",
+    ],
   },
   {
     id: "voltline",
@@ -121,6 +175,7 @@ export const projects: Project[] = [
     imageAlt: "Voltline brand identity cover with mark, wordmark, and system tiles",
     featured: false,
     href: "/projects/voltline",
+    proofPoints: ["Logo system", "Packaging", "Campaign applications"],
   },
   {
     id: "nightshift",
@@ -139,6 +194,7 @@ export const projects: Project[] = [
     imageAlt: "NightShift festival campaign cover with Create after dark lockup",
     featured: false,
     href: "/projects/nightshift",
+    proofPoints: ["Campaign art direction", "Typography", "Motion design"],
   },
   {
     id: "signal-magazine",
@@ -157,6 +213,7 @@ export const projects: Project[] = [
     imageAlt: "Signal Magazine Issue 01 Human / Machine editorial cover",
     featured: false,
     href: "/projects/signal-magazine",
+    proofPoints: ["Editorial design", "Grid systems", "Typography"],
   },
   // Toolkit module deep-links (not listed as separate portfolio cards)
   {
@@ -239,7 +296,7 @@ function isPortfolioVisible(project: Project): boolean {
   return project.portfolioVisible !== false;
 }
 
-/** Projects shown on homepage featured + Projects page grids. */
+/** Portfolio-visible projects: All Work, command palette, and eligible project grids. */
 export function getPortfolioProjects(): Project[] {
   return projects.filter(isPortfolioVisible);
 }
@@ -259,6 +316,30 @@ export function getHomepageFeaturedProjects(): Project[] {
   return homepageFeaturedProjectIds
     .map((id) => getProjectById(id))
     .filter((project): project is Project => Boolean(project));
+}
+
+export const FEATURED_PROOF_LIMIT = 2;
+
+/**
+ * Proof line for homepage / Featured Applications cards.
+ * Keeps the full `proofPoints` list intact for other surfaces.
+ */
+export function getFeaturedCardProofPoints(project: Project): string[] {
+  const source = project.featuredProofPoints ?? project.proofPoints ?? [];
+  return source
+    .map((point) => point.trim())
+    .filter(Boolean)
+    .slice(0, FEATURED_PROOF_LIMIT);
+}
+
+/**
+ * `/projects` Featured Applications grid — finished featured web work only.
+ * In-development projects stay on All Work and Engineering Lab.
+ */
+export function getFeaturedApplicationProjects(): Project[] {
+  return getPortfolioProjectsByCategory("web").filter(
+    (project) => project.featured && !project.inDevelopment,
+  );
 }
 
 /** Portfolio-visible Kilo Toolkit card for dedicated sections. */
@@ -333,6 +414,86 @@ export function isExternalHref(url: string | undefined): boolean {
 export const PORTFOLIO_GITHUB_REPO =
   "https://github.com/christopherkilo/portfolio";
 
+/**
+ * Recruiter-facing status vocabulary. Each label means exactly one thing:
+ * live-app — visitor can use the actual product
+ * live-demo — functional public demonstration
+ * production-verified — real production path was executed and checked
+ * architecture-demo — real architecture without inviting public production use
+ * case-study — documentation / engineering walkthrough
+ * experiment — technical exploration
+ * active-development — still being built
+ * demo — illustrative / simulated surface
+ */
+export const PROJECT_STATUS_LABELS = {
+  "live-app": "Live app",
+  "live-demo": "Live demo",
+  "production-verified": "Production verified",
+  "architecture-demo": "Architecture demo",
+  "case-study": "Case study",
+  "experiment": "Experiment",
+  "active-development": "Active development",
+  demo: "Demo",
+} as const;
+
+export type ProjectStatusKind = keyof typeof PROJECT_STATUS_LABELS;
+
+export function getProjectStatusKind(
+  id: string,
+  inDevelopment?: boolean,
+): ProjectStatusKind {
+  switch (id) {
+    case "event-horizon":
+    case "taskflow":
+      return "live-demo";
+    case "novatech-solutions":
+      return "production-verified";
+    case "starlenz":
+      return "active-development";
+    case "kilo-toolkit":
+    case "systemscope":
+    case "memorymedic":
+    case "netcheck":
+      return "demo";
+    case "taskflow-angular":
+      return "experiment";
+    default:
+      if (inDevelopment) return "active-development";
+      return "case-study";
+  }
+}
+
+export function getProjectStatusLabel(
+  project: Pick<Project, "id" | "inDevelopment">,
+): string {
+  return PROJECT_STATUS_LABELS[
+    getProjectStatusKind(project.id, project.inDevelopment)
+  ];
+}
+
+/** Visitor-facing control that opens a public surface — not a status badge. */
+export function getPublicSurfaceLinkLabel(id: string): string {
+  const kind = getProjectStatusKind(id);
+  if (kind === "production-verified" || kind === "architecture-demo" || kind === "demo") {
+    return "Open demo";
+  }
+  return "Live Demo";
+}
+
+export function getPublicSurfaceCta(id: string): { title: string; body: string } {
+  const kind = getProjectStatusKind(id);
+  if (kind === "production-verified" || kind === "architecture-demo") {
+    return {
+      title: "Explore the public demo",
+      body: "Open the demonstration site, then return here via the demo chrome or browser Back.",
+    };
+  }
+  return {
+    title: "Explore the live demo",
+    body: "Open the demo, then return here anytime via the demo chrome or browser Back.",
+  };
+}
+
 /** True when a GitHub URL is this site’s portfolio/monorepo, including subdirectory links. */
 export function isPortfolioMonorepoGithub(url: string | undefined): boolean {
   if (!url) return false;
@@ -342,7 +503,9 @@ export function isPortfolioMonorepoGithub(url: string | undefined): boolean {
   );
 }
 
-export function githubControlLabel(project: Project): string {
+export function githubControlLabel(
+  project: Pick<Project, "title" | "github" | "githubNote">,
+): string {
   if (isPortfolioMonorepoGithub(project.github)) {
     return project.githubNote
       ? `${project.title} on GitHub — ${project.githubNote}`

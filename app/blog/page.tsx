@@ -3,7 +3,7 @@ import { BlogCard } from "@/components/blog/BlogCard";
 import { TagFilter } from "@/components/blog/TagFilter";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { getAllPosts, getAllTags } from "@/lib/blog";
+import { getAllPosts, getAllTags, partitionBlogFilters } from "@/lib/blog";
 import { SITE } from "@/lib/constants";
 import { pageMetadata } from "@/lib/seo";
 
@@ -23,6 +23,7 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
   const { tag } = await searchParams;
   const posts = getAllPosts();
   const tags = getAllTags();
+  const { primary, more } = partitionBlogFilters(tags);
   const requestedTag = tag?.trim() || undefined;
   const knownTag = requestedTag ? tags.includes(requestedTag) : false;
   const invalidTag = Boolean(requestedTag && !knownTag);
@@ -40,11 +41,11 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
         as="h1"
         className="mb-6 sm:mb-8"
         eyebrow="Blog"
-        title="Notes from the work in progress"
+        title="Notes from the build"
         description="Development notes, design decisions, experiments, and lessons from the projects I’m building."
       />
 
-      <TagFilter tags={tags} active={requestedTag} />
+      <TagFilter primary={primary} more={more} active={requestedTag} />
 
       {filtered.length ? (
         <section aria-labelledby="all-writing">

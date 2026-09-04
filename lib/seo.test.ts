@@ -32,13 +32,13 @@ describe("SEO helpers", () => {
 
   it("can emit an absolute homepage title that skips the layout template", () => {
     const home = pageMetadata({
-      title: "Christopher Kilo — Full-Stack Developer",
+      title: "Christopher Kilo — Software Engineer",
       description: "Portfolio",
       path: "/",
       absoluteTitle: true,
     });
     expect(home.title).toEqual({
-      absolute: "Christopher Kilo — Full-Stack Developer",
+      absolute: "Christopher Kilo — Software Engineer",
     });
   });
 
@@ -48,6 +48,7 @@ describe("SEO helpers", () => {
     expect(urls.some((url) => url.includes("/demos/"))).toBe(false);
     expect(urls.some((url) => url.includes("/api/"))).toBe(false);
     expect(urls).toContain("https://www.christopherkilo.com");
+    expect(urls).toContain("https://www.christopherkilo.com/work");
     expect(urls).toContain("https://www.christopherkilo.com/projects");
     expect(urls).toContain("https://www.christopherkilo.com/blog");
     expect(urls).toContain("https://www.christopherkilo.com/about");

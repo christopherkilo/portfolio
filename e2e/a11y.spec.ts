@@ -5,6 +5,7 @@ const PAGES = [
   "/",
   "/about",
   "/projects",
+  "/work",
   "/blog",
   "/contact",
   "/projects/event-horizon",

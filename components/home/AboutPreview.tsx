@@ -25,7 +25,7 @@ export function AboutPreview() {
       <SectionHeader
         eyebrow="About"
         title="Three disciplines, one craft"
-        description={`${SITE.name} builds full-stack applications, visual systems, and practical IT utilities—with an eye for maintainable architecture and clear user experience.`}
+        description={`${SITE.name} is a software engineer working across full-stack development, cloud / IT, and graphic design.`}
       />
 
       {reducedMotion ? (

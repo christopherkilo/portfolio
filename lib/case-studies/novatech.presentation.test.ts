@@ -54,15 +54,11 @@ describe("NovaTech case-study presentation", () => {
     ]);
   });
 
-  it("uses verified engineering metrics rather than traffic or revenue", () => {
-    const labels = study?.metrics.map((metric) => metric.label) ?? [];
-    expect(labels).toEqual(
-      expect.arrayContaining(["HTTP success", "Ingress IAM", "Notification jobs"]),
-    );
-    const blob = JSON.stringify(study?.metrics);
+  it("does not use weak IAM or queue counts as metrics", () => {
+    expect(study?.metrics).toEqual([]);
+    const blob = JSON.stringify(study);
     expect(blob).not.toMatch(/uptime/i);
     expect(blob).not.toMatch(/revenue/i);
-    expect(blob).not.toMatch(/%/);
   });
 
   it("keeps the resume bullet architectural and outcome-focused", () => {
@@ -84,5 +80,12 @@ describe("NovaTech case-study presentation", () => {
   it("keeps the project card technologies compact", () => {
     const project = getProjectById("novatech-solutions");
     expect(project?.technologies).toEqual(["Next.js", "TypeScript", "HubSpot", "AWS"]);
+    expect(project?.proofPoints?.join(" ")).toMatch(/OIDC/);
+    expect(project?.proofPoints?.join(" ")).toMatch(/Step Functions/);
+    expect(project?.featuredProofPoints).toEqual([
+      "OIDC-authenticated AWS workflow",
+      "Step Functions + CRM verified",
+    ]);
+    expect(project?.featuredProofPoints).toHaveLength(2);
   });
 });

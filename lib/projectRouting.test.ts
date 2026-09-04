@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getAllCaseStudyIds, getCaseStudy } from "./caseStudies";
 import {
+  getFeaturedApplicationProjects,
   getHomepageFeaturedProjects,
   getPortfolioProjects,
   getProjectById,
@@ -110,6 +111,8 @@ describe("web project routing metadata", () => {
       "taskflow",
       "kilo-toolkit",
     ]);
+    expect(getFeaturedApplicationProjects().map((p) => p.id)).toEqual([...WEB_IDS]);
+    expect(getFeaturedApplicationProjects().map((p) => p.id)).not.toContain("starlenz");
     expect(getPortfolioProjects().map((p) => p.id)).toEqual([
       ...WEB_IDS,
       "starlenz",

@@ -1,6 +1,6 @@
 ---
 title: "Building StarLenz: From a Graphic Design Concept to an Interactive Web Experience"
-description: "How a graphic design concept evolved into an interactive astronomy experience through responsive design, animated space environments, constellation mapping, and repeated UI refinement."
+description: "How a graphic design concept became an interactive astronomy experience."
 date: 2026-08-18
 project: StarLenz
 featured: true

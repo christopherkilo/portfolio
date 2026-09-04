@@ -7,7 +7,7 @@ type InDevBadgeProps = {
 
 export function InDevBadge({
   className,
-  children = "In development",
+  children = "Active development",
 }: InDevBadgeProps) {
   return (
     <span

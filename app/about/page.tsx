@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "About",
-  description: `About ${SITE.name} — full-stack developer with a background in IT and web design.`,
+  description: `About ${SITE.name} — software engineer working across full-stack development, cloud / IT, and graphic design.`,
   path: "/about",
 });
 
@@ -28,7 +28,7 @@ export default function AboutPage() {
         as="h1"
         eyebrow="About"
         title={`Hi, I'm ${SITE.name}.`}
-        description="Full-stack developer with a background in IT and web design, focused on software that solves practical problems."
+        description="I'm a software engineer and full-stack developer working across frontend applications, backend systems, cloud infrastructure, IT, and graphic design."
       />
 
       <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
@@ -40,7 +40,7 @@ export default function AboutPage() {
           <div className="relative aspect-square overflow-hidden bg-transparent">
             <Image
               src={PORTRAIT_SRC}
-              alt={`${SITE.name}, full-stack developer`}
+              alt={`${SITE.name}, software engineer`}
               fill
               sizes="(max-width: 640px) min(100vw, 22rem), (max-width: 1024px) 320px, 360px"
               className="object-contain object-center"
@@ -68,7 +68,7 @@ export default function AboutPage() {
             </p>
             <p>
               I&apos;m currently seeking opportunities where I can continue
-              growing as a software developer while contributing to meaningful
+              growing as a software engineer while contributing to meaningful
               products and learning from experienced engineering teams.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">

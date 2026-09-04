@@ -1,6 +1,6 @@
 ---
 title: "Taking NovaTech to AWS"
-description: "How a same-origin contact form grew from a synchronous HubSpot-and-Resend handler into a durable inquiry workflow—without treating retries as a single-delivery guarantee or ingress rate limiting as global."
+description: "How a contact form grew from a synchronous HubSpot handler into a durable AWS inquiry workflow."
 date: 2026-08-29
 project: NovaTech
 featured: false

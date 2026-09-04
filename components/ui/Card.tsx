@@ -13,6 +13,7 @@ import {
 } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import {
+  getFeaturedCardProofPoints,
   getProjectCtaLabel,
   getProjectHref,
   githubControlLabel,
@@ -28,6 +29,7 @@ import { NovaTechCardCover } from "@/components/ui/NovaTechCardCover";
 import { TaskflowCardCover } from "@/components/ui/TaskflowCardCover";
 import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
 import { InDevBadge } from "@/components/blog/InDevBadge";
+import { ProjectProofLine } from "@/components/projects/ProjectProofLine";
 import { cn, isSvgImageSrc } from "@/lib/utils";
 
 export type ProjectCardVariant = "carousel" | "grid";
@@ -37,6 +39,11 @@ type ProjectCardProps = {
   className?: string;
   /** `carousel` keeps fixed widths for the homepage strip; `grid` fills the cell. */
   variant?: ProjectCardVariant;
+  /**
+   * Featured cards (homepage + Featured Applications) show two proof points.
+   * Other grids keep the fuller project list.
+   */
+  proofPresentation?: "featured" | "full";
 };
 
 const ANIMATED_COVER_IDS = new Set([
@@ -51,6 +58,7 @@ function ProjectCardComponent({
   project,
   className,
   variant = "carousel",
+  proofPresentation,
 }: ProjectCardProps) {
   const ref = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
@@ -62,6 +70,12 @@ function ProjectCardComponent({
   const [imageLoaded, setImageLoaded] = useState(hasAnimatedCover);
   const ctaLabel = getProjectCtaLabel(project);
   const isGrid = variant === "grid";
+  const proofMode =
+    proofPresentation ?? (variant === "carousel" ? "featured" : "full");
+  const proofPoints =
+    proofMode === "featured"
+      ? getFeaturedCardProofPoints(project)
+      : project.proofPoints;
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -281,6 +295,11 @@ function ProjectCardComponent({
             <Badge key={tech}>{tech}</Badge>
           ))}
         </div>
+
+        <ProjectProofLine
+          points={proofPoints}
+          max={proofMode === "featured" ? 2 : 4}
+        />
 
         <p className="mt-auto pt-1 text-xs font-medium text-muted transition duration-[var(--duration-fast)] group-hover:text-primary">
           {ctaLabel} →

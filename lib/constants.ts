@@ -1,10 +1,13 @@
 export const SITE = {
   name: "Christopher Kilo",
-  title: "Full-Stack Developer",
-  tagline:
-    "Full-stack developer specializing in modern web applications, business automation, collaborative software, and IT tools.",
+  title: "Software Engineer",
+  disciplines: [
+    "Full-Stack Development",
+    "Cloud / IT",
+    "Graphic Design",
+  ] as const,
   description:
-    "Christopher Kilo is a full-stack developer specializing in modern web applications, business automation, collaborative software, and IT tools built with React, Next.js, TypeScript, PostgreSQL, Supabase, and AWS.",
+    "Christopher Kilo is a software engineer building full-stack applications, cloud-backed systems, and interactive digital experiences, with additional experience in IT and graphic design.",
   email: "christopherkilo.pro@gmail.com",
   linkedin: "https://www.linkedin.com/in/christopher-kilo-312467425/",
   github: "https://github.com/christopherkilo",
@@ -43,14 +46,14 @@ export const TECH_BADGES = [
 export const ROLES = [
   {
     id: "developer",
-    title: "Developer",
+    title: "Full-Stack Development",
     description:
-      "Full-stack interfaces with clean architecture, thoughtful motion, and production-grade performance.",
+      "Frontend applications, backend APIs, and application architecture with testing and reliability in the same toolkit.",
     icon: "Code2" as const,
   },
   {
     id: "designer",
-    title: "Designer",
+    title: "Graphic Design",
     description:
       "Visual systems, brand assets, and layouts that feel intentional rather than templated.",
     icon: "Palette" as const,

@@ -3,10 +3,12 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { InDevBadge } from "@/components/blog/InDevBadge";
 import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
+import { ProjectSnapshotCard } from "@/components/projects/ProjectSnapshot";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { SITE } from "@/lib/constants";
 import { pageMetadata } from "@/lib/seo";
+import type { ProjectSnapshot } from "@/lib/case-studies/types";
 
 export const metadata: Metadata = pageMetadata({
   title: "StarLenz",
@@ -15,6 +17,14 @@ export const metadata: Metadata = pageMetadata({
   path: "/projects/starlenz",
   ogTitle: `StarLenz · ${SITE.name}`,
 });
+
+const STARLENZ_SNAPSHOT: ProjectSnapshot = {
+  role: "Frontend Developer / Designer",
+  type: "Interactive astronomy experience",
+  frontend: "Next.js · TypeScript · Motion design",
+  architecture: "Custom constellation presentation with an animated sky.",
+  status: "Active development",
+};
 
 export default function StarLenzProjectPage() {
   return (
@@ -43,8 +53,8 @@ export default function StarLenzProjectPage() {
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-secondary md:text-lg">
           An interactive astronomy experience that started as a graphic design
-          concept. The case study is still being written. The development
-          update on the blog is the current record of the work.
+          concept. The development update on the blog is the current record of
+          the work.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2">
@@ -55,6 +65,10 @@ export default function StarLenzProjectPage() {
 
         <div className="blog-shot relative mt-8 aspect-[16/9] max-w-3xl overflow-hidden rounded-2xl border border-white/10">
           <StarLenzBlogCover className="absolute inset-0" />
+        </div>
+
+        <div className="mt-10 max-w-3xl">
+          <ProjectSnapshotCard snapshot={STARLENZ_SNAPSHOT} className="mb-0" />
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3">

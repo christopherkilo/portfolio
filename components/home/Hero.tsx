@@ -183,9 +183,21 @@ export function Hero() {
           <p className="hero-role mt-4 text-lg font-medium text-secondary sm:text-xl">
             {SITE.title}
           </p>
-          <p className="hero-tagline mt-5 max-w-xl text-base leading-relaxed text-secondary sm:text-lg">
-            {SITE.tagline}
-          </p>
+          <ul
+            className="hero-disciplines mt-2 flex max-w-xl flex-wrap gap-x-3 gap-y-1 text-sm leading-relaxed text-muted sm:text-base"
+            aria-label="Disciplines"
+          >
+            {SITE.disciplines.map((discipline, index) => (
+              <li key={discipline} className="flex items-center gap-3">
+                {index > 0 ? (
+                  <span className="select-none text-muted/70" aria-hidden>
+                    ·
+                  </span>
+                ) : null}
+                {discipline}
+              </li>
+            ))}
+          </ul>
           <div className="hero-cta mt-8 flex flex-wrap gap-3">
             <Button href="/projects" size="lg">
               View Projects

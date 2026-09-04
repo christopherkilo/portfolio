@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils";
 type EventHorizonBlogCoverProps = {
   className?: string;
   title?: string;
+  showTitle?: boolean;
 };
 
 /** Editorial cover using Event Horizon orange, independent of demo CSS tokens. */
 export function EventHorizonBlogCover({
   className,
   title = "Event Horizon",
+  showTitle = true,
 }: EventHorizonBlogCoverProps) {
   const reducedMotion = useReducedMotion();
 
@@ -36,9 +38,11 @@ export function EventHorizonBlogCover({
       </div>
       <div className="absolute inset-x-[18%] bottom-[30%] h-px bg-gradient-to-r from-transparent via-[#FF8C2B]/55 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 to-transparent" />
-      <p className="absolute bottom-4 left-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white sm:bottom-5 sm:left-5 sm:text-base">
-        {title}
-      </p>
+      {showTitle ? (
+        <p className="absolute bottom-4 left-4 font-display text-sm font-semibold uppercase tracking-[0.22em] text-white sm:bottom-5 sm:left-5 sm:text-base">
+          {title}
+        </p>
+      ) : null}
     </div>
   );
 }

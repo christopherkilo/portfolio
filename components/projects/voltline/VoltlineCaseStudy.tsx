@@ -904,9 +904,9 @@ export function VoltlineCaseStudy() {
         </section>
 
         <CaseStudyFooterNav
-          prev={{ href: "/projects/signal-magazine", label: "Signal Magazine" }}
+          prev={{ href: "/projects/event-horizon-brand", label: "Event Horizon" }}
           next={{ href: "/projects/nightshift", label: "NightShift" }}
-          seriesLabel="Design series 1 / 3"
+          seriesLabel="Design series 2 / 4"
           accent="#C8FF3D"
         />
       </div>

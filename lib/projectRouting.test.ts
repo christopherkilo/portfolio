@@ -117,6 +117,7 @@ describe("web project routing metadata", () => {
       ...WEB_IDS,
       "starlenz",
       "kilo-toolkit",
+      "event-horizon-brand",
       "voltline",
       "nightshift",
       "signal-magazine",

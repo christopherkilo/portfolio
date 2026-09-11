@@ -12,6 +12,7 @@ const STATIC_PATHS = [
   "/resume",
   "/contact",
   "/toolkit",
+  "/projects/event-horizon-brand",
   "/projects/voltline",
   "/projects/nightshift",
   "/projects/signal-magazine",

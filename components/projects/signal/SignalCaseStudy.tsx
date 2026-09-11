@@ -1666,8 +1666,8 @@ export function SignalCaseStudy() {
 
         <CaseStudyFooterNav
           prev={{ href: "/projects/nightshift", label: "NightShift" }}
-          next={{ href: "/projects/voltline", label: "Voltline" }}
-          seriesLabel="Design series 3 / 3"
+          next={{ href: "/projects/event-horizon-brand", label: "Event Horizon" }}
+          seriesLabel="Design series 4 / 4"
           accent={SIGNAL_ACCENT}
         />
       </div>

@@ -894,7 +894,7 @@ export function NightshiftCaseStudy() {
         <CaseStudyFooterNav
           prev={{ href: "/projects/voltline", label: "Voltline" }}
           next={{ href: "/projects/signal-magazine", label: "Signal Magazine" }}
-          seriesLabel="Design series 2 / 3"
+          seriesLabel="Design series 3 / 4"
           accent={ACCENT}
         />
       </div>

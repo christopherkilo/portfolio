@@ -136,6 +136,11 @@ export default async function CaseStudyPage({ params }: PageProps) {
               ) : null}
             </Button>
           ) : null}
+          {project.id === "event-horizon" ? (
+            <Button href="/projects/event-horizon-brand" variant="outline" size="lg">
+              View the brand identity
+            </Button>
+          ) : null}
           <Button href="/projects" variant="ghost" size="lg">
             <ArrowLeft className="size-4" aria-hidden />
             Back to Projects

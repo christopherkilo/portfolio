@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" fill="none" role="img" aria-labelledby="t">
+  <title id="t">Event Horizon  -  VIP ticket  ·  Skyline Jazz Sessions</title>
+  <rect width="800" height="280" fill="#0B0B0B"/>
+  <rect x="0" y="0" width="118" height="280" fill="#050505"/>
+  <line x1="118" y1="16" x2="118" y2="264" stroke="#FFD54A" stroke-width="1" stroke-dasharray="5 7" opacity="0.55"/>
+  <g transform="rotate(-90 59 140)">
+    <text x="59" y="144" text-anchor="middle" font-family="Outfit, sans-serif" font-size="11" font-weight="600" letter-spacing="2.2"><tspan fill="#F5F5F5">EVENT H</tspan><tspan fill="#FF8C2B">O</tspan><tspan fill="#F5F5F5">RIZON</tspan></text>
+  </g>
+  <rect x="148" y="28" width="44" height="18" fill="#FFD54A"/>
+  <text x="170" y="41" text-anchor="middle" fill="#1A1408" font-family="Outfit, sans-serif" font-size="10" font-weight="600" letter-spacing="1.6">VIP</text>
+  <text x="204" y="42" fill="#FFC27A" font-family="Outfit, sans-serif" font-size="11" font-weight="500" letter-spacing="2.4">ADMISSION</text>
+  <text x="148" y="92" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="28" font-weight="700">Skyline Jazz Sessions</text>
+  <text x="148" y="128" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="14" font-weight="500" letter-spacing="2.2">THE VELVET ROOM  ·  BROOKLYN</text>
+  <line x1="148" y1="148" x2="620" y2="148" stroke="#FF8C2B" stroke-width="1" opacity="0.7"/>
+  <text x="148" y="184" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="12" font-weight="500" letter-spacing="2">SEP 27 2026</text>
+  <text x="320" y="184" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="12" font-weight="500" letter-spacing="2">DOORS 7:30 PM</text>
+  <text x="148" y="248" fill="#D4D4D4" font-family="Source Sans 3, sans-serif" font-size="13">Lounge access  ·  EH-VIP-027</text>
+  <rect x="668" y="168" width="96" height="96" fill="#F4F0EB"/>
+  <rect x="676" y="176" width="16" height="16" fill="#0B0B0B"/>
+  <rect x="740" y="176" width="16" height="16" fill="#0B0B0B"/>
+  <rect x="676" y="240" width="16" height="16" fill="#0B0B0B"/>
+  <rect x="700" y="200" width="8" height="8" fill="#0B0B0B"/>
+  <rect x="716" y="216" width="8" height="8" fill="#0B0B0B"/>
+</svg>

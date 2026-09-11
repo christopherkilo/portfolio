@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" fill="none">
+  <title>Event Horizon sign  -  Main stage</title>
+  <rect width="400" height="200" fill="#0B0B0B"/>
+  <text x="28" y="40" font-family="Outfit, sans-serif" font-size="11" font-weight="500" letter-spacing="1.8"><tspan fill="#F5F5F5">EVENT H</tspan><tspan fill="#FF8C2B">O</tspan><tspan fill="#F5F5F5">RIZON</tspan></text>
+  <text x="28" y="124" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="32" font-weight="700">Main stage</text>
+  <path d="M340 108h-48m48 0-12-12m12 12-12 12" stroke="#FF8C2B" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

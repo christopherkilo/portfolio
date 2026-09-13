@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 72" fill="none">
+  <title>Event Horizon general admission wristband</title>
+  <rect width="640" height="72" rx="8" fill="#0B0B0B"/>
+  <circle cx="36" cy="36" r="12" fill="none" stroke="#FF8C2B" stroke-width="2"/>
+  <text x="60" y="42" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="13" font-weight="500" letter-spacing="2.4">EVENT HORIZON  ·  GA</text>
+  <line x1="280" y1="36" x2="600" y2="36" stroke="#FF8C2B" stroke-width="1"/>
+  <text x="612" y="42" fill="#F4F0EB" font-family="Outfit, sans-serif" font-size="11" font-weight="500" letter-spacing="1.4">GA</text>
+</svg>

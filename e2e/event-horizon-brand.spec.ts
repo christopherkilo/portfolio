@@ -32,6 +32,11 @@ test.describe("Event Horizon brand identity case study", () => {
       page.getByText("Brand identity for a cinematic event-discovery platform."),
     ).toBeVisible();
     await expect(
+      page.getByRole("img", {
+        name: "Event Horizon visual identity: campaign poster, mobile product interface, admission ticket, and VIP credential.",
+      }),
+    ).toBeVisible();
+    await expect(
       page.getByRole("heading", { name: "Warm Darkness." }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: "View the product case study" })).toBeVisible();
@@ -47,9 +52,10 @@ test.describe("Event Horizon brand identity case study", () => {
     await page.getByRole("button", { name: "Copy Void color #0B0B0B" }).click();
     await expect(page.locator("[aria-live='polite']")).toHaveText("Copied Void #0B0B0B");
 
-    const assertLightboxRatio = async (label: string, ratio: number) => {
-      await page.getByRole("button", { name: `View ${label}` }).click();
-      const dialog = page.getByRole("dialog", { name: label });
+    const assertLightboxRatio = async (label: string, dialogName: string, ratio: number) => {
+      const trigger = page.getByRole("button", { name: label });
+      await trigger.click();
+      const dialog = page.getByRole("dialog", { name: dialogName });
       await expect(dialog).toBeVisible();
       const img = dialog.locator("img");
       await expect.poll(async () => {
@@ -59,12 +65,75 @@ test.describe("Event Horizon brand identity case study", () => {
       }).toBeCloseTo(ratio, 2);
       await page.keyboard.press("Escape");
       await expect(dialog).toHaveCount(0);
+      await expect(trigger).toBeFocused();
     };
 
     await page.locator("#merch").scrollIntoViewIfNeeded();
-    await assertLightboxRatio("Cap", 1400 / 933);
-    await assertLightboxRatio("Bottle", 1024 / 1024);
-    await assertLightboxRatio("Consumer shirt back", 1200 / 1440);
+    await expect(page.locator("#merch li")).toHaveCount(8);
+    await assertLightboxRatio("View Event Horizon sticker mockups", "Stickers · Set", 1400 / 933);
+    await assertLightboxRatio("View Event Horizon tumbler mockup", "Tumbler · Front", 1024 / 1024);
+
+    const shirtTrigger = page.getByRole("button", { name: "View Event Horizon T-shirt mockups" });
+    await shirtTrigger.click();
+    const shirtDialog = page.getByRole("dialog");
+    await expect(shirtDialog).toBeVisible();
+    await expect(shirtDialog).toHaveAccessibleName("T-Shirt · Front");
+    await page.keyboard.press("ArrowRight");
+    await expect(shirtDialog).toHaveAccessibleName("T-Shirt · Back");
+    await page.keyboard.press("Tab");
+    expect(
+      await shirtDialog.evaluate((dialog) => dialog.contains(document.activeElement)),
+    ).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(shirtDialog).toHaveCount(0);
+    await expect(shirtTrigger).toBeFocused();
+
+    await page.locator("#events").scrollIntoViewIfNeeded();
+    await expect(page.locator("#events li")).toHaveCount(3);
+    await expect(page.locator('#events img[src*="tickets.webp"]')).toHaveCount(0);
+    const wayfindingTrigger = page.getByRole("button", {
+      name: "View Event Horizon wayfinding system",
+    });
+    await wayfindingTrigger.click();
+    const wayfindingDialog = page.getByRole("dialog");
+    await expect(wayfindingDialog).toBeVisible();
+    await expect(wayfindingDialog).toHaveAccessibleName("Wayfinding · System");
+    await page.keyboard.press("ArrowRight");
+    await expect(wayfindingDialog).toHaveAccessibleName("Wayfinding · Main stage");
+    await page.keyboard.press("Escape");
+    await expect(wayfindingDialog).toHaveCount(0);
+    await expect(wayfindingTrigger).toBeFocused();
+
+    await page.locator("#bridge").scrollIntoViewIfNeeded();
+    await expect(page.locator("#bridge li")).toHaveCount(4);
+    await expect(page.locator('#bridge img[src*="bridge.webp"]')).toHaveCount(0);
+    const digitalTrigger = page.getByRole("button", {
+      name: "View Event Horizon digital product applications",
+    });
+    await digitalTrigger.click();
+    const digitalDialog = page.getByRole("dialog");
+    await expect(digitalDialog).toBeVisible();
+    await expect(digitalDialog).toHaveAccessibleName("Digital product · System");
+    await page.keyboard.press("ArrowRight");
+    await expect(digitalDialog).toHaveAccessibleName("Digital product · Mobile");
+    await page.keyboard.press("Escape");
+    await expect(digitalDialog).toHaveCount(0);
+    await expect(digitalTrigger).toBeFocused();
+
+    await page.locator("#close").scrollIntoViewIfNeeded();
+    await expect(page.locator("#close li")).toHaveCount(6);
+    await expect(page.locator('#close img[src*="kit-board.webp"]')).toHaveCount(0);
+    await expect(
+      page.locator("#close").getByRole("button", {
+        name: /T-shirt|hoodie|cap mockup|tote|tumbler|notebook|sticker/i,
+      }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "View Event Horizon campaign poster" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "View Event Horizon stationery system" }),
+    ).toBeVisible();
 
     await expect(page.getByText("AWS CDK")).toHaveCount(0);
     await assertNoHorizontalOverflow(page);
@@ -95,9 +164,22 @@ test.describe("Event Horizon brand identity case study", () => {
 
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/projects");
-    await expect(
-      page.getByRole("link", { name: /Event Horizon — Brand Identity/ }),
-    ).toBeVisible();
+    const brandCard = page.getByRole("link", {
+      name: /Event Horizon — Brand Identity/,
+    });
+    await expect(brandCard).toBeVisible();
+    const brandThumb = brandCard.locator("img").first();
+    await expect(brandThumb).toHaveAttribute(
+      "alt",
+      "Event Horizon brand identity with campaign poster, mobile interface, event ticket, and VIP credential",
+    );
+    await expect
+      .poll(async () => brandThumb.evaluate((img: HTMLImageElement) => img.currentSrc))
+      .toContain("cover-identity.webp");
+    await expect
+      .poll(async () => brandThumb.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(300);
+    await expect(page.locator('#event-horizon-brand img[src*="cover.webp"]')).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: /Event Horizon(?! —)/ }).first(),
     ).toBeVisible();

@@ -20,10 +20,16 @@ import {
   PrintWordmark,
   SpecLabel,
 } from "@/components/projects/event-horizon-brand/EventHorizonBrandPrimitives";
+import { EventHorizonMerchGallery } from "@/components/projects/event-horizon-brand/EventHorizonMerchGallery";
+import {
+  BRIDGE_APPLICATIONS,
+  EVENTS_APPLICATIONS,
+  EventHorizonApplicationGallery,
+  SYSTEM_APPLICATIONS,
+} from "@/components/projects/event-horizon-brand/EventHorizonApplicationGallery";
 import {
   CaseStudyDesktopNav,
   CaseStudyFooterNav,
-  CaseStudyLightbox,
   CaseStudyMobileToc,
   CaseStudyProgress,
   CaseStudyScrollCue,
@@ -31,75 +37,6 @@ import {
 } from "@/components/projects/shared/CaseStudyChrome";
 
 const ACCENT = "#FF8C2B";
-
-const MERCH = [
-  {
-    id: "shirt-back",
-    src: "/projects/event-horizon-brand/shirt-back.webp",
-    title: "Consumer shirt back",
-    alt: "Black Event Horizon T-shirt back with a cropped orange horizon arc and the line Where nights out gather gravity.",
-    width: 1200,
-    height: 1440,
-  },
-  {
-    id: "hoodie-back",
-    src: "/projects/event-horizon-brand/hoodie-back.webp",
-    title: "Consumer hoodie back",
-    alt: "Black Event Horizon hoodie with an oversized orange horizon arc printed across the back and the product tagline.",
-    width: 1200,
-    height: 1440,
-  },
-  {
-    id: "tote",
-    src: "/projects/event-horizon-brand/tote.webp",
-    title: "Tote",
-    alt: "Dark Event Horizon tote with a thin horizon rule, the line Where nights out gather gravity, and a small wordmark at the lower right.",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    id: "notebook",
-    src: "/projects/event-horizon-brand/notebook.webp",
-    title: "Notebook",
-    alt: "Black Event Horizon notebook with a hollow orange ring above the EVENT HORIZON wordmark.",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    id: "cap",
-    src: "/projects/event-horizon-brand/cap.webp",
-    title: "Cap",
-    alt: "Black Event Horizon cap with a small hollow orange ring embroidered on the front.",
-    width: 1400,
-    height: 933,
-  },
-  {
-    id: "tumbler",
-    src: "/projects/event-horizon-brand/tumbler.webp",
-    title: "Bottle",
-    alt: "Matte black Event Horizon bottle with a hollow orange ring above the EVENT HORIZON wordmark and a thin orange horizon line.",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    id: "stickers",
-    src: "/projects/event-horizon-brand/stickers.webp",
-    title: "Stickers",
-    alt: "Event Horizon sticker set with a hollow ring, wordmark, tagline, and horizon-line marks.",
-    width: 1400,
-    height: 933,
-  },
-  {
-    id: "staff-back",
-    src: "/projects/event-horizon-brand/staff-back.webp",
-    title: "Staff shirt back",
-    alt: "Black Event Horizon staff shirt back with large STAFF type and EVENT CREW in orange.",
-    width: 1100,
-    height: 1320,
-  },
-] as const;
-
-type LightboxItem = (typeof MERCH)[number];
 
 function SectionHeading({
   eyebrow,
@@ -170,7 +107,6 @@ function Plate({
 export function EventHorizonBrandCaseStudy() {
   const reducedMotion = useReducedMotion();
   const [copied, setCopied] = useState<string | null>(null);
-  const [lightbox, setLightbox] = useState<LightboxItem | null>(null);
   const activeSection = useActiveSection(EH_BRAND_SECTIONS);
 
   const copyHex = useCallback(async (name: string, hex: string) => {
@@ -198,16 +134,20 @@ export function EventHorizonBrandCaseStudy() {
       <section className="relative min-h-[88vh] overflow-hidden border-b border-white/8 bg-[#0B0B0B]">
         <Image
           src="/projects/event-horizon-brand/hero.webp"
-          alt="Event Horizon merchandise arranged on a wooden table: stacked shirts, hoodie, cap, tumbler, and tote with hollow orange rings."
+          alt="Event Horizon visual identity: campaign poster, mobile product interface, admission ticket, and VIP credential."
           fill
           priority
           quality={90}
           sizes="100vw"
-          className="object-cover object-[center_40%]"
+          className="object-cover object-[78%_40%] lg:object-[center_42%]"
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/78 to-[#0B0B0B]/35"
+          className="absolute inset-0 bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/70 to-[#0B0B0B]/25"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-[#0B0B0B]/45 via-[#0B0B0B]/12 to-transparent lg:from-[#0B0B0B]/60 lg:via-[#0B0B0B]/20"
         />
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-4 pb-10 pt-24 sm:px-6 lg:px-8 lg:pb-14">
           <Link
@@ -559,51 +499,10 @@ export function EventHorizonBrandCaseStudy() {
             title="The brand doing its actual job"
             description="Tickets, credentials, and wayfinding had to work in the hand and in a dark venue. The mark stays small. Type, contrast, and the horizon line do the recognition."
           />
-          <figure>
-            <BrandFrame padded={false}>
-              <Plate
-                src="/projects/event-horizon-brand/tickets.webp"
-                alt="Event Horizon tickets, mobile pass, VIP and staff credentials, lanyard, and wristbands arranged as a family."
-                width={1400}
-                height={1051}
-              />
-            </BrandFrame>
-            <Caption>
-              One event family: GA ticket, VIP credential, staff badge, lanyard, wristband.
-            </Caption>
-          </figure>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <BrandFrame padded={false} className="bg-[#F4F0EB] p-4">
-              <Image
-                src="/projects/event-horizon-brand/ticket-vip.svg"
-                alt="Event Horizon VIP ticket with gold status strip, event title, and orange-O wordmark."
-                width={720}
-                height={280}
-                unoptimized
-                className="h-auto w-full"
-              />
-            </BrandFrame>
-            <BrandFrame padded={false} className="bg-[#F4F0EB] p-4">
-              <Image
-                src="/projects/event-horizon-brand/credential-vip.svg"
-                alt="Event Horizon VIP credential with orange-O wordmark, portrait area, and gold status."
-                width={320}
-                height={480}
-                unoptimized
-                className="mx-auto h-auto max-h-64 w-auto"
-              />
-            </BrandFrame>
-            <BrandFrame padded={false} className="flex items-center bg-[#0B0B0B] p-4">
-              <Image
-                src="/projects/event-horizon-brand/signage.svg"
-                alt="Event Horizon main-stage wayfinding sign with orange-O wordmark and directional arrow."
-                width={640}
-                height={240}
-                unoptimized
-                className="h-auto w-full"
-              />
-            </BrandFrame>
-          </div>
+          <EventHorizonApplicationGallery
+            items={EVENTS_APPLICATIONS}
+            layout="system"
+          />
         </section>
 
         <section id="posters" className="scroll-mt-[var(--scroll-mt)]">
@@ -634,79 +533,11 @@ export function EventHorizonBrandCaseStudy() {
             title="Expressive for guests. Functional for crew."
             description="The system moves off the screen into objects people carry, wear, and use. Consumer backs use the cropped arc and tagline. Staff apparel drops the graphic and says STAFF. Same identity, different jobs."
           />
-          <div className="grid gap-4 md:grid-cols-2">
-            {MERCH.slice(0, 2).map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setLightbox(item)}
-                aria-label={`View ${item.title}`}
-                className="overflow-hidden rounded-2xl border border-white/8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C2B]"
-              >
-                <Plate
-                  src={item.src}
-                  alt={item.alt}
-                  width={item.width}
-                  height={item.height}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => setLightbox(MERCH[2])}
-            aria-label={`View ${MERCH[2].title}`}
-            className="mt-4 w-full overflow-hidden rounded-2xl border border-white/8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C2B]"
-          >
-            <Plate
-              src={MERCH[2].src}
-              alt={MERCH[2].alt}
-              width={MERCH[2].width}
-              height={MERCH[2].height}
-            />
-          </button>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {MERCH.slice(3, 5).map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setLightbox(item)}
-                aria-label={`View ${item.title}`}
-                className="overflow-hidden rounded-2xl border border-white/8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C2B]"
-              >
-                <Plate
-                  src={item.src}
-                  alt={item.alt}
-                  width={item.width}
-                  height={item.height}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </button>
-            ))}
-          </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {MERCH.slice(5).map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setLightbox(item)}
-                aria-label={`View ${item.title}`}
-                className="overflow-hidden rounded-2xl border border-white/8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C2B]"
-              >
-                <Plate
-                  src={item.src}
-                  alt={item.alt}
-                  width={item.width}
-                  height={item.height}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-              </button>
-            ))}
-          </div>
+          <EventHorizonMerchGallery />
           <p className="mt-6 max-w-2xl text-sm leading-relaxed text-[#D4CDC6]">
-            The final selection focuses on eight applications that show how the system
-            changes across apparel, objects, and staff use without losing recognition.
+            Each object is one application of the system. Apparel, drinkware, and
+            print keep the same gravity without repeating the same lockup on every
+            surface.
           </p>
         </section>
 
@@ -717,14 +548,10 @@ export function EventHorizonBrandCaseStudy() {
             description="The system moves between two lockups without changing its center of gravity. Digital and editorial applications use the orange-O wordmark; symbol-led merchandise and compact physical applications use the hollow ring with plain type. Each object chooses one treatment—never both."
           />
           <figure>
-            <BrandFrame padded={false}>
-              <Plate
-                src="/projects/event-horizon-brand/bridge.webp"
-                alt="Event Horizon product UI on phone and laptop beside a printed ticket, wristband, and hollow-ring app icon."
-                width={1400}
-                height={788}
-              />
-            </BrandFrame>
+            <EventHorizonApplicationGallery
+              items={BRIDGE_APPLICATIONS}
+              layout="bridge"
+            />
             <Caption>
               Interface and print share type, void fields, and the same orange gravity.
               The engineering story lives in a separate case study.
@@ -745,16 +572,10 @@ export function EventHorizonBrandCaseStudy() {
             eyebrow="12 · The final system"
             title="Where nights out gather gravity."
           />
-          <figure>
-            <BrandFrame padded={false}>
-              <Plate
-                src="/projects/event-horizon-brand/kit-board.webp"
-                alt="Event Horizon identity kit with posters, tickets, credentials, phone UI, and print pieces on a warm gray field."
-                width={1600}
-                height={1067}
-              />
-            </BrandFrame>
-          </figure>
+          <EventHorizonApplicationGallery
+            items={SYSTEM_APPLICATIONS}
+            layout="system"
+          />
         </section>
 
         <section id="reflection" className="scroll-mt-[var(--scroll-mt)]">
@@ -779,23 +600,6 @@ export function EventHorizonBrandCaseStudy() {
           accent={ACCENT}
         />
       </div>
-
-      <CaseStudyLightbox
-        open={!!lightbox}
-        title={lightbox?.title ?? ""}
-        onClose={() => setLightbox(null)}
-        accent={ACCENT}
-      >
-        {lightbox ? (
-          <Image
-            src={lightbox.src}
-            alt={lightbox.alt}
-            width={lightbox.width}
-            height={lightbox.height}
-            className="h-auto w-full rounded-xl"
-          />
-        ) : null}
-      </CaseStudyLightbox>
     </article>
   );
 }

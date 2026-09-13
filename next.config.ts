@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    qualities: [75, 90],
     dangerouslyAllowSVG: true,
     // inline so optimized SVG URLs render in <img>, not as downloads
     contentDispositionType: "inline",

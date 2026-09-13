@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+} from "framer-motion";
 import { ArrowLeft, ArrowRight, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -171,16 +177,24 @@ export function CaseStudyLightbox({
   onClose,
   accent,
   children,
+  wide = false,
+  onPrev,
+  onNext,
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
   accent: string;
   children: React.ReactNode;
+  wide?: boolean;
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const touchStartX = useRef<number | null>(null);
   const titleId = useId();
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!open) return;
@@ -189,7 +203,19 @@ export function CaseStudyLightbox({
     const frame = window.requestAnimationFrame(() => closeRef.current?.focus());
 
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        onPrev?.();
+        return;
+      }
+      if (event.key === "ArrowRight") {
+        onNext?.();
+        return;
+      }
       if (event.key !== "Tab") return;
       const dialog = document.getElementById(`case-study-lightbox-${titleId}`);
       if (!dialog) return;
@@ -215,14 +241,14 @@ export function CaseStudyLightbox({
       window.removeEventListener("keydown", onKey);
       previouslyFocused.current?.focus();
     };
-  }, [open, onClose, titleId]);
+  }, [open, onClose, onPrev, onNext, titleId]);
 
   return (
     <AnimatePresence>
       {open ? (
         <motion.div
           className="fixed inset-0 z-[80] grid place-items-center bg-black/80 p-4 backdrop-blur-sm"
-          initial={{ opacity: 0 }}
+          initial={reducedMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           role="dialog"
@@ -232,11 +258,27 @@ export function CaseStudyLightbox({
           onClick={onClose}
         >
           <motion.div
-            className="w-full max-w-3xl rounded-3xl border border-white/10 bg-[#0B0B12] p-5"
+            className={cn(
+              "relative w-full rounded-3xl border border-white/10 bg-[#0B0B12] p-5",
+              wide ? "max-w-6xl" : "max-w-3xl",
+            )}
             onClick={(event) => event.stopPropagation()}
-            initial={{ opacity: 0, y: 12 }}
+            initial={reducedMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            onTouchStart={(event) => {
+              touchStartX.current = event.changedTouches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(event) => {
+              if (touchStartX.current == null) return;
+              const dx =
+                (event.changedTouches[0]?.clientX ?? touchStartX.current) -
+                touchStartX.current;
+              touchStartX.current = null;
+              if (Math.abs(dx) < 48) return;
+              if (dx < 0) onNext?.();
+              else onPrev?.();
+            }}
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 id={titleId} className="font-display text-2xl font-semibold">
@@ -254,6 +296,30 @@ export function CaseStudyLightbox({
               </button>
             </div>
             {children}
+            {onPrev || onNext ? (
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={onPrev}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 text-sm transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{ outlineColor: accent }}
+                  aria-label="Previous image"
+                >
+                  <ArrowLeft className="size-4" aria-hidden />
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  onClick={onNext}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 text-sm transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{ outlineColor: accent }}
+                  aria-label="Next image"
+                >
+                  Next
+                  <ArrowRight className="size-4" aria-hidden />
+                </button>
+              </div>
+            ) : null}
           </motion.div>
         </motion.div>
       ) : null}

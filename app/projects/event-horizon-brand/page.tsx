@@ -9,10 +9,10 @@ export const metadata: Metadata = pageMetadata({
   path: "/projects/event-horizon-brand",
   images: [
     {
-      url: "/projects/event-horizon-brand/cover.webp",
-      width: 1024,
-      height: 798,
-      alt: "Event Horizon merchandise table with apparel, cap, tumbler, and tote",
+      url: "/projects/event-horizon-brand/cover-identity.webp",
+      width: 1600,
+      height: 1000,
+      alt: "Event Horizon brand identity with campaign poster, mobile interface, event ticket, and VIP credential",
     },
   ],
 });

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" fill="none">
+  <title>Event Horizon sign  -  Restrooms</title>
+  <rect width="400" height="200" fill="#0B0B0B"/>
+  <text x="28" y="40" font-family="Outfit, sans-serif" font-size="11" font-weight="500" letter-spacing="1.8"><tspan fill="#F5F5F5">EVENT H</tspan><tspan fill="#FF8C2B">O</tspan><tspan fill="#F5F5F5">RIZON</tspan></text>
+  <circle cx="48" cy="112" r="14" fill="none" stroke="#F5F5F5" stroke-width="1.6"/>
+  <path d="M48 126v28M40 154h16" stroke="#F5F5F5" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="84" y="128" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="32" font-weight="700">Restrooms</text>
+</svg>

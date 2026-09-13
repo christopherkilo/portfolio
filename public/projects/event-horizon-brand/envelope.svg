@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 380" fill="none">
+  <title>Event Horizon envelope</title>
+  <rect width="540" height="380" fill="#F4F0EB"/>
+  <polygon points="0,0 270,150 540,0" fill="none" stroke="#FF8C2B" stroke-width="1" opacity="0.35"/>
+  <text x="36" y="324" font-family="Outfit, sans-serif" font-size="12" font-weight="500" letter-spacing="2"><tspan fill="#161310">EVENT H</tspan><tspan fill="#FF8C2B">O</tspan><tspan fill="#161310">RIZON</tspan></text>
+  <text x="300" y="200" fill="#161310" font-family="Outfit, sans-serif" font-size="12" font-weight="500">The Velvet Room</text>
+  <text x="300" y="222" fill="#5C574F" font-family="Source Sans 3, sans-serif" font-size="13">Brooklyn, NY</text>
+</svg>

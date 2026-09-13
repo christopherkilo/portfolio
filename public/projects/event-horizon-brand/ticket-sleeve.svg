@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" fill="none">
+  <title>Event Horizon ticket sleeve</title>
+  <rect width="420" height="300" fill="#171717"/>
+  <rect x="16" y="16" width="388" height="268" fill="#0B0B0B"/>
+  <circle cx="210" cy="118" r="28" fill="none" stroke="#FF8C2B" stroke-width="3"/>
+  <line x1="48" y1="188" x2="372" y2="188" stroke="#FF8C2B" stroke-width="1"/>
+  <text x="210" y="230" text-anchor="middle" fill="#F5F5F5" font-family="Outfit, sans-serif" font-size="14" font-weight="500" letter-spacing="3">EVENT HORIZON</text>
+  <text x="210" y="256" text-anchor="middle" fill="#D4D4D4" font-family="Source Sans 3, sans-serif" font-size="13">Admit one</text>
+</svg>

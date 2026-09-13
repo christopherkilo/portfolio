@@ -165,9 +165,9 @@ export const projects: Project[] = [
     description:
       "A visual identity and campaign system extending Event Horizon from a digital event-discovery product into tickets, environments, and physical merchandise.",
     technologies: ["Brand Identity", "Campaign Design", "Graphic Design"],
-    image: "/projects/event-horizon-brand/cover.webp",
+    image: "/projects/event-horizon-brand/cover-identity.webp",
     imageAlt:
-      "Event Horizon merchandise table with apparel, cap, tumbler, and tote using hollow orange rings",
+      "Event Horizon brand identity with campaign poster, mobile interface, event ticket, and VIP credential",
     featured: false,
     href: "/projects/event-horizon-brand",
     proofPoints: ["Identity system", "Campaign collateral", "Physical merchandise"],

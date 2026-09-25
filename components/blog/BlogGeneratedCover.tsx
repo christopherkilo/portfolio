@@ -1,5 +1,6 @@
 "use client";
 
+import { AiEngineeringBlogCover } from "@/components/blog/AiEngineeringBlogCover";
 import { EventHorizonBlogCover } from "@/components/blog/EventHorizonBlogCover";
 import { NovaTechBlogCover } from "@/components/blog/NovaTechBlogCover";
 import { StarLenzBlogCover } from "@/components/blog/StarLenzBlogCover";
@@ -27,6 +28,9 @@ export function BlogGeneratedCover({
   }
   if (kind === "taskflow") {
     return <TaskFlowBlogCover className={className} showTitle={false} />;
+  }
+  if (kind === "ai-engineering") {
+    return <AiEngineeringBlogCover className={className} showTitle={false} />;
   }
 
   return (

@@ -10,6 +10,7 @@ const PAGES = [
   "/contact",
   "/projects/event-horizon",
   "/blog/taking-event-horizon-to-aws",
+  "/blog/ai-engineering",
 ] as const;
 
 test.describe("axe accessibility", () => {

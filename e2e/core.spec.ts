@@ -178,6 +178,7 @@ test.describe("portfolio e2e", () => {
     await page.goto("/blog");
     const filters = page.getByRole("navigation", { name: "Filter by tag" });
     await expect(filters.getByRole("link", { name: "All" })).toBeVisible();
+    await expect(filters.getByRole("link", { name: "AI Engineering" })).toBeVisible();
     await expect(filters.getByRole("link", { name: "Angular" })).toBeVisible();
     await expect(filters.getByRole("link", { name: "Graphic Design" })).toBeVisible();
     await expect(filters.getByRole("link", { name: "DynamoDB" })).toHaveCount(0);

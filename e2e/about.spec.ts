@@ -67,8 +67,8 @@ test.describe("about page narrative", () => {
       page.getByRole("link", { name: "View Resume" }),
     ).toHaveAttribute("href", "/resume");
     await expect(
-      page.getByRole("link", { name: /prompt engineering case study/i }),
-    ).toHaveCount(0);
+      page.getByRole("link", { name: /ai engineering case study/i }),
+    ).toHaveAttribute("href", "/blog/ai-engineering");
 
     await page.getByRole("link", { name: "Contact Me" }).click();
     await expect(page).toHaveURL(/\/contact$/);

@@ -25,12 +25,12 @@ describe("blog content source", () => {
     const posts = getAllPosts();
     const featured = getFeaturedPost();
     const latest = getLatestPosts(3);
-    expect(posts.length).toBeGreaterThanOrEqual(4);
+    expect(posts.length).toBeGreaterThanOrEqual(5);
     expect(featured?.slug).toBe("building-starlenz");
     expect(latest.map((post) => post.slug)).toEqual([
+      "ai-engineering",
       "rebuilding-taskflow-in-angular",
       "taking-novatech-to-aws",
-      "taking-event-horizon-to-aws",
     ]);
     expect(posts.every((post) => post.href.startsWith("/blog/"))).toBe(true);
     expect(posts.every((post) => getGeneratedCoverKind(post) !== null)).toBe(
@@ -114,11 +114,46 @@ describe("blog content source", () => {
     expect(post?.title).toContain("Taking Event Horizon to AWS");
     expect(post?.project).toBe("Event Horizon");
     expect(post?.featured).toBe(false);
+    expect(post?.coverImage).toBe("generated:event-horizon");
+    expect(getGeneratedCoverKind(post!)).toBe("event-horizon");
     expect(post?.content).toContain("PostgreSQL");
     expect(post?.content).toContain("DynamoDB");
     expect(post?.content).not.toMatch(/868150783834/);
     expect(post?.content).not.toMatch(/lambda-url/);
     expect(post?.headings.length).toBeGreaterThan(5);
+  });
+
+  it("loads the AI Engineering case study", () => {
+    const post = getPostBySlug("ai-engineering");
+    expect(post).not.toBeNull();
+    expect(post?.title).toBe(
+      "AI Engineering: Designing Reliable Human–AI Development Workflows",
+    );
+    expect(post?.project).toBe("AI Engineering");
+    expect(post?.featured).toBe(false);
+    expect(post?.href).toBe("/blog/ai-engineering");
+    expect(post?.coverImage).toBe("generated:ai-engineering");
+    expect(getGeneratedCoverKind(post!)).toBe("ai-engineering");
+    expect(post?.tags).toEqual([
+      "AI Engineering",
+      "Prompt Engineering",
+      "Cursor",
+      "QA",
+    ]);
+    expect(post?.content).toContain("ALREADY LOCKED — DO NOT REOPEN");
+    expect(post?.content).toContain("CURRENT STATUS");
+    expect(post?.content).toContain("task_update");
+    expect(post?.content).toContain("ResolveOps");
+    expect(post?.content).toContain("Trace before regenerating");
+    expect(post?.content).toContain("Do not report PASS");
+    expect(post?.content).toMatch(/\/projects\/taskflow/);
+    expect(post?.content).toMatch(/\/projects\/event-horizon/);
+    expect(post?.content).toMatch(/\/projects\/novatech-solutions/);
+    expect(post?.content).toMatch(/\/about/);
+    expect(post?.content).not.toMatch(/868150783834/);
+    expect(post?.content).not.toMatch(/10x engineer/i);
+    expect(post?.headings.length).toBeGreaterThan(12);
+    expect(post?.readingMinutes).toBeGreaterThanOrEqual(10);
   });
 
   it("estimates reading time from copy, not frontmatter", () => {
@@ -129,20 +164,26 @@ describe("blog content source", () => {
   it("keeps blog index filters to browse categories, not a tag cloud", () => {
     const { primary, more } = partitionBlogFilters(getAllTags());
     expect(primary).toEqual([...BLOG_PRIMARY_FILTERS]);
+    expect(primary).toContain("AI Engineering");
     expect(primary).not.toContain("DynamoDB");
     expect(primary).not.toContain("Next.js");
+    expect(primary).not.toContain("Prompt Engineering");
     expect(more).toEqual(
       expect.arrayContaining([
+        "Cursor",
         "DynamoDB",
         "ECS",
         "HubSpot",
         "Next.js",
+        "Prompt Engineering",
+        "QA",
         "Step Functions",
         "Supabase",
         "TypeScript",
         "UI/UX",
       ]),
     );
+    expect(more).not.toContain("AI Engineering");
   });
 
   it("uses complete card excerpts instead of clipped summaries", () => {

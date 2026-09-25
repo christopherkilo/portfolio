@@ -4,7 +4,8 @@ export type GeneratedBlogCover =
   | "novatech"
   | "event-horizon"
   | "starlenz"
-  | "taskflow";
+  | "taskflow"
+  | "ai-engineering";
 
 /**
  * Resolves the editorial cover registered for a post.
@@ -18,11 +19,13 @@ export function getGeneratedCoverKind(
   if (image === "generated:event-horizon") return "event-horizon";
   if (image === "generated:starlenz") return "starlenz";
   if (image === "generated:taskflow") return "taskflow";
+  if (image === "generated:ai-engineering") return "ai-engineering";
 
   const project = post.project?.trim().toLowerCase();
   if (project === "novatech" || project === "novatech solutions") return "novatech";
   if (project === "event horizon") return "event-horizon";
   if (project === "starlenz") return "starlenz";
   if (project === "taskflow") return "taskflow";
+  if (project === "ai engineering") return "ai-engineering";
   return null;
 }

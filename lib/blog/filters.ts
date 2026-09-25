@@ -3,6 +3,7 @@
  * (and behind More filters) so the page reads as writing, not a tag cloud.
  */
 export const BLOG_PRIMARY_FILTERS = [
+  "AI Engineering",
   "Angular",
   "AWS",
   "Event Horizon",

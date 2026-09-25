@@ -6,6 +6,7 @@
  * certificate names, credential IDs, honors, or a Google AI title here.
  */
 
+import { getPostBySlug } from "@/lib/blog/posts";
 import { ROLES, SITE } from "@/lib/constants";
 import { getProjectById, getProjectHref } from "@/lib/projectData";
 import {
@@ -18,8 +19,9 @@ export const ABOUT_PORTRAIT_SRC = "/about/portrait.webp";
 export const ABOUT_THESIS =
   "When I encounter something I don't know, I know how to learn it.";
 
-/** Reserved project id for a future Prompt Engineering case study CTA. */
+/** Reserved project id kept for compatibility; the case study lives on the blog. */
 export const PROMPT_ENGINEERING_PROJECT_ID = "prompt-engineering";
+export const AI_ENGINEERING_ARTICLE_SLUG = "ai-engineering";
 
 export const aboutHero = {
   eyebrow: "About",
@@ -142,7 +144,7 @@ export const aboutAI = {
     "Over time, that evolved into a structured workflow built around context, constraints, acceptance criteria, regression protection, and validation.",
     "The goal isn't simply to make an AI generate more code. It's to reduce ambiguity, understand the decisions being made, and verify that the resulting system actually works.",
   ],
-  caseStudyLabel: "Read the Prompt Engineering case study",
+  caseStudyLabel: "Read the AI Engineering case study",
 } as const;
 
 export const aboutPhilosophy = {
@@ -180,10 +182,12 @@ export const aboutCapabilities = {
 } as const;
 
 /**
- * Returns a case-study href only when that project exists.
+ * Returns the AI Engineering case-study href once the article exists.
  * Do not hard-code a path that 404s.
  */
 export function getPromptEngineeringCaseStudyHref(): string | null {
+  const post = getPostBySlug(AI_ENGINEERING_ARTICLE_SLUG);
+  if (post) return post.href;
   const project = getProjectById(PROMPT_ENGINEERING_PROJECT_ID);
   return project ? getProjectHref(project) : null;
 }

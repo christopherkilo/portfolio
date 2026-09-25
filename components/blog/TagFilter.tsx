@@ -32,7 +32,7 @@ export function TagFilter({
   return (
     <div className="mb-8" role="navigation" aria-label="Filter by tag">
       <div className="flex flex-wrap gap-2">
-        <Link href="/blog" className={chipClass(!active)}>
+        <Link href="/blog" className={chipClass(!active)} aria-current={!active ? "page" : undefined}>
           All
         </Link>
         {primary.map((tag) => {
@@ -42,6 +42,7 @@ export function TagFilter({
               key={tag}
               href={selected ? "/blog" : `/blog?tag=${encodeURIComponent(tag)}`}
               className={chipClass(selected)}
+              aria-current={selected ? "page" : undefined}
             >
               {tag}
             </Link>

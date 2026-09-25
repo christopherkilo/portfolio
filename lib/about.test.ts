@@ -10,6 +10,7 @@ import {
   getAboutCertifications,
   getAboutEducation,
   getPromptEngineeringCaseStudyHref,
+  AI_ENGINEERING_ARTICLE_SLUG,
   PROMPT_ENGINEERING_PROJECT_ID,
 } from "./about";
 import { ROLES } from "./constants";
@@ -118,9 +119,12 @@ describe("about page content", () => {
     expect(blob).not.toMatch(/outsourcing understanding/i);
   });
 
-  it("omits a Prompt Engineering CTA until that case study exists", () => {
+  it("links the AI Engineering case study from the About page", () => {
     expect(getProjectById(PROMPT_ENGINEERING_PROJECT_ID)).toBeUndefined();
-    expect(getPromptEngineeringCaseStudyHref()).toBeNull();
+    expect(getPromptEngineeringCaseStudyHref()).toBe(
+      `/blog/${AI_ENGINEERING_ARTICLE_SLUG}`,
+    );
+    expect(aboutAI.caseStudyLabel).toBe("Read the AI Engineering case study");
   });
 
   it("keeps the learning thesis as a distinct statement", () => {

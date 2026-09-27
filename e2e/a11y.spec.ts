@@ -9,6 +9,7 @@ const PAGES = [
   "/blog",
   "/contact",
   "/projects/event-horizon",
+  "/projects/resolveops",
   "/blog/taking-event-horizon-to-aws",
   "/blog/ai-engineering",
 ] as const;

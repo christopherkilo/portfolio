@@ -57,6 +57,11 @@ export function getEngineeringLabItems(): EngineeringLabItem[] {
       state: "live-demo",
       description: "Authenticated React workspace with seeded demo data.",
     }),
+    fromProject(getProjectById("resolveops")!, {
+      state: "live-demo",
+      description:
+        "ITSM on AWS. Public Interactive Demo uses sample data with no sign-in; production Cognito stays separate.",
+    }),
     {
       id: "taskflow-angular",
       title: "TaskFlow Angular",

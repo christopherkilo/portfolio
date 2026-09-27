@@ -119,6 +119,11 @@ export default async function CaseStudyPage({ params }: PageProps) {
               {getPublicSurfaceLinkLabel(project.id)}
             </Button>
           ) : null}
+          {project.id === "resolveops" ? (
+            <p className="w-full text-sm text-muted">
+              {project.liveDemoNote ?? "No sign-in required · Sample data · Read-only"}
+            </p>
+          ) : null}
           {project.github ? (
             <Button
               href={project.github}

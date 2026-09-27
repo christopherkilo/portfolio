@@ -21,11 +21,15 @@ const WEB_IDS = [
   "taskflow",
 ] as const;
 
+const FEATURED_WEB_IDS = [...WEB_IDS, "resolveops"] as const;
+
 const DEMO_BY_ID = {
   "event-horizon": "/demos/event-horizon",
   "novatech-solutions": "/demos/novatech-solutions",
   taskflow: "/demos/taskflow",
 } as const;
+
+const RESOLVEOPS_DEMO = "https://dm3qr6hca0sa0.cloudfront.net/demo";
 
 describe("web project routing metadata", () => {
   it("gives every web project an explicit internal case-study href", () => {
@@ -65,12 +69,25 @@ describe("web project routing metadata", () => {
     }
   });
 
-  it("exposes only the three active web case studies", () => {
-    expect(getAllCaseStudyIds().sort()).toEqual([...WEB_IDS].sort());
+  it("exposes the four active web case studies", () => {
+    expect(getAllCaseStudyIds().sort()).toEqual(
+      [...FEATURED_WEB_IDS].sort(),
+    );
     expect(getCaseStudy("signal-board")).toBeNull();
     expect(getCaseStudy("edge-lab-network")).toBeNull();
     expect(getCaseStudy("fleet-image-pipeline")).toBeNull();
     expect(getCaseStudy("bench-diagnostics")).toBeNull();
+  });
+
+  it("publishes ResolveOps with an external Interactive Demo URL", () => {
+    const project = getProjectById("resolveops");
+    expect(project?.href).toBe("/projects/resolveops");
+    expect(project?.liveDemo).toBe(RESOLVEOPS_DEMO);
+    expect(isPublicLiveDemoUrl(project?.liveDemo)).toBe(true);
+    expect(hasLiveDemo(project?.liveDemo)).toBe(true);
+    expect(project?.liveDemoNote).toMatch(/No sign-in required/i);
+    expect(getCaseStudy("resolveops")).not.toBeNull();
+    expect(project?.github).toBeUndefined();
   });
 
   it("does not expose localhost liveDemo values on web projects", () => {
@@ -93,9 +110,9 @@ describe("web project routing metadata", () => {
     expect(hasLiveDemo("https://example.com/demo")).toBe(true);
   });
 
-  it("lists the three flagship web case studies plus StarLenz", () => {
+  it("lists the flagship web case studies plus StarLenz", () => {
     expect(getProjectsByCategory("web").map((p) => p.id)).toEqual([
-      ...WEB_IDS,
+      ...FEATURED_WEB_IDS,
       "starlenz",
     ]);
   });
@@ -111,10 +128,12 @@ describe("web project routing metadata", () => {
       "taskflow",
       "kilo-toolkit",
     ]);
-    expect(getFeaturedApplicationProjects().map((p) => p.id)).toEqual([...WEB_IDS]);
+    expect(getFeaturedApplicationProjects().map((p) => p.id)).toEqual([
+      ...FEATURED_WEB_IDS,
+    ]);
     expect(getFeaturedApplicationProjects().map((p) => p.id)).not.toContain("starlenz");
     expect(getPortfolioProjects().map((p) => p.id)).toEqual([
-      ...WEB_IDS,
+      ...FEATURED_WEB_IDS,
       "starlenz",
       "kilo-toolkit",
       "event-horizon-brand",
@@ -251,7 +270,7 @@ describe("web project routing metadata", () => {
 });
 
 describe("demo route correspondence", () => {
-  it("maps each demo route back to its case study", () => {
+  it("maps each internal demo route back to its case study", () => {
     for (const id of WEB_IDS) {
       const project = getProjectById(id)!;
       expect(project.liveDemo).toBe(`/demos/${id}`);

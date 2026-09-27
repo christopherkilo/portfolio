@@ -2,6 +2,7 @@ import type { Project } from "@/lib/projectData";
 import { getProjectById, projects } from "@/lib/projectData";
 import { eventHorizonStudy } from "@/lib/case-studies/event-horizon";
 import { novatechSolutionsStudy } from "@/lib/case-studies/novatech-solutions";
+import { resolveopsStudy } from "@/lib/case-studies/resolveops";
 import { taskflowStudy } from "@/lib/case-studies/taskflow";
 import type { CaseStudy } from "@/lib/case-studies/types";
 
@@ -24,6 +25,7 @@ export { VERIFICATION_CATEGORY_LABELS } from "@/lib/case-studies/types";
 const studies: Record<string, Omit<CaseStudy, "projectId">> = {
   "event-horizon": eventHorizonStudy,
   "novatech-solutions": novatechSolutionsStudy,
+  resolveops: resolveopsStudy,
   taskflow: taskflowStudy,
 };
 

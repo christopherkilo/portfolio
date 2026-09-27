@@ -17,6 +17,8 @@ import {
   getProjectCtaLabel,
   getProjectHref,
   githubControlLabel,
+  hasLiveDemo,
+  isInternalHref,
   type Project,
 } from "@/lib/projectData";
 import { durations, springHover } from "@/lib/animation";
@@ -69,6 +71,10 @@ function ProjectCardComponent({
   const coverActive = hovered && !reducedMotion;
   const [imageLoaded, setImageLoaded] = useState(hasAnimatedCover);
   const ctaLabel = getProjectCtaLabel(project);
+  const demoPrimary =
+    project.id === "resolveops" && hasLiveDemo(project.liveDemo)
+      ? project.liveDemo
+      : undefined;
   const isGrid = variant === "grid";
   const proofMode =
     proofPresentation ?? (variant === "carousel" ? "featured" : "full");
@@ -179,8 +185,15 @@ function ProjectCardComponent({
 
       <Link
         href={href}
-        className="relative z-[1] flex h-full flex-col rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-        aria-label={`${ctaLabel}: ${project.title}`}
+        className={cn(
+          "relative z-[1] flex flex-col rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+          demoPrimary ? "min-h-0 flex-1" : "h-full",
+        )}
+        aria-label={
+          demoPrimary
+            ? `View Case Study: ${project.title}`
+            : `${ctaLabel}: ${project.title}`
+        }
       >
       <div className="pointer-events-none relative aspect-[16/10] overflow-hidden bg-surface-elevated">
         <div
@@ -275,7 +288,12 @@ function ProjectCardComponent({
         </span>
       </div>
 
-      <div className="pointer-events-none relative z-[3] flex flex-1 flex-col gap-4 p-[var(--pad-card)]">
+      <div
+        className={cn(
+          "pointer-events-none relative z-[3] flex flex-1 flex-col gap-4 p-[var(--pad-card)]",
+          demoPrimary && "pb-0",
+        )}
+      >
         <div>
           {project.inDevelopment ? (
             <div className="mb-2">
@@ -301,11 +319,37 @@ function ProjectCardComponent({
           max={proofMode === "featured" ? 2 : 4}
         />
 
-        <p className="mt-auto pt-1 text-xs font-medium text-muted transition duration-[var(--duration-fast)] group-hover:text-primary">
-          {ctaLabel} →
-        </p>
+        {!demoPrimary ? (
+          <p className="mt-auto pt-1 text-xs font-medium text-muted transition duration-[var(--duration-fast)] group-hover:text-primary">
+            {ctaLabel} →
+          </p>
+        ) : null}
       </div>
       </Link>
+
+      {demoPrimary ? (
+        <div className="relative z-[3] mt-auto flex flex-col gap-2 px-[var(--pad-card)] pb-[var(--pad-card)] pt-4">
+          <a
+            href={demoPrimary}
+            {...(isInternalHref(demoPrimary)
+              ? {}
+              : { target: "_blank", rel: "noopener noreferrer" })}
+            data-no-drag
+            className="inline-flex min-h-11 items-center text-sm font-medium text-primary transition duration-[var(--duration-fast)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            {ctaLabel} →
+          </a>
+          {project.liveDemoNote ? (
+            <p className="text-[11px] leading-snug text-muted">{project.liveDemoNote}</p>
+          ) : null}
+          <Link
+            href={href}
+            className="inline-flex min-h-11 items-center text-xs font-medium text-muted transition duration-[var(--duration-fast)] hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            View Case Study →
+          </Link>
+        </div>
+      ) : null}
     </motion.article>
   );
 }

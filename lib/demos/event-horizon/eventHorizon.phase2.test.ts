@@ -176,7 +176,7 @@ describe("loading states", () => {
 
 describe("trending ranking", () => {
   it("scores featured scarcity and returns a ranked list", () => {
-    const now = Date.parse("2026-08-08T12:00:00-05:00");
+    const now = Date.parse("2026-10-31T12:00:00-05:00");
     const ranked = getTrendingEvents(events, 3, now);
     expect(ranked.length).toBeGreaterThan(0);
     expect(ranked.length).toBeLessThanOrEqual(3);

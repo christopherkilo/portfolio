@@ -7,6 +7,7 @@ import {
   getFeaturedCardProofPoints,
   getHomepageFeaturedProjects,
   getPortfolioProjects,
+  getProjectById,
   getPublicSurfaceLinkLabel,
   PROJECT_STATUS_LABELS,
 } from "./projectData";
@@ -41,6 +42,7 @@ describe("portfolio proof metadata", () => {
       "event-horizon",
       "novatech-solutions",
       "taskflow",
+      "resolveops",
     ]);
     expect(getPortfolioProjects().map((project) => project.id)).toContain("starlenz");
   });
@@ -101,6 +103,7 @@ describe("portfolio proof metadata", () => {
     expect(lab.map((item) => item.state)).not.toContain("live-app");
     expect(lab.find((item) => item.id === "event-horizon")?.state).toBe("live-demo");
     expect(lab.find((item) => item.id === "taskflow")?.state).toBe("live-demo");
+    expect(lab.find((item) => item.id === "resolveops")?.state).toBe("live-demo");
     expect(lab.find((item) => item.id === "novatech-solutions")?.state).toBe(
       "production-verified",
     );
@@ -114,6 +117,7 @@ describe("portfolio proof metadata", () => {
     );
     expect(web["event-horizon"]).toBe("Live demo");
     expect(web.taskflow).toBe("Live demo");
+    expect(web.resolveops).toBe("Live demo");
     expect(web["novatech-solutions"]).toBe("Production verified");
     expect(web["taskflow-angular"]).toBe("Experiment");
     expect(web.starlenz).toBe("Active development");
@@ -122,6 +126,7 @@ describe("portfolio proof metadata", () => {
     expect(Object.values(PROJECT_STATUS_LABELS)).not.toContain("Live");
     expect(getPublicSurfaceLinkLabel("event-horizon")).toBe("Live Demo");
     expect(getPublicSurfaceLinkLabel("taskflow")).toBe("Live Demo");
+    expect(getPublicSurfaceLinkLabel("resolveops")).toBe("Open Interactive Demo");
     expect(getPublicSurfaceLinkLabel("novatech-solutions")).toBe("Open demo");
     expect(getPublicSurfaceLinkLabel("kilo-toolkit")).toBe("Open demo");
   });
@@ -132,9 +137,23 @@ describe("portfolio proof metadata", () => {
     const webIds = groups[0]?.items.map((item) => item.id) ?? [];
     expect(webIds).toContain("event-horizon");
     expect(webIds).toContain("starlenz");
+    expect(webIds).toContain("resolveops");
     expect(webIds.indexOf("taskflow-angular")).toBe(webIds.indexOf("taskflow") + 1);
     expect(groups[1]?.items.some((item) => item.id === "kilo-toolkit")).toBe(true);
-    expect(webIds).not.toContain("resolveops");
+  });
+
+  it("keeps ResolveOps demo and AI claims accurate", () => {
+    const study = getCaseStudy("resolveops");
+    const blob = JSON.stringify(study);
+    expect(blob).toMatch(/dm3qr6hca0sa0\.cloudfront\.net\/demo/);
+    expect(blob).toMatch(/local fixture/i);
+    expect(blob).toMatch(/does not weaken/i);
+    expect(blob).toMatch(/Bedrock/);
+    expect(blob).toMatch(/disabled/i);
+    expect(blob).toMatch(/complete manual WCAG audit was not performed/i);
+    expect(blob).not.toMatch(/fully WCAG compliant/i);
+    expect(blob).not.toMatch(/live Bedrock/i);
+    expect(getProjectById("resolveops")?.liveDemoNote).toMatch(/No sign-in required/);
   });
 
   it("does not render testimonials while none are verified", () => {
@@ -143,8 +162,13 @@ describe("portfolio proof metadata", () => {
 });
 
 describe("case-study snapshots and verification", () => {
-  it("gives Event Horizon, NovaTech, and TaskFlow recruiter snapshots", () => {
-    for (const id of ["event-horizon", "novatech-solutions", "taskflow"] as const) {
+  it("gives Event Horizon, NovaTech, TaskFlow, and ResolveOps recruiter snapshots", () => {
+    for (const id of [
+      "event-horizon",
+      "novatech-solutions",
+      "taskflow",
+      "resolveops",
+    ] as const) {
       const study = getCaseStudy(id);
       expect(study?.snapshot?.role).toBeTruthy();
       expect(study?.snapshot?.architecture).toBeTruthy();

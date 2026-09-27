@@ -36,6 +36,8 @@ export interface Project {
    * Full `proofPoints` stay available for other surfaces.
    */
   featuredProofPoints?: string[];
+  /** Optional supporting line under a live-demo CTA (e.g. no sign-in). */
+  liveDemoNote?: string;
 }
 
 export const projects: Project[] = [
@@ -114,6 +116,31 @@ export const projects: Project[] = [
     featuredProofPoints: [
       "React + Angular clients",
       "Offline queue + optimistic concurrency",
+    ],
+  },
+  {
+    id: "resolveops",
+    title: "ResolveOps",
+    category: "web",
+    description:
+      "IT service and incident management with Angular, Spring Boot, PostgreSQL, and AWS—plus a no-login Interactive Demo for recruiters.",
+    technologies: ["Angular", "Spring Boot", "PostgreSQL", "AWS"],
+    image: "/projects/resolveops/demo-queue.jpg",
+    imageAlt:
+      "ResolveOps Interactive Demo technician ticket queue with sample tickets, the Employee / Technician / Administrator role switcher, and Resolve Blue accents",
+    liveDemo: "https://dm3qr6hca0sa0.cloudfront.net/demo",
+    liveDemoNote: "No sign-in required · Sample data · Read-only",
+    featured: true,
+    href: "/projects/resolveops",
+    proofPoints: [
+      "Public Interactive Demo",
+      "Cognito + PostgreSQL RBAC",
+      "SLA + audit separation",
+      "Human-reviewed AI architecture",
+    ],
+    featuredProofPoints: [
+      "Public Interactive Demo · no sign-in",
+      "Cognito + PostgreSQL RBAC",
     ],
   },
   {
@@ -381,6 +408,9 @@ export function getProjectHref(project: Project): string {
 }
 
 export function getProjectCtaLabel(project: Project): string {
+  if (project.id === "resolveops") {
+    return "Open Interactive Demo";
+  }
   if (
     project.id === "kilo-toolkit" ||
     project.category === "it" ||
@@ -460,6 +490,8 @@ export function getProjectStatusKind(
     case "event-horizon":
     case "taskflow":
       return "live-demo";
+    case "resolveops":
+      return "live-demo";
     case "novatech-solutions":
       return "production-verified";
     case "starlenz":
@@ -487,6 +519,9 @@ export function getProjectStatusLabel(
 
 /** Visitor-facing control that opens a public surface — not a status badge. */
 export function getPublicSurfaceLinkLabel(id: string): string {
+  if (id === "resolveops") {
+    return "Open Interactive Demo";
+  }
   const kind = getProjectStatusKind(id);
   if (kind === "production-verified" || kind === "architecture-demo" || kind === "demo") {
     return "Open demo";
@@ -495,6 +530,12 @@ export function getPublicSurfaceLinkLabel(id: string): string {
 }
 
 export function getPublicSurfaceCta(id: string): { title: string; body: string } {
+  if (id === "resolveops") {
+    return {
+      title: "Open the Interactive Demo",
+      body: "No sign-in required. Sample data · Read-only. Production Cognito routes stay separate.",
+    };
+  }
   const kind = getProjectStatusKind(id);
   if (kind === "production-verified" || kind === "architecture-demo") {
     return {
